@@ -1,0 +1,24 @@
+{
+  "name": "L'Ultima Veglia",
+  "short_name": "Veglia",
+  "description": "Tower defense pixel art dark fantasy",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#07060a",
+  "theme_color": "#07060a",
+  "icons": [
+    {
+      "src": "icona180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "icona540.png",
+      "sizes": "540x540",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
