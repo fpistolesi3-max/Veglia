@@ -650,7 +650,7 @@ const ENEMIES={
   mietitore:{name:'Mietitore',hp:540,speed:12,armor:13,bounty:65,dmg:3,
     big:true,slowResist:.45,breakAt:.5},
   tromba:{name:'La Tromba',hp:1350,speed:16,armor:12,bounty:130,dmg:6,boss:true,spawner:4},
-  agnello:{name:'L\'Agnello',hp:380,speed:9,armor:18,bounty:600,dmg:99,
+  agnello:{name:'L\'Agnello',hp:290,speed:9,armor:18,bounty:600,dmg:99,
     final:true,big:true,slowResist:.7,breakAt:.45,spawner:4}
 };
 /* i due atti condividono la struttura delle ondate, non le creature */
@@ -698,7 +698,7 @@ function waveDef(n){
 NOMI[1]=WAVENAMES;NOMI[2]=WAVENAMES2;NOMI[3]=WAVENAMES3;
 const HP20=Math.pow(1.16,19), HP40=HP20*Math.pow(1.09,20);
 const hpMul=n=>n<=20?Math.pow(1.16,n-1)
-  :(n<=40?HP20*Math.pow(1.09,n-20):HP40*Math.pow(1.056,n-40));
+  :(n<=40?HP20*Math.pow(1.09,n-20):HP40*Math.pow(1.05,n-40));
 const spdMul=n=>Math.min(1.45,1+ (n-1)*.014);
 
 /* ─────────── STATO ─────────── */
@@ -1961,7 +1961,7 @@ function showScreen(title,sub,lore,main,alt,score){
 }
 function menu(){
   G.state='menu';smode='menu';
-  showScreen("L'ULTIMA<br>VEGLIA",'TOWER DEFENSE · SAGRATO DI CENERE',LORE_INTRO,
+  showScreen("L'ULTIMA<br>VEGLIA",'TRE ATTI · 60 ONDATE · v3',LORE_INTRO,
     'INIZIA LA VEGLIA','IL RITO — COME SI GIOCA',
     G.best?'SPINTO FINO A: <b>'+ATTO[Math.min(3,Math.ceil(G.best/20))].hud+
       ROMAN(G.best-(Math.min(3,Math.ceil(G.best/20))-1)*20)+'</b>':null);
