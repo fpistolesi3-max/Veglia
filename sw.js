@@ -1,5 +1,5 @@
 /* Tiene il gioco in memoria: dopo la prima apertura funziona senza rete. */
-const CACHE='ultima-veglia-v1';
+const CACHE='ultima-veglia-v2';
 const FILES=['./','./index.html','./manifest.webmanifest','./icona180.png','./icona540.png'];
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE)
