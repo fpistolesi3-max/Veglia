@@ -14,6 +14,11 @@
          node tools/quaterne.js tutte 2    ogni scambio singolo, solo atto 2  */
 const { carica } = require('./harness.js');
 const { T, G } = carica();
+// qui si misura il valore di un insieme, non quanto è stato guadagnato: senza
+// aprire tutto, ogni quaterna che tocca un edificio non ancora concesso
+// tornerebbe indietro ripulita nei quattro storici e le colonne sarebbero
+// tutte uguali
+T.apriTutto();
 
 const dt = 1 / 60;
 

@@ -47,6 +47,16 @@ node tools/rilascio.js        # rigenera index.html dal gioco
 
 Tutto tranne `sim.js` e `check` richiede `npm install` (solo `@napi-rs/canvas`).
 
+Due appigli del banco che valgono per tutti i tool:
+- `VEGLIA_FILE=prima.html node tools/sim.js` fa girare il banco su un'**altra
+  copia** del gioco. È così che si confronta una modifica con la versione da cui
+  si è partiti: `git show HEAD:ultima-veglia.html > prima.html`. Se anche i
+  banchi sono cambiati serve la coppia intera (`git show HEAD:tools/…`).
+- `T.apriTutto()` apre tutti gli edifici e tutti i gradi. La chiamano
+  `quaterne.js` e `salva.js`, che misurano il valore di un insieme e non quanto
+  è stato guadagnato. **`sim.js` no**: quello deve restare il metro di chi
+  comincia adesso, con i quattro storici al primo grado.
+
 > **Nota su Windows:** `npm run check` scrive in `/tmp/g.js`, che Node risolve
 > come `C:\tmp\g.js`. Su Windows fallisce sempre con `ENOENT`, anche a sintassi
 > corretta — non è un errore del gioco. L'equivalente a mano:
@@ -129,10 +139,13 @@ fermato alle venti e chi ha tirato avanti nell'infinito — conta l'ondata.
 `segna()` infila, riordina e taglia a `NALBO`; ci passa anche l'abbandono.
 
 **Memoria**, due chiavi via `window.storage`, mai `localStorage`:
-- `veglia:prog` → `PROG` = `{unl, fin, rec}`: fin dove si è arrivati, quali
-  scenari sono **compiuti** (`unl` non basta: l'ultimo scenario non ha un
-  successivo da sbloccare) e l'albo. Migra dal vecchio `veglia:best` e dal
-  vecchio `rec[a]` a record singolo (`migraProg`).
+- `veglia:prog` → `PROG` = `{unl, fin, rec, arm, ucc, tk}`: fin dove si è
+  arrivati, quali scenari sono **compiuti** (`unl` non basta: l'ultimo scenario
+  non ha un successivo da sbloccare), l'albo, l'ultima quaterna per scenario, i
+  caduti contati **per mondo** (`ucc`) e **per edificio** (`tk`). Migra dal
+  vecchio `veglia:best` e dal vecchio `rec[a]` a record singolo (`migraProg`);
+  una memoria senza `ucc`/`tk` riparte da zero contatori, cioè dai quattro
+  storici — voluto: sono l'unica cosa che si può dare a chi non ha una storia.
 - `veglia:save` → `SAVE`, una partita sospesa per scenario. Separata apposta:
   un salvataggio malandato non si deve portare dietro l'albo d'oro.
 - L'account Collaudo usa `veglia:prog:test` e `veglia:save:test`: apre tutte le
@@ -142,6 +155,10 @@ fermato alle venti e chi ha tirato avanti nell'infinito — conta l'ondata.
 ricavare da capo; sagome (`sp`), statistiche (`st`) e scheda della creatura
 (`def`) si rimettono a mano al ritorno. Non si salva solo ciò che dura meno di
 mezzo secondo ed è pura scena: raggi, anelli, faville.
+
+Dell'istantanea fa parte anche `mani`, chi ha messo le mani addosso a ogni
+creatura: senza, una creatura ripresa a metà rogo cadrebbe per opera di nessuno
+e i gradi di chi ci stava lavorando non avanzerebbero.
 
 I **proiettili sì**, e non è un dettaglio: un colpo insegue un *oggetto*, e un
 oggetto non si scrive su disco — il bersaglio si salva come posto nella lista
@@ -179,6 +196,9 @@ di sagoma; il **quinto non cresce**: cambia materia (marmo bianco e oro, fiamma
 azzurra) e aggiunge aureola e sigillo. Regola voluta dal progettista: al quinto
 grado niente ingrandimenti.
 
+Di quei sedici, in mano se ne hanno **quattro**: gli altri si guadagnano
+giocando (vedi «Quel che si guadagna»).
+
 **La quaterna** (`G.loadout`, `NSLOT`): si sceglie in armeria prima di scendere
 e non cambia più fino alla fine della veglia. La barra si costruisce da lì
 (`buildBar`), l'ultima usata per ogni scenario sta in `PROG.arm[a]`, e la
@@ -204,6 +224,59 @@ Sei edifici hanno meccaniche proprie, non solo numeri diversi:
 - **scongiuro** non colpisce: mette `e.armorCut`, che `damage()` toglie alla
   corazza. Si azzera a ogni giro come `slowAmt`: vale finché si sta nell'aura.
 
+## Quel che si guadagna
+
+Niente è concesso in partenza tranne i quattro storici al primo grado. Il resto
+si compra con l'unica moneta che il gioco produce: **i caduti**.
+
+**Gli edifici** si aprono contando caduti **nel mondo a cui appartengono**.
+Ogni voce di `TOWERS` dichiara `mondo` e `ucc`, e non serve altro: aggiungere un
+edificio a un mondo nuovo è scrivere due numeri lì. Le soglie sono 250, 600,
+1000, 1500, 2100, 2800 per i sei di ogni mondo — uno scenario compiuto vale
+circa 850 caduti, quindi il primo arriva a metà della prima veglia e l'ultimo
+poco dopo aver compiuto il mondo. I quattro storici hanno `ucc:0`.
+
+**I gradi** si aprono usando l'edificio: `GRADI_LIEVI` (8/30/80/160) per i
+quattro storici, `GRADI_ALTRI` (20/70/180/380) per gli altri dodici. Due
+tabelle e non una perché i quattro storici sono la quaterna di riferimento su
+cui è tarato `ATTO`, e un cancello troppo stretto lì sposterebbe il
+bilanciamento invece di aggiungersi: a 10/40/100/200 la prima Veglia non regge
+più un `×1.05` e il punto di rottura si sposta; a 8/30/80/160 torna a rompersi
+dove si è sempre rotta (`×1.10`) e il cancello si sente lo stesso — si arriva in
+fondo con otto sigilli in meno. Sono numeri da sweep, non da intuito.
+
+**Niente di tutto questo si scrive come «sbloccato»**: si ricava da due
+contatori, che sono l'unica cosa in memoria (`PROG.ucc` per mondo, `PROG.tk` per
+edificio). Una sorgente sola, e le soglie restano ritoccabili senza lasciare in
+giro sblocchi che non tornano. `edificioAperto`, `gradoMax`, `mancaEdificio` e
+`mancaGrado` sono le sole quattro domande che il resto del gioco fa.
+
+**Il caduto va a chi ci ha messo mano, non all'ultimo colpo.** Era la parte
+sbagliata alla prima stesura e si è vista subito nella simulazione: la campana
+uccide **14** creature in tutta una Veglia — di mestiere rallenta — e salmodia e
+scongiuro non fanno danno affatto, quindi sarebbero rimasti al primo grado per
+sempre. Ogni creatura porta perciò `mani`, un intero in cui ogni edificio che
+l'ha toccata accende il suo bit (`TBIT`): chi l'ha rallentata, chi le ha
+scrostato la corazza, chi sosteneva chi la colpiva (`t.mani`, rifatto in
+`ricalcolaTorri`). Quando cade, il caduto va a tutti loro. Accendere un bit
+costa un OR: si può fare nei cicli caldi. Con l'attribuzione giusta la campana
+passa da 14 a 585 e gli scenari 2-6 tornano **identici al bit** a prima.
+
+Il conto **non** si scrive su disco a ogni morte — sarebbero centinaia di
+scritture per ondata a ×3: si segna `progSporco` e si salva ai punti fermi (fine
+ondata, sospensione, fine partita) e subito quando qualcosa si apre, che è raro.
+`soglieProssime` tiene la prossima soglia di ogni mondo, così a ogni caduto si
+confronta un numero e non sedici edifici; va rifatta (`ricalcolaSoglie`) quando
+cambia quel che è aperto: avvio, mondo nuovo, cambio di profilo, soglia varcata.
+
+**L'avviso** (`annuncia`/`avvisiTick`, `#avviso`) compare e scompare da solo in
+alto, dove non incrocia il banner dell'ondata. Uno per volta e in coda: in
+un'ondata fitta se ne aprono due nello stesso istante e due scritte sovrapposte
+non le legge nessuno. Il tempo è quello vero, non quello di gioco — a ×3 un
+avviso durerebbe un terzo.
+
+Il **Collaudo** apre tutto, come apre tutte le veglie: è un banco di prova.
+
 **Armeria** (`armeria(scegli)`): una schermata, due modi — si sfoglia dai mondi,
 si sceglie dalla mappa prima di scendere. Tiene la legenda degli **edifici**,
 che è roba della campagna: le pietre sono le stesse dappertutto. Il compendio
@@ -213,6 +286,16 @@ invece di restare in cache. In alto mostra sempre i quattro slot della quaterna:
 in modalità scelta si tocca prima lo slot e poi `SCEGLI` sull'edificio. Se
 l'edificio è già equipaggiato, i due slot si scambiano. Ogni riga ha un tasto
 `INFO` che apre sprite, costi e statistiche di tutti e cinque i gradi.
+
+Il catalogo è **raggruppato per mondo** e ogni riga ha tre stati, che si devono
+leggere senza leggere una parola: aperta; **sigillata** — il mondo è ancora
+chiuso, catena in diagonale e lucchetto sull'edificio, nessun conto da mostrare
+perché quei caduti non li si può nemmeno fare; **in conto** — il mondo è aperto
+ma l'edificio no: via la catena, resta l'ombra e compare la barra con quanti ne
+mancano. Il lucchetto sta sulla sagoma e non sul tasto `INFO`: la scheda si deve
+poter leggere anche di quel che non si è guadagnato, e nella scheda i gradi
+chiusi dicono quanti caduti mancano. In partita lo stesso conto sta sul tasto
+del pannello (`GRADO III · −40`) invece del prezzo.
 
 **Sigilli (vite):** se ne guadagna **1 per ondata** e si muore quando scendono
 sotto zero. Nella Veglia si parte da **0** e le prime ondate non perdonano
@@ -235,6 +318,12 @@ più alto per cui il giocatore-tipo arriva in fondo, e si rompe attorno a
 quanto sembri perché la parte restante del gradino sta nel tracciato, che dopo
 il primo scenario si accorcia.
 
+`sim.js` gioca un profilo **appena nato**: la prima Veglia si apre con i quattro
+storici al primo grado e i gradi si guadagnano durante la partita (il banco li
+stampa all'inizio e alla fine di ogni scenario). È il caso peggiore vero, ed è
+l'unico scenario che il cancello degli sblocchi cambi: dal secondo in poi i
+gradi sono già stati guadagnati e i numeri tornano identici a prima.
+
 Il bot di `sim.js` erige sulle venti posizioni scelte a mano di `BASE1`, e
 **quelle non si toccano**: sono il metro con cui è stato tarato tutto, e
 cambiarle rende incomparabili le simulazioni vecchie e nuove. Vale solo per la
@@ -242,7 +331,11 @@ Veglia; gli altri scenari hanno un altro percorso e ricavano le posizioni dalla
 griglia, in ordine di percorrenza.
 
 **Quaterne** (`tools/quaterne.js`). Da quando gli edifici sono otto, il bersaglio
-non è più «le quattro torri» ma *qualunque quaterna legale*. Il banco gioca la
+non è più «le quattro torri» ma *qualunque quaterna legale*. Il banco apre tutto
+(`T.apriTutto()`) prima di cominciare — qui si misura il valore di un insieme,
+non quanto è stato guadagnato: se no ogni quaterna che tocca un edificio non
+concesso tornerebbe indietro ripulita nei quattro storici e le colonne sarebbero
+tutte uguali. Gioca la
 stessa partita con quaterne diverse e le mette una accanto all'altra; ordina la
 quaterna per costo diviso gittata, perché una quaterna è un **insieme** e senza
 ordinare si finisce per misurare in quale riquadro è finito un edificio.

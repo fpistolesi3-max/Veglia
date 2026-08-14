@@ -9,6 +9,9 @@
    Uso:  node tools/salva.js [scenario]                                 */
 const { carica } = require('./harness.js');
 const { T, G } = carica();
+// la prova usa una quaterna che tocca le meccaniche più difficili da salvare
+// (caldaia e salmodia): serve averle in mano, e un profilo appena nato non le ha
+T.apriTutto();
 
 const atto = Number(process.argv[2]) || 2;
 const dt = 1 / 60;
