@@ -2030,16 +2030,34 @@ const NALBO=5;
    così l'infinito non diventa il modo migliore per fare cassa.
    Il vincolo che regge tutto: quel che un giorno si comprerà con denaro vero
    sono frammenti, mai potenza che i frammenti non diano già da soli. */
-const FRAM_COSTO={reliquiario:450,rotaia:650};
-/* ...e i frammenti, da soli, non bastano. Un edificio avanzato è custodito dal
-   suo mondo: prima se ne compie la prima veglia, poi lo si apre. Serve a una
-   cosa sola, ma grossa: il giorno che i frammenti si compreranno, il denaro
-   potrà risparmiare la fatica di rifare una strada, mai quella di farla la
-   prima volta. Senza questa riga il vincolo qui sopra è una promessa; con
-   questa riga è una porta chiusa. */
+/* ═══ LA SCALA DEGLI EDIFICI ═══
+   Sei edifici ci sono da subito: meno di quattro e la quaterna non si riempie,
+   sei perché la prima veglia abbia una scelta e non una dotazione. Gli altri
+   dieci si aprono a due condizioni insieme — la veglia che li concede dev'essere
+   compiuta, e vanno pagati in frammenti.
+   La prima condizione tiene il denaro fuori dalla progressione: non si compra
+   una strada che non si è fatta, e un edificio della Città non si concede a chi
+   la Città non l'ha ancora vista. La seconda è quel che rende l'armeria una cosa
+   che si costruisce invece di una che ti viene consegnata.
+   `v` è la veglia che apre, `fr` quanto costa aprire. Sta tutto qui, ed è
+   voluto: quando i mondi avranno più veglie — e le avranno — la scala si
+   rispalma cambiando questa tabella, senza toccare una riga di logica. */
+const TOR_APRE={
+  // IL CAMPANARO
+  salmodia:{v:1,fr:80},  reliquiario:{v:1,fr:450,av:1},
+  caldaia:{v:2,fr:100},
+  scongiuro:{v:3,fr:120},
+  // LA CITTÀ SENZA ALBA
+  impulso:{v:4,fr:140},  plasma:{v:4,fr:160},  rotaia:{v:4,fr:650,av:1},
+  stasi:{v:5,fr:180},    sciame:{v:5,fr:200},
+  disturbo:{v:6,fr:220}
+};
+const torCosto=k=>{const t=TOR_APRE[k];return t?t.fr:0;};
+const torVeglia=k=>{const t=TOR_APRE[k];return t?t.v:0;};
+// «avanzato» resta il nome dei due raggi, non di tutto ciò che è chiuso
+const torAvanzata=k=>!!(TOR_APRE[k]&&TOR_APRE[k].av);
 const framMondo=k=>CY_TOWER_SET.has(k)?2:1;
-const framSoglia=k=>{const s=MONDO[framMondo(k)].scen;return s.length?s[0]:0;};
-const torApribile=k=>{const a=framSoglia(k);return !a||!!PROG.fin[a];};
+const torApribile=k=>{const a=torVeglia(k);return !a||!!PROG.fin[a];};
 const FRAM_PRIMA={1:50,2:80,3:120,4:150,5:190,6:240};
 const FRAM_REC={1:10,2:15};   // per mondo: i mondi ancora chiusi ereditano il secondo
 const FRAM_TETTO=50;          // al giorno, record e infinito insieme
@@ -2091,10 +2109,10 @@ function framDai(n,tetto){
   return n;
 }
 const framRiga=()=>framSess>0?' · '+FRAM_SEGNO+' <b>+'+framSess+'</b>':'';
-const torSbloccata=k=>!FRAM_COSTO[k]||COLLAUDO||!!(PROG.sbl&&PROG.sbl[k]);
+const torSbloccata=k=>!TOR_APRE[k]||COLLAUDO||!!(PROG.sbl&&PROG.sbl[k]);
 function torSblocca(k){
-  const c=FRAM_COSTO[k];
-  if(!c||torSbloccata(k)||!torApribile(k)||(PROG.fr|0)<c)return false;
+  const c=torCosto(k);
+  if(!TOR_APRE[k]||torSbloccata(k)||!torApribile(k)||(PROG.fr|0)<c)return false;
   PROG.fr=(PROG.fr|0)-c;
   if(!PROG.sbl||typeof PROG.sbl!=='object')PROG.sbl={};
   PROG.sbl[k]=true;progSalva();return true;
@@ -4524,9 +4542,9 @@ function armRiga(k){
     /* finché il mondo non l'ha concesso il prezzo non c'entra niente: dire
        «SERVE ❖650» a chi non può comprarlo comunque manda a raccogliere
        frammenti per una porta che non si apre coi frammenti */
-    if(!torApribile(k))azione='<span class="acAct acGate">COMPI<br>'+ATTO[framSoglia(k)].nome+'</span>';
+    if(!torApribile(k))azione='<span class="acAct acGate">COMPI<br>'+ATTO[torVeglia(k)].nome+'</span>';
     else{
-      const c=FRAM_COSTO[k],puoi=(PROG.fr|0)>=c;
+      const c=torCosto(k),puoi=(PROG.fr|0)>=c;
       azione='<button type="button" class="acAct armApri'+(puoi?'':' no')+'" data-arm-apri="'+k+
         '">'+(puoi?'APRI':'SERVE')+' '+FRAM_SEGNO+c+'</button>';
     }
@@ -4539,7 +4557,7 @@ function armRiga(k){
     '<button type="button" class="acBody" data-arm-info="'+k+'">'+
       '<span class="acI">'+spr(k+'1',2)+'</span>'+
       '<span class="acN">'+cfg.short+'</span>'+
-      (chiusa?'<span class="acAdv">AVANZATO</span>':'')+
+      (chiusa?'<span class="acAdv">'+(torAvanzata(k)?'AVANZATO':'CHIUSO')+'</span>':'')+
     '</button>'+azione+'</div>';
 }
 function armCosto(k,lv){
@@ -4583,13 +4601,13 @@ function armDettaglio(k){
     '<div class="armInfoHead"><div class="nome">'+cfg.name+'</div><div class="ruolo">'+cfg.ruolo+'</div>'+ 
     '<div class="desc">'+cfg.desc+'</div></div>';
   if(!torSbloccata(k)){
-    const c=FRAM_COSTO[k],puoi=(PROG.fr|0)>=c,nomeMondo=MONDO[framMondo(k)].nome,
-      soglia=framSoglia(k),aperto=torApribile(k);
-    h+='<div class="armChiuso">Edificio <b>avanzato</b> di <b>'+nomeMondo+'</b>: si apre una volta '+
-      'sola e da lì è tuo in ogni veglia, di qualsiasi mondo.<br>Costa '+
-      FRAM_SEGNO+' <b>'+c+'</b> · ne hai '+FRAM_SEGNO+' <b>'+(PROG.fr|0)+'</b>'+
-      (aperto?'':'<br><br>Ma i frammenti da soli non bastano: lo custodisce il suo mondo, e '+
-        'si concede solo a chi ne ha già compiuto la prima veglia — <b>'+ATTO[soglia].nome+'</b>.')+
+    const c=torCosto(k),puoi=(PROG.fr|0)>=c,nomeMondo=MONDO[framMondo(k)].nome,
+      soglia=torVeglia(k),aperto=torApribile(k);
+    h+='<div class="armChiuso">Edificio '+(torAvanzata(k)?'<b>avanzato</b> ':'')+'di <b>'+
+      nomeMondo+'</b>: si apre una volta sola e da lì è tuo in ogni veglia, di qualsiasi mondo.'+
+      '<br>Costa '+FRAM_SEGNO+' <b>'+c+'</b> · ne hai '+FRAM_SEGNO+' <b>'+(PROG.fr|0)+'</b>'+
+      (aperto?'':'<br><br>Ma i frammenti da soli non bastano: lo custodisce il suo mondo, e si '+
+        'concede solo a chi ha compiuto <b>'+ATTO[soglia].nome+'</b>.')+
       '</div>'+
       (aperto
         ?'<button type="button" class="armInfoPick'+(puoi?'':' no')+'" data-arm-apri="'+k+'">'+
@@ -4624,13 +4642,15 @@ function buildArmeria(){
     'si cambia più: sceglila guardando la veglia che ti aspetta, non l\'ultima che hai vinto.'+
     '<br><br>Ogni edificio ha <b>cinque gradi</b>: i primi quattro crescono di sagoma, il quinto '+
     'cambia materia — marmo e oro, fiamma fredda — e non si ingrandisce più.'+
-    '<br><br>Un edificio per mondo è <b>avanzato</b> e comincia chiuso: si apre con i '+
-    '<b>frammenti</b> ('+FRAM_SEGNO+'), che restano fra una veglia e l\'altra e si raccolgono '+
-    'compiendo una veglia per la prima volta, battendo il proprio record e tenendo le ondate '+
-    'oltre la ventesima. Aperto una volta, è tuo per sempre, in ogni veglia di ogni mondo.'+
-    '<br><br>I frammenti però non bastano da soli: ogni edificio avanzato <b>lo custodisce il '+
-    'suo mondo</b>, e si concede solo a chi ne ha già compiuto la <b>prima veglia</b>. Non c\'è '+
-    'scorciatoia che salti quella strada.</div>';
+    '<br><br><b>Sei</b> edifici li hai da subito. Gli altri <b>dieci</b> cominciano chiusi e '+
+    'chiedono due cose insieme: la <b>veglia che li concede</b> dev\'essere compiuta, e vanno '+
+    'pagati in <b>frammenti</b> ('+FRAM_SEGNO+'). I frammenti restano fra una veglia e l\'altra '+
+    'e si raccolgono compiendo una veglia per la prima volta, battendo il proprio record e '+
+    'tenendo le ondate oltre la ventesima.'+
+    '<br><br>Nessuna delle due condizioni sostituisce l\'altra: <b>lo custodisce il suo mondo</b>, '+
+    'e le pietre della Città non si concedono a chi la Città non l\'ha ancora vista, per quanti '+
+    'frammenti abbia in mano. Aperto una volta, però, un edificio è tuo per sempre — in ogni '+
+    'veglia di ogni mondo, anche tornando indietro.</div>';
   for(let m=1;m<=2;m++){
     const lista=TORDER_MONDO[m-1];
     h+='<div class="cmpH">'+MONDO[m].nome+' · '+conta(lista.length)+' edifici</div>';
@@ -4679,7 +4699,7 @@ el('scLore').addEventListener('click',ev=>{
   const apri=hit('[data-arm-apri]');
   if(apri){
     audio();
-    const k=apri.dataset.armApri,c=FRAM_COSTO[k]||0;
+    const k=apri.dataset.armApri,c=torCosto(k);
     if(torSblocca(k)){
       armAvviso='<b>'+TOWERS[k].short+'</b> è aperta · da ora è tua in ogni veglia';
       // appena aperta, se c'è uno slot libero ci entra: era quello che si voleva
