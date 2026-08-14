@@ -220,6 +220,13 @@ canvas#menubg.off{display:none}
 #screen .btns{margin-top:22px;width:100%;max-width:300px;display:flex;flex-direction:column;gap:8px}
 #screen .scoreline{font-size:10px;letter-spacing:.14em;color:#8b7f6c;margin-top:10px}
 #screen .scoreline b{color:#c9a227}
+/* la colonna sonora si spegne da qui: sta in un angolo perché nelle schermate
+   il tasto ♪ dell'HUD è coperto e non si raggiunge */
+#bMus{position:absolute;top:8px;right:10px;z-index:3;
+  border:1px solid #332b3d;border-radius:3px;background:rgba(10,8,14,.55);
+  color:#8b7f6c;font:600 12px/1 ui-monospace,monospace;padding:5px 7px;letter-spacing:.06em}
+#bMus.spento{color:#584f45;border-color:#241f2b}
+#bMus:active{background:#2a2016}
 .hidden{display:none!important}
 </style>
 </head>
@@ -271,6 +278,7 @@ canvas#menubg.off{display:none}
   </div>
 
   <div id="screen">
+    <button id="bMus" title="colonna sonora">♫</button>
     <h1 id="scTitle">L'ULTIMA<br>VEGLIA</h1>
     <div class="rule"></div>
     <div class="sub" id="scSub">TOWER DEFENSE · SAGRATO DI CENERE</div>
@@ -2010,6 +2018,9 @@ buildGrid();
 /* ─────────── AUDIO ─────────── */
 let AC=null,noiseBuf=null;
 function audio(){
+  // ogni gesto passa di qui: è il punto in cui i browser permettono di far
+  // partire l'audio, e quindi anche la colonna sonora
+  musicaAggiorna();
   if(AC)return AC;
   try{AC=new (window.AudioContext||window.webkitAudioContext)();
     noiseBuf=AC.createBuffer(1,AC.sampleRate*.5,AC.sampleRate);
@@ -2017,6 +2028,61 @@ function audio(){
     for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
   }catch(e){}
   return AC;
+}
+/* ═══ COLONNA SONORA ═══
+   Suona nelle schermate e tace in partita: è una regola sola, e sta qui
+   invece che sparsa nei pulsanti, così non c'è un ramo del menu che si
+   dimentica di spegnerla.
+   È l'unico pezzo del gioco che non sta dentro l'HTML: un MP3 da otto mega
+   in base64 farebbe pesare la pagina undici, e il service worker la riscarica
+   a ogni avvio. Il file sta accanto, e la cache se lo tiene.
+   I browser non lasciano partire l'audio senza un gesto dell'utente: la si
+   accende al primo tocco, non al caricamento. */
+const MUSICA={el:null,vol:.45,acceso:true,dentro:false,fade:null};
+function musicaInit(){
+  if(MUSICA.el)return;
+  try{
+    const a=document.createElement('audio');
+    if(!a||typeof a.play!=='function')return;   // il banco di prova non ha audio
+    a.src='colonna-sonora.mp3';a.loop=true;a.preload='auto';a.volume=0;
+    MUSICA.el=a;
+  }catch(e){}
+}
+function musicaSfuma(a,verso){
+  if(!MUSICA.el)return;
+  clearInterval(MUSICA.fade);
+  const passo=verso>0?.045:-.06;
+  MUSICA.fade=setInterval(()=>{
+    if(!MUSICA.el)return clearInterval(MUSICA.fade);
+    let v=MUSICA.el.volume+passo;
+    if(v>=MUSICA.vol){v=MUSICA.vol;clearInterval(MUSICA.fade);}
+    if(v<=0){v=0;clearInterval(MUSICA.fade);try{MUSICA.el.pause();}catch(e){}}
+    try{MUSICA.el.volume=Math.max(0,Math.min(1,v));}catch(e){}
+  },40);
+}
+/* la chiama chi cambia schermata: decide da sola se è il caso di suonare */
+function musicaAggiorna(){
+  musicaInit();
+  if(!MUSICA.el)return;
+  const deve=MUSICA.acceso&&G.state!=='play';
+  if(deve&&!MUSICA.dentro){
+    MUSICA.dentro=true;
+    const p=MUSICA.el.play();
+    if(p&&p.catch)p.catch(()=>{});   // niente gesto ancora: riproverà al prossimo
+    musicaSfuma(MUSICA.el,1);
+  }else if(!deve&&MUSICA.dentro){
+    MUSICA.dentro=false;
+    musicaSfuma(MUSICA.el,-1);
+  }
+}
+function musicaToggle(){
+  MUSICA.acceso=!MUSICA.acceso;
+  if(!MUSICA.acceso){MUSICA.dentro=false;musicaSfuma(MUSICA.el,-1);}
+  else musicaAggiorna();
+  try{if(window.storage&&window.storage.set)
+    window.storage.set('veglia:musica',MUSICA.acceso?'1':'0');}catch(e){}
+  const b=el('bMus');if(b){b.textContent=MUSICA.acceso?'♫':'♫✕';
+    b.classList.toggle('spento',!MUSICA.acceso);}
 }
 function tone(f,dur,type,vol,slide){
   if(!G.sound||!AC)return;
@@ -4078,6 +4144,7 @@ el('bSpeed').addEventListener('click',()=>{
   el('bSpeed').textContent='×'+G.speed;
   el('bSpeed').classList.toggle('on',G.speed>1);
 });
+el('bMus').addEventListener('click',ev=>{ev.stopPropagation();musicaToggle();});
 el('bSound').addEventListener('click',()=>{
   audio();G.sound=!G.sound;
   el('bSound').textContent=G.sound?'♪':'✕';
@@ -4224,11 +4291,13 @@ function buildHelp(){
 function hideScreen(){
   el('screen').classList.add('off');
   el('menubg').classList.add('off');
+  musicaAggiorna();          // si scende in campo: la musica sfuma
 }
 function showScreen(title,sub,lore,main,alt,score,alt2,alt3){
   const s=el('screen');s.className='';
   el('menubg').classList.remove('off');
   menuBgSync();
+  musicaAggiorna();          // si torna a una schermata: la musica riprende
   el('scTitle').innerHTML=title;
   el('scSub').textContent=sub;
   el('scLore').innerHTML=lore;
@@ -4922,6 +4991,9 @@ function riprendiOScendi(a){if(!riprendi(a))startScen(a);}
     if(p&&typeof p==='object')
       for(let a=1;a<=NSCEN;a++)if(p[a]&&p[a].act)SAVE[a]=p[a];
   }
+  const mus=await window.storage.get('veglia:musica');
+  if(mus&&mus.value==='0'){MUSICA.acceso=false;
+    const b=el('bMus');if(b){b.textContent='♫✕';b.classList.add('spento');}}
   tsel=PROG.unl;msel=mondoDi(PROG.unl);
   if(G.state==='menu'&&smode==='menu')menu();
 }catch(e){}})();

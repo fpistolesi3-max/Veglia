@@ -86,7 +86,7 @@ function carica(opzioni = {}) {
         'haSalvataggio,scenariSospesi,SAVE,apriPausa,chiudiPausa,gameOver,' +
         'TORDER,NSLOT,QUATERNA_BASE,quaterneValida,ricalcolaTorri,arretra,buildBar,' +
         'armeria,buildArmeria,help,buildHelp,damage,tstats,makeSprite,ART,PAL_TOW,' +
-        'cambiaProfilo};' +
+        'cambiaProfilo,MUSICA,musicaAggiorna,musicaToggle,hideScreen,lex};' +
         '\nglobalThis.__T.getProfilo=()=>({collaudo:COLLAUDO,unl:PROG.unl,msel,tsel,smode});' +
         '\nglobalThis.__T.getArm=()=>({armSel:armSel.slice(),armScegli});' +
         '\nglobalThis.__T.setArm=(q)=>{armSel=q.slice();};' +

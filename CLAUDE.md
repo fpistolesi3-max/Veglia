@@ -15,6 +15,7 @@ bundler, non aggiungere librerie esterne.**
 | File | Ruolo |
 |---|---|
 | `ultima-veglia.html` | il gioco. È la sorgente di verità |
+| `colonna-sonora.mp3` | musica delle schermate. L'unico pezzo fuori dall'HTML |
 | `index.html` | copia di `ultima-veglia.html` + meta PWA + icona in base64 |
 | `sw.js` | service worker (rete-prima per l'HTML, cache per il resto) |
 | `manifest.webmanifest`, `icona*.png` | icona e configurazione dell'app |
@@ -279,6 +280,24 @@ fuori disegnandole, e che valgono per la prossima:
 `tools/sheet.js torri` le affianca tutte grado per grado; con un quarto
 argomento (`spine,ossario,caldaia`) se ne guardano poche per volta, che a dieci
 colonne non si legge niente.
+
+**Colonna sonora** (`MUSICA`, `musicaAggiorna`). Suona nelle schermate e tace
+in partita — pausa compresa, che è ancora una partita in corso. La regola sta
+in un posto solo, agganciata a `showScreen`/`hideScreen`: se fosse sparsa nei
+pulsanti, prima o poi un ramo del menu si dimenticherebbe di spegnerla.
+Entra e esce in dissolvenza, e il tasto `#bMus` in alto a destra la spegne
+(la preferenza va in `veglia:musica`) — serve perché nelle schermate il tasto
+`♪` dell'HUD è coperto e non si raggiunge.
+
+I browser non fanno partire l'audio senza un gesto: la si accende dentro
+`audio()`, che è già il punto in cui passa ogni tocco, non al caricamento.
+
+**È l'unica cosa del gioco che non sta dentro l'HTML**, ed è una deroga
+consapevole alla regola del file unico: un MP3 da otto mega in base64 ne
+farebbe undici dentro la pagina, e il service worker è rete-prima — la
+riscaricherebbe **a ogni avvio**. Come file accanto si scarica una volta e la
+cache se lo tiene (è in `FILES` di `sw.js`). La regola del file unico riguarda
+il *codice*: niente moduli, niente bundler. Non i media.
 
 **Vincoli tecnici da rispettare:**
 - Niente `localStorage`/`sessionStorage`. Il record usa `window.storage` se c'è.
