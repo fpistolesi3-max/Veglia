@@ -1,0 +1,13 @@
+{
+  "name": "ultima-veglia",
+  "version": "3.0.0",
+  "private": true,
+  "description": "Tower defense pixel art dark fantasy, file singolo HTML",
+  "scripts": {
+    "sim": "node tools/sim.js",
+    "shot": "node tools/shot.js",
+    "sheet": "node tools/sheet.js",
+    "check": "node -e \"const{estraiScript}=require('./tools/harness.js');const fs=require('fs');fs.writeFileSync('/tmp/g.js',estraiScript('ultima-veglia.html'));\" && node --check /tmp/g.js && echo sintassi ok"
+  },
+  "devDependencies": { "@napi-rs/canvas": "^0.1.0" }
+}

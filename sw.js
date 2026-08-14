@@ -1,10 +1,14 @@
-/* L'Ultima Veglia — service worker v9
+/* L'Ultima Veglia — service worker v11
    Per la pagina si prova PRIMA la rete: così un aggiornamento caricato su
    GitHub si vede al primo avvio con connessione, senza dover toccare nulla.
    La cache resta come riserva per l'uso offline.
-   La v9 introduce il Mondo II neon e l'account Collaudo separato. */
-const CACHE='ultima-veglia-v10';
-const FILES=['./','./index.html','./manifest.webmanifest','./icona180.png','./icona540.png'];
+   La v11 aggiunge la colonna sonora delle schermate. */
+const CACHE='ultima-veglia-v11';
+/* La colonna sonora è l'unico pezzo grosso che non sta dentro la pagina: si
+   scarica una volta e resta in cache, come le icone. In base64 dentro l'HTML
+   peserebbe undici mega e il rete-prima la riscaricherebbe a ogni avvio. */
+const FILES=['./','./index.html','./manifest.webmanifest','./icona180.png','./icona540.png',
+  './colonna-sonora.mp3'];
 
 self.addEventListener('install',e=>{
   e.waitUntil(
