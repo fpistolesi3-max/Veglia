@@ -200,6 +200,11 @@ canvas#menubg.off{display:none}
 .armCard.chiusa .acI{opacity:.4}
 .armApri{border:1px solid #4a3a6a;background:#161022;color:#b79ae8;line-height:1.35}
 .armApri.no{border-color:#2f2740;background:#0e0b16;color:#6b5f7d}
+/* la porta chiusa dal mondo, non dal prezzo: niente viola, che qui è il colore
+   dei frammenti e prometterebbe che basti pagare */
+.acGate,.armInfoPick.gate{display:block;border:1px dashed #3a3344;background:#0b0910;
+  color:#6f6656;line-height:1.35;text-align:center}
+.armInfoPick.gate{padding:7px 4px;border-radius:2px}
 .armInfoPick,.armBack{min-height:24px;padding:4px 3px;border-radius:2px;
   font:600 7.5px/1.2 ui-monospace,monospace;letter-spacing:.08em}
 @media (min-width:480px){
@@ -2026,6 +2031,15 @@ const NALBO=5;
    Il vincolo che regge tutto: quel che un giorno si comprerà con denaro vero
    sono frammenti, mai potenza che i frammenti non diano già da soli. */
 const FRAM_COSTO={reliquiario:450,rotaia:650};
+/* ...e i frammenti, da soli, non bastano. Un edificio avanzato è custodito dal
+   suo mondo: prima se ne compie la prima veglia, poi lo si apre. Serve a una
+   cosa sola, ma grossa: il giorno che i frammenti si compreranno, il denaro
+   potrà risparmiare la fatica di rifare una strada, mai quella di farla la
+   prima volta. Senza questa riga il vincolo qui sopra è una promessa; con
+   questa riga è una porta chiusa. */
+const framMondo=k=>CY_TOWER_SET.has(k)?2:1;
+const framSoglia=k=>{const s=MONDO[framMondo(k)].scen;return s.length?s[0]:0;};
+const torApribile=k=>{const a=framSoglia(k);return !a||!!PROG.fin[a];};
 const FRAM_PRIMA={1:50,2:80,3:120,4:150,5:190,6:240};
 const FRAM_REC={1:10,2:15};   // per mondo: i mondi ancora chiusi ereditano il secondo
 const FRAM_TETTO=50;          // al giorno, record e infinito insieme
@@ -2080,7 +2094,7 @@ const framRiga=()=>framSess>0?' · '+FRAM_SEGNO+' <b>+'+framSess+'</b>':'';
 const torSbloccata=k=>!FRAM_COSTO[k]||COLLAUDO||!!(PROG.sbl&&PROG.sbl[k]);
 function torSblocca(k){
   const c=FRAM_COSTO[k];
-  if(!c||torSbloccata(k)||(PROG.fr|0)<c)return false;
+  if(!c||torSbloccata(k)||!torApribile(k)||(PROG.fr|0)<c)return false;
   PROG.fr=(PROG.fr|0)-c;
   if(!PROG.sbl||typeof PROG.sbl!=='object')PROG.sbl={};
   PROG.sbl[k]=true;progSalva();return true;
@@ -4507,9 +4521,15 @@ function armRiga(k){
   const chiusa=!torSbloccata(k);
   let azione;
   if(chiusa){
-    const c=FRAM_COSTO[k],puoi=(PROG.fr|0)>=c;
-    azione='<button type="button" class="acAct armApri'+(puoi?'':' no')+'" data-arm-apri="'+k+
-      '">'+(puoi?'APRI':'SERVE')+' '+FRAM_SEGNO+c+'</button>';
+    /* finché il mondo non l'ha concesso il prezzo non c'entra niente: dire
+       «SERVE ❖650» a chi non può comprarlo comunque manda a raccogliere
+       frammenti per una porta che non si apre coi frammenti */
+    if(!torApribile(k))azione='<span class="acAct acGate">COMPI<br>'+ATTO[framSoglia(k)].nome+'</span>';
+    else{
+      const c=FRAM_COSTO[k],puoi=(PROG.fr|0)>=c;
+      azione='<button type="button" class="acAct armApri'+(puoi?'':' no')+'" data-arm-apri="'+k+
+        '">'+(puoi?'APRI':'SERVE')+' '+FRAM_SEGNO+c+'</button>';
+    }
   }else if(armScegli){
     const et=slot===armSlot?'SCELTA':(dentro?'SPOSTA':'SCEGLI');
     azione='<button type="button" class="acAct armPick'+(slot===armSlot?' on':'')+
@@ -4563,12 +4583,18 @@ function armDettaglio(k){
     '<div class="armInfoHead"><div class="nome">'+cfg.name+'</div><div class="ruolo">'+cfg.ruolo+'</div>'+ 
     '<div class="desc">'+cfg.desc+'</div></div>';
   if(!torSbloccata(k)){
-    const c=FRAM_COSTO[k],puoi=(PROG.fr|0)>=c,nomeMondo=MONDO[CY_TOWER_SET.has(k)?2:1].nome;
+    const c=FRAM_COSTO[k],puoi=(PROG.fr|0)>=c,nomeMondo=MONDO[framMondo(k)].nome,
+      soglia=framSoglia(k),aperto=torApribile(k);
     h+='<div class="armChiuso">Edificio <b>avanzato</b> di <b>'+nomeMondo+'</b>: si apre una volta '+
       'sola e da lì è tuo in ogni veglia, di qualsiasi mondo.<br>Costa '+
-      FRAM_SEGNO+' <b>'+c+'</b> · ne hai '+FRAM_SEGNO+' <b>'+(PROG.fr|0)+'</b></div>'+
-      '<button type="button" class="armInfoPick'+(puoi?'':' no')+'" data-arm-apri="'+k+'">'+
-      (puoi?'APRI PER '+FRAM_SEGNO+c:'TI MANCANO '+FRAM_SEGNO+(c-(PROG.fr|0)))+'</button>';
+      FRAM_SEGNO+' <b>'+c+'</b> · ne hai '+FRAM_SEGNO+' <b>'+(PROG.fr|0)+'</b>'+
+      (aperto?'':'<br><br>Ma i frammenti da soli non bastano: lo custodisce il suo mondo, e '+
+        'si concede solo a chi ne ha già compiuto la prima veglia — <b>'+ATTO[soglia].nome+'</b>.')+
+      '</div>'+
+      (aperto
+        ?'<button type="button" class="armInfoPick'+(puoi?'':' no')+'" data-arm-apri="'+k+'">'+
+          (puoi?'APRI PER '+FRAM_SEGNO+c:'TI MANCANO '+FRAM_SEGNO+(c-(PROG.fr|0)))+'</button>'
+        :'<div class="armInfoPick gate">COMPI PRIMA '+ATTO[soglia].nome+'</div>');
   }
   else if(armScegli)h+='<button type="button" class="armInfoPick" data-arm-choose="'+k+'">ASSEGNA ALLO SLOT '+
     ROMAN(armSlot+1)+'</button>';
@@ -4601,7 +4627,10 @@ function buildArmeria(){
     '<br><br>Un edificio per mondo è <b>avanzato</b> e comincia chiuso: si apre con i '+
     '<b>frammenti</b> ('+FRAM_SEGNO+'), che restano fra una veglia e l\'altra e si raccolgono '+
     'compiendo una veglia per la prima volta, battendo il proprio record e tenendo le ondate '+
-    'oltre la ventesima. Aperto una volta, è tuo per sempre, in ogni veglia di ogni mondo.</div>';
+    'oltre la ventesima. Aperto una volta, è tuo per sempre, in ogni veglia di ogni mondo.'+
+    '<br><br>I frammenti però non bastano da soli: ogni edificio avanzato <b>lo custodisce il '+
+    'suo mondo</b>, e si concede solo a chi ne ha già compiuto la <b>prima veglia</b>. Non c\'è '+
+    'scorciatoia che salti quella strada.</div>';
   for(let m=1;m<=2;m++){
     const lista=TORDER_MONDO[m-1];
     h+='<div class="cmpH">'+MONDO[m].nome+' · '+conta(lista.length)+' edifici</div>';
