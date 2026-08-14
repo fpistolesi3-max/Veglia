@@ -173,32 +173,39 @@ canvas#menubg.off{display:none}
 .armSlot .asT{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   font-size:7px;letter-spacing:.06em;color:#c9a227}
 .armSlot.vuoto .asT{color:#584f45}
-.armR{display:flex;gap:8px;align-items:flex-start;padding:8px 6px;text-align:left;
-  border:1px solid #332b3d;border-radius:3px;margin-bottom:5px;background:rgba(14,11,19,.58);
-  width:100%;font:inherit}
-.armR.on{border-color:#c9a227;background:rgba(201,162,39,.09)}
-.armR .ap{flex:0 0 auto;width:34px;display:flex;align-items:flex-end;justify-content:center;
-  padding-top:2px}
-.armR .ap img{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
-.armR .at{flex:1 1 auto;min-width:0}
-.armR .an{display:block;font-size:9.5px;letter-spacing:.13em;color:#c9a227}
-.armR .ar{font-size:7.5px;letter-spacing:.18em;color:#7d6a4a;margin-left:6px}
-.armR .ad{display:block;font-size:8.5px;line-height:1.6;color:#7a6f60;margin-top:3px}
-.armR .ad i{color:#8fa5b0;font-style:normal}
-.armActions{flex:0 0 63px;display:flex;flex-direction:column;gap:5px}
-.armActions button,.armBack,.armInfoPick{min-height:24px;padding:4px 3px;border-radius:2px;
-  font:600 7.5px/1.2 ui-monospace,monospace;letter-spacing:.08em}
+/* catalogo: griglia di schede compatte invece di righe intere, così si vede
+   più armeria per schermata e si scorre meno. Due colonne sul telefono,
+   tre da tablet in su (vedi media query più sotto). */
+.armGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:4px}
+.armCard{display:flex;flex-direction:column;text-align:center;
+  border:1px solid #332b3d;border-radius:3px;background:rgba(14,11,19,.58);overflow:hidden}
+.armCard.on{border-color:#c9a227;background:rgba(201,162,39,.09)}
+.acBody{width:100%;display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:7px 4px 5px;background:transparent;border:0;color:inherit;font:inherit}
+.acI{height:30px;display:flex;align-items:flex-end;justify-content:center}
+.acI img{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+.acN{display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-size:9px;letter-spacing:.1em;color:#c9a227}
+.acRuolo{display:block;padding:0 4px 6px;font-size:6.8px;letter-spacing:.13em;color:#7d6a4a}
+.acAdv{display:block;margin-top:2px;font-size:6.5px;letter-spacing:.12em;color:#9a7fd0}
+.acAct{width:100%;min-height:22px;padding:4px 3px;border-radius:0;
+  font:600 7.5px/1.2 ui-monospace,monospace;letter-spacing:.06em}
 .armPick{border:1px solid #5a4a22;background:#1b1510;color:#c9a227}
 .armPick.on{border-color:#8a6f1c;background:#2a2114;color:#f7e08a}
 /* i frammenti non sono lacrime: viola, mai oro, così a colpo d'occhio non si
    confonde la moneta che resta con quella che muore a fine veglia */
 .fram{color:#b79ae8;white-space:nowrap}
-.armR.chiusa{border-color:#2a2436;background:rgba(10,8,14,.62)}
-.armR.chiusa .an{color:#7d6f95}
-.armR.chiusa .ap{opacity:.4}
-.armR .aq{display:block;font-size:7.5px;letter-spacing:.16em;color:#9a7fd0;margin-top:5px}
+.armCard.chiusa{border-color:#2a2436;background:rgba(10,8,14,.62)}
+.armCard.chiusa .acN{color:#7d6f95}
+.armCard.chiusa .acI{opacity:.4}
 .armApri{border:1px solid #4a3a6a;background:#161022;color:#b79ae8;line-height:1.35}
 .armApri.no{border-color:#2f2740;background:#0e0b16;color:#6b5f7d}
+.armInfoPick,.armBack{min-height:24px;padding:4px 3px;border-radius:2px;
+  font:600 7.5px/1.2 ui-monospace,monospace;letter-spacing:.08em}
+@media (min-width:480px){
+  .armGrid{grid-template-columns:repeat(3,1fr)}
+  #screen.wide .lore{max-width:520px}
+}
 .armChiuso{font-size:8.5px;line-height:1.7;color:#8b7f6c;margin:8px 0 2px;
   padding:7px 8px;border:1px solid #2f2740;border-radius:3px;background:rgba(22,16,34,.5)}
 .armChiuso b{color:#b79ae8}
@@ -4492,37 +4499,28 @@ function armSlotHtml(){
   }
   return h+'</div></div>';
 }
+/* scheda compatta del catalogo: tutta la descrizione/numeri che prima
+   stavano in riga ora si vedono solo aprendo l'INFO (armDettaglio), la
+   scheda stessa serve solo a orientarsi e a scegliere/aprire in fretta. */
 function armRiga(k){
   const cfg=TOWERS[k],slot=armSel.indexOf(k),dentro=slot>=0;
   const chiusa=!torSbloccata(k);
-  const st=tstats({type:k,lv:1});
-  let numeri;
-  if(cfg.sostegno)numeri='sostegno · voce '+Math.round(st.range);
-  else if(cfg.cut)numeri='scrosta '+Math.round(st.cut*100)+'% · aura '+Math.round(st.range);
-  else if(cfg.pozza)numeri='gittata '+Math.round(st.range)+' · pece '+st.dmg+'/s per '+
-    st.pozT.toFixed(1)+'s';
-  else if(cfg.aura)numeri=(st.slow>0?'rallenta '+Math.round(st.slow*100)+'% · ':'')+
-    'aura '+Math.round(st.range)+' · '+(st.dmg/st.rate).toFixed(1)+' dps';
-  else numeri='gittata '+Math.round(st.range)+' · '+(st.dmg/st.rate).toFixed(1)+' dps';
-  let scegli='';
+  let azione;
   if(chiusa){
     const c=FRAM_COSTO[k],puoi=(PROG.fr|0)>=c;
-    scegli='<button type="button" class="armApri'+(puoi?'':' no')+'" data-arm-apri="'+k+'">'+
-      (puoi?'APRI':'SERVE')+'<br>'+FRAM_SEGNO+c+'</button>';
+    azione='<button type="button" class="acAct armApri'+(puoi?'':' no')+'" data-arm-apri="'+k+
+      '">'+(puoi?'APRI':'SERVE')+' '+FRAM_SEGNO+c+'</button>';
   }else if(armScegli){
-    const et=slot===armSlot?'SCELTA':(dentro?'SPOSTA QUI':'SCEGLI');
-    scegli='<button type="button" class="armPick'+(slot===armSlot?' on':'')+
+    const et=slot===armSlot?'SCELTA':(dentro?'SPOSTA':'SCEGLI');
+    azione='<button type="button" class="acAct armPick'+(slot===armSlot?' on':'')+
       '" data-arm-choose="'+k+'">'+et+'</button>';
-  }
-  const chiuso=chiusa?'<span class="aq">EDIFICIO AVANZATO · CHIUSO · '+FRAM_SEGNO+
-    FRAM_COSTO[k]+'</span>':'';
-  return '<div class="armR'+(dentro?' on':'')+(chiusa?' chiusa':'')+'" data-t="'+k+'">'+
-    '<span class="ap">'+spr(k+'1',2)+'</span>'+
-    '<span class="at"><span class="an">'+cfg.short+
-      '<span class="ar">'+(cfg.ruolo||'')+'</span></span>'+
-      '<span class="ad">'+cfg.desc+'<br><i>'+numeri+'</i></span>'+chiuso+'</span>'+
-    '<span class="armActions">'+scegli+
-      '<button type="button" class="armMore" data-arm-info="'+k+'">INFO</button></span></div>';
+  }else azione='<span class="acRuolo">'+(cfg.ruolo||'')+'</span>';
+  return '<div class="armCard'+(dentro?' on':'')+(chiusa?' chiusa':'')+'" data-t="'+k+'">'+
+    '<button type="button" class="acBody" data-arm-info="'+k+'">'+
+      '<span class="acI">'+spr(k+'1',2)+'</span>'+
+      '<span class="acN">'+cfg.short+'</span>'+
+      (chiusa?'<span class="acAdv">AVANZATO</span>':'')+
+    '</button>'+azione+'</div>';
 }
 function armCosto(k,lv){
   const cfg=TOWERS[k];
@@ -4565,10 +4563,10 @@ function armDettaglio(k){
     '<div class="armInfoHead"><div class="nome">'+cfg.name+'</div><div class="ruolo">'+cfg.ruolo+'</div>'+ 
     '<div class="desc">'+cfg.desc+'</div></div>';
   if(!torSbloccata(k)){
-    const c=FRAM_COSTO[k],puoi=(PROG.fr|0)>=c;
-    h+='<div class="armChiuso">Edificio <b>avanzato</b>: si apre una volta sola, e da lì è '+
-      'tuo in ogni veglia.<br>Costa '+FRAM_SEGNO+' <b>'+c+'</b> · ne hai '+FRAM_SEGNO+' <b>'+
-      (PROG.fr|0)+'</b></div>'+
+    const c=FRAM_COSTO[k],puoi=(PROG.fr|0)>=c,nomeMondo=MONDO[CY_TOWER_SET.has(k)?2:1].nome;
+    h+='<div class="armChiuso">Edificio <b>avanzato</b> di <b>'+nomeMondo+'</b>: si apre una volta '+
+      'sola e da lì è tuo in ogni veglia, di qualsiasi mondo.<br>Costa '+
+      FRAM_SEGNO+' <b>'+c+'</b> · ne hai '+FRAM_SEGNO+' <b>'+(PROG.fr|0)+'</b></div>'+
       '<button type="button" class="armInfoPick'+(puoi?'':' no')+'" data-arm-apri="'+k+'">'+
       (puoi?'APRI PER '+FRAM_SEGNO+c:'TI MANCANO '+FRAM_SEGNO+(c-(PROG.fr|0)))+'</button>';
   }
@@ -4589,6 +4587,10 @@ function armDettaglio(k){
 const LETT=['nessuno','uno','due','tre','quattro','cinque','sei','sette','otto',
   'nove','dieci','undici','dodici'];
 const conta=n=>LETT[n]||String(n);
+/* il catalogo si divide per mondo, non solo per costo: ogni mondo ha la sua
+   fila di edifici e il suo avanzato da aprire, così l'esclusività si vede
+   a colpo d'occhio invece di doverla dedurre dal nome della torre. */
+const TORDER_MONDO=[TORDER.filter(k=>!CY_TOWER_SET.has(k)),TORDER.filter(k=>CY_TOWER_SET.has(k))];
 function buildArmeria(){
   if(armInfo&&TOWERS[armInfo])return armDettaglio(armInfo);
   let h=armSlotHtml()+'<div class="cmpT cmpI">'+conta(TORDER.length).replace(/^./,c=>c.toUpperCase())+
@@ -4596,12 +4598,15 @@ function buildArmeria(){
     'si cambia più: sceglila guardando la veglia che ti aspetta, non l\'ultima che hai vinto.'+
     '<br><br>Ogni edificio ha <b>cinque gradi</b>: i primi quattro crescono di sagoma, il quinto '+
     'cambia materia — marmo e oro, fiamma fredda — e non si ingrandisce più.'+
-    '<br><br>Due edifici sono <b>avanzati</b> e cominciano chiusi: si aprono con i '+
+    '<br><br>Un edificio per mondo è <b>avanzato</b> e comincia chiuso: si apre con i '+
     '<b>frammenti</b> ('+FRAM_SEGNO+'), che restano fra una veglia e l\'altra e si raccolgono '+
     'compiendo una veglia per la prima volta, battendo il proprio record e tenendo le ondate '+
-    'oltre la ventesima. Aperti una volta, sono tuoi per sempre.</div>';
-  h+='<div class="cmpH">LE CONSACRAZIONI</div>';
-  for(const k of TORDER)h+=armRiga(k);
+    'oltre la ventesima. Aperto una volta, è tuo per sempre, in ogni veglia di ogni mondo.</div>';
+  for(let m=1;m<=2;m++){
+    const lista=TORDER_MONDO[m-1];
+    h+='<div class="cmpH">'+MONDO[m].nome+' · '+conta(lista.length)+' edifici</div>';
+    h+='<div class="armGrid">'+lista.map(armRiga).join('')+'</div>';
+  }
   return h;
 }
 function armeriaAggiorna(){
