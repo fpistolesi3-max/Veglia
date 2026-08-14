@@ -41,6 +41,18 @@ canvas#game{display:block;image-rendering:pixelated;image-rendering:crisp-edges;
 #banner .b2{font-size:15px;letter-spacing:.18em;color:#d8cbb0;margin-top:3px;
   text-shadow:0 0 12px #8e1b25}
 @keyframes ban{0%{opacity:0;transform:translateY(6px)}15%{opacity:1;transform:none}75%{opacity:1}100%{opacity:0}}
+/* l'avviso di uno sblocco: compare e scompare da solo, in alto, dove non
+   incrocia il banner dell'ondata */
+#avviso{position:absolute;left:6px;right:6px;top:5%;text-align:center;pointer-events:none;
+  opacity:0;z-index:6}
+#avviso.go{animation:avv 3.2s ease-out}
+#avviso .av1{font-size:7.5px;letter-spacing:.34em;color:#8fa5b0}
+#avviso .av2{font-size:11px;letter-spacing:.14em;color:#c9a227;margin-top:3px;
+  text-shadow:0 0 10px rgba(201,162,39,.55)}
+#avviso .avBox{display:inline-block;padding:5px 12px;border:1px solid #5a4a22;border-radius:3px;
+  background:rgba(10,8,14,.92)}
+@keyframes avv{0%{opacity:0;transform:translateY(-6px)}12%{opacity:1;transform:none}
+  78%{opacity:1}100%{opacity:0;transform:translateY(-4px)}}
 
 /* ---------- BARRA TORRI ---------- */
 #bar{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:6px 2px 4px}
@@ -207,6 +219,46 @@ canvas#menubg.off{display:none}
 .armLv .lvStat b{color:#d8cbb0;font-weight:600}.armLv .lvStat i{color:#8fa5b0;font-style:normal}
 #armCont{font-size:9px;letter-spacing:.12em;color:#8b7f6c;margin:2px 0 8px}
 #armCont b{color:#c9a227}
+/* ── quel che non si è ancora guadagnato ──
+   Due stati, e devono leggersi al primo sguardo senza leggere una parola:
+   il mondo ancora sigillato porta la catena e il lucchetto; il mondo aperto
+   toglie la catena ma lascia l'edificio in ombra, con la barra che dice
+   quanti ne mancano. Il buio è lo stesso: cambia solo che cosa lo tiene. */
+.armR.chiuso{position:relative;border-color:#241f2b;background:rgba(8,6,12,.72)}
+.armR.chiuso .ap img{filter:grayscale(1) brightness(.34)}
+.armR.chiuso .an{color:#584f45}
+.armR.chiuso .ar,.armR.chiuso .ad{color:#4a423a}
+.armR.chiuso .ad i{color:#4a5a63}
+.armR.sigillato::before{content:'';position:absolute;inset:0;border-radius:3px;pointer-events:none;
+  background:repeating-linear-gradient(-52deg,rgba(120,132,142,.20) 0 4px,
+    rgba(120,132,142,.05) 4px 7px,transparent 7px 15px);}
+/* il lucchetto: un arco e un corpo, due riquadri — a questa scala un disegno
+   più dettagliato diventa una macchia */
+/* il lucchetto sta sull'edificio, non sul tasto INFO: la scheda si deve
+   poter leggere anche di quel che non si è ancora guadagnato */
+.armLucch{position:absolute;left:13px;top:50%;margin-top:-11px;width:16px;height:22px;
+  pointer-events:none;filter:drop-shadow(0 0 4px rgba(0,0,0,.95))}
+.armLucch i{position:absolute;left:3px;top:0;width:10px;height:9px;border:2px solid #6e7a84;
+  border-bottom:0;border-radius:5px 5px 0 0}
+.armLucch b{position:absolute;left:0;top:8px;width:16px;height:14px;border:1px solid #4a545c;
+  border-radius:2px;background:#20262c;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.armLucch b::after{content:'';position:absolute;left:7px;top:4px;width:2px;height:6px;
+  background:#6e7a84}
+.armR.sigillato .armActions{opacity:.45}
+/* la barra: quanti ne mancano, non una percentuale — il giocatore conta teste */
+.armProg{display:block;margin-top:6px}
+.armProg .apB{display:block;height:5px;border:1px solid #332b3d;border-radius:2px;
+  background:#0b0910;overflow:hidden}
+.armProg .apF{display:block;height:100%;min-width:2px;
+  background:linear-gradient(90deg,#5a4a22,#c9a227)}
+.armProg .apT{display:block;font-size:7.5px;letter-spacing:.14em;color:#8b7f6c;margin-top:3px}
+.armProg .apT b{color:#c9a227;font-weight:600}
+.armR.chiuso .armMore{border-color:#2b2434;color:#5f6f78}
+.armLv.chiuso .lvPic img{filter:grayscale(1) brightness(.36)}
+.armLv.chiuso .lvN{color:#584f45}
+.armLv.chiuso .lvStat{color:#584f45}
+.armLv .lvChiuso{display:block;margin-top:4px;font-size:7.5px;letter-spacing:.14em;color:#8fa5b0}
+.armLv .lvChiuso b{color:#c9a227}
 /* pausa: stessa tipografia delle schermate, ma il velo è solo un velo —
    sotto deve restare leggibile il campo con le torri e le creature ferme */
 #pausa{position:absolute;inset:0;z-index:21;display:flex;flex-direction:column;
@@ -251,6 +303,8 @@ canvas#menubg.off{display:none}
     <div id="wrap">
       <canvas id="game"></canvas>
       <div id="banner"><div class="b1" id="banA">ONDATA I</div><div class="b2" id="banB">I Penitenti</div></div>
+      <div id="avviso"><div class="avBox"><div class="av1" id="avvA">SBLOCCATO</div>
+        <div class="av2" id="avvB">—</div></div></div>
     </div>
     <div id="panel">
       <div class="ph"><span class="pn" id="pName">—</span><span class="pl" id="pLev">Liv 1</span>
@@ -1704,56 +1758,71 @@ function buildPercorso(a){
 buildPercorso(1);
 
 /* ─────────── TORRI ─────────── */
-/* Dieci edifici, quattro in campo: la quaterna si sceglie prima di scendere e
+/* Sedici edifici, quattro in campo: la quaterna si sceglie prima di scendere e
    non si cambia più fino alla fine della veglia. Ognuno ha un mestiere che gli
    altri non fanno — chi macina a contatto, chi sostiene i vicini, chi apre le
    corazze da lontano — perché la scelta sia laterale e non una classifica.
-   `ruolo` è quel mestiere in una parola, e serve all'armeria. */
+   `ruolo` è quel mestiere in una parola, e serve all'armeria.
+   `mondo` e `ucc` sono la sua storia: di che mondo è, e quanti caduti di quel
+   mondo bisogna aver contato prima che si conceda. `ucc:0` vuol dire dato in
+   mano fin dal principio — sono i quattro storici e nessun altro. Chi aggiunge
+   un edificio a un mondo nuovo scrive due numeri qui e non tocca altro. */
 const TOWERS={
   spine:{name:'TORRE DELLE SPINE',short:'SPINE',ruolo:'TIRO RAPIDO',cost:45,dmg:9,rate:.55,range:48,ap:0,
-    desc:'Quadrelli rapidi su un solo bersaglio.'},
+    mondo:1,ucc:0,desc:'Quadrelli rapidi su un solo bersaglio.'},
   braciere:{name:'BRACIERE VOTIVO',short:'BRACIERE',ruolo:'AREA',cost:80,dmg:11,rate:1.25,range:42,ap:.5,
-    splash:15,burn:5,desc:'Fuoco ad area, incendia e ignora metà corazza.'},
+    mondo:1,ucc:0,splash:15,burn:5,desc:'Fuoco ad area, incendia e ignora metà corazza.'},
   campana:{name:'CAMPANA DEL SILENZIO',short:'CAMPANA',ruolo:'RALLENTA',cost:65,dmg:7,rate:1.9,range:40,ap:1,
-    aura:true,slow:.45,desc:'Rallenta del 45% e percuote tutti nell\'aura.'},
+    mondo:1,ucc:0,aura:true,slow:.45,desc:'Rallenta del 45% e percuote tutti nell\'aura.'},
   reliquiario:{name:'RELIQUIARIO',short:'RELIQUIARIO',ruolo:'GITTATA',cost:140,dmg:52,rate:2.2,range:82,ap:1,
-    beam:true,desc:'Raggio istantaneo, lunga gittata, trapassa ogni corazza.'},
+    mondo:1,ucc:0,beam:true,desc:'Raggio istantaneo, lunga gittata, trapassa ogni corazza.'},
   ossario:{name:'OSSARIO',short:'OSSARIO',ruolo:'MACINA',cost:45,dmg:8,rate:.45,range:31,ap:.25,
-    aura:true,slow:0,desc:'Non mira: rode chiunque gli passi accanto. Gittata cortissima, '+
+    mondo:1,ucc:250,aura:true,slow:0,desc:'Non mira: rode chiunque gli passi accanto. Gittata cortissima, '+
     'va dove la via si stringe.'},
   salmodia:{name:'SALMODIA',short:'SALMODIA',ruolo:'SOSTEGNO',cost:95,dmg:0,rate:0,range:44,ap:0,
-    sostegno:{dmg:.22,rate:.11},desc:'Non colpisce: gli edifici che la odono battono '+
+    mondo:1,ucc:2800,sostegno:{dmg:.22,rate:.11},desc:'Non colpisce: gli edifici che la odono battono '+
     '<i>più forte e più spesso</i>.'},
   mangano:{name:'MANGANO',short:'MANGANO',ruolo:'COLPO GROSSO',cost:112,dmg:84,rate:2.8,range:54,ap:.8,
-    desc:'Un colpo solo, lento ed enorme, che sfonda quasi ogni corazza. Sulla truppa fitta '+
+    mondo:1,ucc:2100,desc:'Un colpo solo, lento ed enorme, che sfonda quasi ogni corazza. Sulla truppa fitta '+
     'è uno spreco.'},
   arpione:{name:'ARPIONE',short:'ARPIONE',ruolo:'ARRETRA',cost:80,dmg:7,rate:1.8,range:50,ap:.5,
-    pull:13,desc:'Fa poco male: <i>ributta indietro</i> lungo la via. Le cose grosse le smuove '+
+    mondo:1,ucc:1000,pull:13,desc:'Fa poco male: <i>ributta indietro</i> lungo la via. Le cose grosse le smuove '+
     'poco, il Signore quasi niente.'},
   caldaia:{name:'CALDAIA DI PECE',short:'CALDAIA',ruolo:'PECE',cost:95,dmg:13,rate:2.2,range:44,ap:.5,
-    pozza:{r:19,dur:4.5},desc:'Versa pece che <i>resta a bruciare</i>: non un colpo, un tratto '+
+    mondo:1,ucc:1500,pozza:{r:19,dur:4.5},desc:'Versa pece che <i>resta a bruciare</i>: non un colpo, un tratto '+
     'di strada che fa male finché dura.'},
   scongiuro:{name:'SCONGIURO',short:'SCONGIURO',ruolo:'SCORTICA',cost:78,dmg:0,rate:0,range:42,ap:0,
-    cut:.55,desc:'Non fa male: <i>scrosta la corazza</i> di chi passa, e i colpi degli altri '+
+    mondo:1,ucc:600,cut:.55,desc:'Non fa male: <i>scrosta la corazza</i> di chi passa, e i colpi degli altri '+
     'mordono. Il rovescio della salmodia.'},
   impulso:{name:'RIPETITORE A IMPULSI',short:'IMPULSO',ruolo:'RAFFICA',cost:58,dmg:8,rate:.34,range:52,ap:.12,
-    desc:'Una raffica di fotoni: poco per colpo, quasi nessuna pausa.'},
+    mondo:2,ucc:250,desc:'Una raffica di fotoni: poco per colpo, quasi nessuna pausa.'},
   plasma:{name:'FORGIA AL PLASMA',short:'PLASMA',ruolo:'AREA',cost:105,dmg:16,rate:1.35,range:46,ap:.55,
-    splash:18,burn:7,desc:'Fonde gruppi e corazze in una pozza di luce.'},
+    mondo:2,ucc:1500,splash:18,burn:7,desc:'Fonde gruppi e corazze in una pozza di luce.'},
   stasi:{name:'FARO DI STASI',short:'STASI',ruolo:'RALLENTA',cost:88,dmg:6,rate:1.55,range:46,ap:1,
-    aura:true,slow:.52,desc:'Piega il tempo locale e consuma ogni intruso nell’aura.'},
+    mondo:2,ucc:600,aura:true,slow:.52,desc:'Piega il tempo locale e consuma ogni intruso nell’aura.'},
   rotaia:{name:'OBELISCO A ROTAIA',short:'ROTAIA',ruolo:'PRECISIONE',cost:155,dmg:66,rate:2.35,range:90,ap:1,
-    beam:true,desc:'Un colpo lineare, istantaneo, oltre ogni corazza.'},
+    mondo:2,ucc:2100,beam:true,desc:'Un colpo lineare, istantaneo, oltre ogni corazza.'},
   sciame:{name:'NIDO DI DRONI',short:'SCIAME',ruolo:'SOSTEGNO',cost:118,dmg:0,rate:0,range:50,ap:0,
-    sostegno:{dmg:.25,rate:.14},desc:'I droni riallineano le armi vicine: più danno, meno attesa.'},
+    mondo:2,ucc:2800,sostegno:{dmg:.25,rate:.14},desc:'I droni riallineano le armi vicine: più danno, meno attesa.'},
   disturbo:{name:'JAMMER DEL VUOTO',short:'JAMMER',ruolo:'DISARMA',cost:96,dmg:0,rate:0,range:48,ap:0,
-    cut:.62,desc:'Spegne i protocolli difensivi e apre le corazze al fuoco alleato.'}
+    mondo:2,ucc:1000,cut:.62,desc:'Spegne i protocolli difensivi e apre le corazze al fuoco alleato.'}
 };
 /* l'ordine in cui l'armeria li mostra: prima i quattro di sempre */
 const TORDER=['spine','braciere','campana','reliquiario',
   'ossario','salmodia','mangano','arpione','caldaia','scongiuro',
   'impulso','plasma','stasi','rotaia','sciame','disturbo'];
 const NSLOT=4;   // quanti se ne portano in campo
+/* ═══ CHI CI HA MESSO MANO ═══
+   Un caduto non è opera dell'ultimo colpo soltanto. La campana ne uccide una
+   manciata in tutta una veglia — di mestiere rallenta — e salmodia e scongiuro
+   non fanno danno affatto: contando solo l'ultimo colpo resterebbero al primo
+   grado per sempre, che è come dire che non si usano.
+   Ogni creatura porta quindi `mani`, un intero in cui ogni edificio che l'ha
+   toccata accende il suo bit: chi l'ha rallentata, chi le ha scrostato la
+   corazza, chi ha sostenuto chi la colpiva. Quando cade, il caduto va a tutti
+   loro. Sedici edifici stanno in sedici bit, e accenderne uno costa un OR:
+   si può fare nei cicli caldi senza pensarci. */
+const TBIT={};TORDER.forEach((k,i)=>{TBIT[k]=1<<i;});
 function tstats(t){
   const b=TOWERS[t.type],l=t.lv-1,m=Math.pow(1.62,l);
   return {dmg:Math.round(b.dmg*m),rate:b.rate*Math.pow(.9,l),range:b.range*Math.pow(1.12,l),
@@ -1768,6 +1837,24 @@ function tstats(t){
 const MAXLV=5, UPMUL=[.85,1.5,2.6,4.2];
 const upCost=t=>Math.round(TOWERS[t.type].cost*UPMUL[t.lv-1]);
 const sellVal=t=>Math.round(t.spent*.6);
+/* ═══ I GRADI SI GUADAGNANO USANDO L'EDIFICIO ═══
+   Le lacrime non bastano più: il grado si apre quando quell'edificio — non il
+   singolo pezzo, il tipo — ha contato abbastanza caduti. Il conto è di sempre
+   e attraversa le veglie, così chi torna sul sagrato ritrova quel che ha già
+   imparato a fare.
+   Due tabelle e non una: i quattro storici hanno soglie più lievi perché sono
+   la quaterna di riferimento — quella su cui è tarato ATTO — e devono poter
+   arrivare al grado nel momento in cui il giocatore se lo può permettere. Gli
+   altri dodici li si guadagna, ed è il loro prezzo per essere migliori.
+   Le soglie sono per il grado II, III, IV e V.
+   I quattro numeri lievi vengono da uno sweep, non a intuito: a 10/40/100/200
+   la Veglia si compie ancora ma non regge più un ×1.05, e il punto in cui si
+   rompe si sposta — cioè il cancello avrebbe cambiato il bilanciamento invece
+   di aggiungersi. A 8/30/80/160 la Veglia torna a rompersi dove si è sempre
+   rotta (×1.10) e il cancello si sente lo stesso: si arriva in fondo con otto
+   sigilli in meno. Scendere ancora lo cancella del tutto. */
+const GRADI_LIEVI=[8,30,80,160];
+const GRADI_ALTRI=[20,70,180,380];
 
 /* ─────────── NEMICI ─────────── */
 const ENEMIES={
@@ -1993,22 +2080,74 @@ const QUATERNA_BASE=['spine','braciere','campana','reliquiario'];
           scenario di tutti non ha un successivo da sbloccare
    `rec`  l'albo d'oro: per ogni scenario fino a cinque serie {w ondate,
           k caduti}, dalla più lunga. Non si distingue fra chi si è fermato
-          alle venti e chi ha tirato avanti nell'infinito: conta l'ondata. */
-const PROG={unl:1,fin:{},rec:{},arm:{}};
+          alle venti e chi ha tirato avanti nell'infinito: conta l'ondata.
+   `ucc`  i caduti contati in ogni mondo: è la moneta con cui si aprono gli
+          edifici di quel mondo
+   `tk`   i caduti contati da ogni edificio, per tipo: è la moneta con cui si
+          aprono i suoi gradi */
+const PROG={unl:1,fin:{},rec:{},arm:{},ucc:{},tk:{}};
 let COLLAUDO=false,CAMBIO_PROFILO=false,PROFILO_NORMALE=null;
 const NALBO=5;
+/* ═══ QUEL CHE SI È GUADAGNATO ═══
+   Niente si concede: un edificio si apre quando il mondo a cui appartiene è
+   aperto **e** in quel mondo si sono contati abbastanza caduti; un grado si
+   apre quando quell'edificio ne ha contati abbastanza da solo.
+   Nulla di tutto questo si scrive in memoria come «sbloccato»: si ricava dai
+   due contatori, che sono l'unica cosa salvata. Una sorgente sola, e le soglie
+   restano ritoccabili senza lasciare in giro sblocchi che non tornano.
+   Il collaudo apre tutto: è un banco di prova, non una partita. */
+const uccMondo=m=>PROG.ucc[m]|0;
+const uccTorre=k=>PROG.tk[k]|0;
+const soglieGradi=k=>QUATERNA_BASE.indexOf(k)>=0?GRADI_LIEVI:GRADI_ALTRI;
+function edificioAperto(k){
+  const c=TOWERS[k];if(!c)return false;
+  if(!(c.ucc>0)||COLLAUDO)return true;
+  const m=c.mondo||1;
+  return mondoAperto(m)&&uccMondo(m)>=c.ucc;
+}
+/* fin dove si può salire con questo edificio, oggi */
+function gradoMax(k){
+  if(COLLAUDO)return MAXLV;
+  const s=soglieGradi(k),n=uccTorre(k);
+  let g=1;for(let i=0;i<s.length&&n>=s[i];i++)g++;
+  return Math.min(MAXLV,g);
+}
+/* quanti caduti mancano: per l'edificio, e per il suo prossimo grado */
+const mancaEdificio=k=>Math.max(0,(TOWERS[k].ucc|0)-uccMondo(TOWERS[k].mondo||1));
+function mancaGrado(k,lv){
+  const s=soglieGradi(k);
+  if(lv<2||lv>MAXLV)return 0;
+  return Math.max(0,s[lv-2]-uccTorre(k));
+}
+/* La prossima soglia di ogni mondo, così a ogni caduto si guarda un numero e
+   non sedici edifici: il conto passa di qui centinaia di volte per ondata.
+   Va rifatta quando cambia quel che è aperto — un mondo nuovo, un profilo
+   nuovo, una soglia varcata. */
+const soglieProssime={};
+function ricalcolaSoglie(){
+  for(let m=1;m<=NMONDI;m++){
+    let s=Infinity;
+    for(const k of TORDER){
+      const c=TOWERS[k];
+      if((c.mondo||1)!==m||!(c.ucc>0)||edificioAperto(k))continue;
+      if(c.ucc<s)s=c.ucc;
+    }
+    soglieProssime[m]=s;
+  }
+}
 /* Una quaterna dalla memoria non è mai da fidarsi: può venire da una versione
-   con altri edifici, o essere stata scritta male. Qui si ripulisce — nomi che
-   esistono, niente doppioni, esattamente NSLOT voci — completandola con i
-   quattro di sempre. */
+   con altri edifici, essere stata scritta male, o portarsi dietro un edificio
+   che in questo profilo non è ancora stato guadagnato. Qui si ripulisce — nomi
+   che esistono, aperti, niente doppioni, esattamente NSLOT voci —
+   completandola con i quattro di sempre, che sono aperti per definizione. */
 function quaterneValida(q){
   const out=[];
   for(const k of (Array.isArray(q)?q:[]))
-    if(TOWERS[k]&&out.indexOf(k)<0&&out.length<NSLOT)out.push(k);
+    if(TOWERS[k]&&edificioAperto(k)&&out.indexOf(k)<0&&out.length<NSLOT)out.push(k);
   for(const k of QUATERNA_BASE){if(out.length>=NSLOT)break;
     if(out.indexOf(k)<0)out.push(k);}
   for(const k of TORDER){if(out.length>=NSLOT)break;
-    if(out.indexOf(k)<0)out.push(k);}
+    if(out.indexOf(k)<0&&edificioAperto(k))out.push(k);}
   return out;
 }
 const grid=[];for(let r=0;r<ROWS;r++){grid.push(new Array(COLS).fill(0));}
@@ -3334,17 +3473,23 @@ function spawn(type,wave,seg,segD){
     bounty:Math.round(d.bounty*(1+.055*(wa-1))),
     seg:seg||0,segD:segD||0,x:PATHPX[0].x,y:PATHPX[0].y,dir:1,prog:0,
     slowAmt:0,burn:0,burnT:0,flash:0,bob:Math.random()*6,alive:true,spawnT:0,
-    stepT:.3,broken:false};
+    stepT:.3,broken:false,mani:0};
   if(d.final){G.bossRef=e;G.shake=8;SFX.roar();
     banner(d.name.toUpperCase(),'SE VARCA LA SOGLIA È FINITA');}
   G.enemies.push(e);
   return e;
 }
-function damage(e,amt,ap){
+/* `mani` sono gli edifici da cui viene il colpo: quello che ha sparato e i
+   cori che lo sostenevano. Va portato fin qui da tutte le strade — proiettile,
+   pece, aura, raggio — se no un edificio lavora e un altro incassa i gradi.
+   L'ustione non ha bisogno di niente: il bit è già entrato quando la fiamma è
+   stata appiccata, e la creatura se lo porta dietro fino a che cade. */
+function damage(e,amt,ap,mani){
   // lo scongiuro scrosta: la corazza che conta è quella che gli resta addosso
   const arm=e.armor*(1-(e.armorCut||0));
   const eff=Math.max(1,amt-arm*(1-(ap||0)));
   e.hp-=eff;e.flash=.09;
+  if(mani)e.mani=(e.mani|0)|mani;
   checkBreak(e);
   if(e.hp<=0&&e.alive)kill(e);
 }
@@ -3370,12 +3515,69 @@ function kill(e){
     G.rings.push({x:e.x,y:e.y-14,r:4,max:90,t:.9,col:'#f5ecd0'});
   }
   G.lacrime+=e.bounty;G.killed++;
+  contaCaduto(e);
   const heavy=e.def.boss||e.def.big;
   burst(e.x,e.y-(heavy?8:0),heavy?26:9,e.type==='ombra'?C.spirit:C.blood,heavy?90:55,.55,90);
   if(heavy)burst(e.x,e.y-6,14,'#6b6252',70,.7,120);
   coins(e.x,e.y,heavy?7:2);
   SFX.die();
   if(heavy)G.shake=6;
+}
+/* ═══ IL CONTO DEI CADUTI ═══
+   Ogni creatura che cade vale due volte: una per il mondo — ed è quel che apre
+   gli edifici nuovi — e una per l'edificio che l'ha finita, ed è quel che ne
+   apre i gradi. Chi è scappato non conta: si contano i caduti, non i passati.
+   Non si scrive in memoria a ogni morte — a ×3 sono centinaia di scritture per
+   ondata: si segna che c'è da salvare e si salva ai punti fermi (fine ondata,
+   pausa, fine partita) e subito quando qualcosa si apre, che è raro. */
+let progSporco=false;
+function progSalvaSeSporco(){if(progSporco)progSalva();}
+function contaCaduto(e){
+  const m=mondoDi(G.act);
+  const n=(PROG.ucc[m]|0)+1;PROG.ucc[m]=n;
+  progSporco=true;
+  // un numero solo da confrontare, non i sedici edifici
+  if(n>=(soglieProssime[m]===undefined?Infinity:soglieProssime[m])){
+    for(const k of TORDER){
+      const c=TOWERS[k];
+      if((c.mondo||1)!==m||!(c.ucc>0)||c.ucc!==soglieProssime[m])continue;
+      if(edificioAperto(k))annuncia('EDIFICIO CONCESSO',c.short);
+    }
+    ricalcolaSoglie();progSalva();
+  }
+  // il caduto va a tutti quelli che ci hanno messo mano, non al solo ultimo
+  // colpo: sedici bit da guardare, e si guardano una volta per morte
+  const mani=e.mani|0;
+  if(!mani)return;
+  for(let i=0;i<TORDER.length;i++){
+    if(!(mani&(1<<i)))continue;
+    const k=TORDER[i],prima=gradoMax(k);
+    PROG.tk[k]=(PROG.tk[k]|0)+1;
+    if(gradoMax(k)>prima){
+      const g=gradoMax(k);
+      annuncia(TOWERS[k].short+' · GRADO '+ROMAN(g),'ora si può salire');
+      progSalva();
+      // se il pannello di quell'edificio è aperto, il tasto deve accendersi
+      // subito: è il momento in cui il giocatore ci sta guardando
+      if(G.sel&&G.sel.type===k&&document.getElementById('panel').classList.contains('on'))openPanel();
+    }
+  }
+}
+/* L'avviso di uno sblocco compare e scompare da solo. Uno per volta e in coda:
+   in un'ondata fitta se ne possono aprire due nello stesso istante, e due
+   scritte sovrapposte non le legge nessuno. Il tempo è quello vero, non quello
+   di gioco: a ×3 un avviso durerebbe un terzo. */
+const CODA_AVVISI=[];let avvisoFino=0;
+function annuncia(a,b){CODA_AVVISI.push([a,b]);}
+function avvisiTick(now){
+  if(now<avvisoFino||!CODA_AVVISI.length)return;
+  const[a,b]=CODA_AVVISI.shift();
+  const el=document.getElementById('avviso');
+  document.getElementById('avvA').textContent=a;
+  document.getElementById('avvB').textContent=b;
+  el.classList.remove('go');void el.offsetWidth;el.classList.add('go');
+  SFX.up();
+  avvisoFino=now+3400;   // quanto dura l'animazione, più un respiro
 }
 
 /* ─────────── ONDATE ─────────── */
@@ -3478,7 +3680,7 @@ function update(dt){
     if(s.pozR){
       // la pece non scoppia: si posa, e resta a bruciare dov'è caduta
       SFX.fire();
-      G.pozze.push({x:s.x,y:s.y,r:s.pozR,t:s.pozT,max:s.pozT,dps:s.dmg,ap:s.ap});
+      G.pozze.push({x:s.x,y:s.y,r:s.pozR,t:s.pozT,max:s.pozT,dps:s.dmg,ap:s.ap,mani:s.mani});
       burst(s.x,s.y,8,'#3a2418',40,.5,60);
       return;
     }
@@ -3491,12 +3693,14 @@ function update(dt){
         const e=G.enemies[i];if(!e.alive)continue;
         const dx=e.x-s.x,dy=e.y-s.y-4;
         if(dx*dx+dy*dy<sr2){
-          damage(e,s.dmg,s.ap);
+          damage(e,s.dmg,s.ap,s.mani);
+          // l'ustione uccide dopo, quando chi l'ha appiccata guarda altrove:
+          // il caduto resta suo
           if(s.burn){e.burn=Math.max(e.burn,s.burn);e.burnT=3;}
         }
       }
     }else if(s.target&&s.target.alive){
-      damage(s.target,s.dmg,s.ap);SFX.hit();
+      damage(s.target,s.dmg,s.ap,s.mani);SFX.hit();
       burst(s.x,s.y,3,'#c9b08a',34,.22,60);
       // l'arpione arretra chi è ancora vivo dopo il colpo
       if(s.pull&&s.target.alive)arretra(s.target,s.pull);
@@ -3511,7 +3715,7 @@ function update(dt){
     for(let j=0;j<G.enemies.length;j++){
       const e=G.enemies[j];if(!e.alive)continue;
       const dx=e.x-p.x,dy=e.y-4-p.y;
-      if(dx*dx+dy*dy<r2)damage(e,p.dps*dt,p.ap);
+      if(dx*dx+dy*dy<r2)damage(e,p.dps*dt,p.ap,p.mani);
     }
     if(Math.random()<dt*14)
       part(p.x+(Math.random()*2-1)*p.r*.8,p.y+(Math.random()*2-1)*p.r*.4,
@@ -3531,6 +3735,7 @@ function update(dt){
   if(G.waveOn&&G.state==='play'&&G.queue.length===0&&G.enemies.length===0){
     G.waveOn=false;
     G.lacrime+=25+wAbs(G.wave)*6;
+    progSalvaSeSporco();   // il conto dei caduti si scrive qui, non a ogni morte
     // venti ondate chiudono lo scenario: da lì si sceglie
     if(!G.endless&&G.wave>=20)compiuto();
     else salvaPartita();   // fra un'ondata e l'altra il punto è fermo: si segna
@@ -3587,9 +3792,13 @@ function ricalcolaTorri(){
     t.buff=0;
     if(TOWERS[t.type].sostegno)continue;   // una salmodia non sostiene un'altra salmodia
     let d=0,r=0;
+    // `mani` è chi lavora a ogni colpo di questo edificio: lui e i cori che lo
+    // sostengono. Un coro non colpisce nessuno, e l'unico modo che ha di
+    // lavorare — quindi di salire di grado — è far battere più forte i vicini.
+    t.mani=TBIT[t.type]|0;
     for(const c of cori){
       const dx=c.x-t.x,dy=c.y-t.y;
-      if(dx*dx+dy*dy<=c.st.range*c.st.range){d+=c.st.sdmg;r+=c.st.srate;}
+      if(dx*dx+dy*dy<=c.st.range*c.st.range){d+=c.st.sdmg;r+=c.st.srate;t.mani|=TBIT[c.type]|0;}
     }
     d=Math.min(d,SBUFF_MAX.dmg);r=Math.min(r,SBUFF_MAX.rate);
     if(d||r){
@@ -3610,7 +3819,8 @@ function towerUpdate(t,dt){
     for(let i=0;i<G.enemies.length;i++){
       const e=G.enemies[i];if(!e.alive)continue;
       const dx=e.x-t.x,dy=e.y-t.y;
-      if(dx*dx+dy*dy<r2)e.armorCut=Math.max(e.armorCut||0,st.cut);
+      // scrostare è il suo mestiere: è così che ci mette mano
+      if(dx*dx+dy*dy<r2){e.armorCut=Math.max(e.armorCut||0,st.cut);e.mani|=t.mani;}
     }
     return;
   }
@@ -3625,6 +3835,9 @@ function towerUpdate(t,dt){
       if(dx*dx+dy*dy<r2){
         if(st.slow>0){const res=e.def.slowResist||0;
           e.slowAmt=Math.max(e.slowAmt,st.slow*(1-res));}
+        // la campana ne uccide una manciata in tutta una veglia: quel che fa
+        // per davvero è tenerle ferme, e va contato
+        e.mani|=t.mani;
         any=true;}
     }
     if(t.cd<=0&&any){
@@ -3634,7 +3847,7 @@ function towerUpdate(t,dt){
         col:muta?'rgba(207,196,168,.75)':'#9fb8c8'});
       for(let i=0;i<G.enemies.length;i++){const e=G.enemies[i];
         const dx=e.x-t.x,dy=e.y-t.y;
-        if(e.alive&&dx*dx+dy*dy<r2)damage(e,st.dmg,cfg.ap);}
+        if(e.alive&&dx*dx+dy*dy<r2)damage(e,st.dmg,cfg.ap,t.mani);}
     }
     return;
   }
@@ -3647,27 +3860,27 @@ function towerUpdate(t,dt){
     SFX.beam();
     G.beams.push({x1:t.x,y1:t.y-6,x2:target.x,y2:target.y-4,t:.16,
       col:t.type==='rotaia'?'#20d8ff':'#f5ecd0',halo:t.type==='rotaia'?'#ff3bd4':C.gold});
-    damage(target,st.dmg,1);
+    damage(target,st.dmg,1,t.mani);
     burst(target.x,target.y-4,7,'#f0e6d0',60,.35,20);
     G.shake=1.6;
   }else if(cfg.splash){
     SFX.fire();
     G.shots.push({x:t.x,y:t.y-6,target,lx:target.x,ly:target.y-4,speed:78,dmg:st.dmg,
-      ap:st.ap,splash:st.splash,burn:st.burn,col:C.ember,life:3,type:'fire',trail:true,a:0});
+      ap:st.ap,splash:st.splash,burn:st.burn,mani:t.mani,col:C.ember,life:3,type:'fire',trail:true,a:0});
   }else if(cfg.pozza){
     SFX.fire();
     G.shots.push({x:t.x,y:t.y-6,target,lx:target.x,ly:target.y-4,speed:64,dmg:st.dmg,
-      ap:st.ap,pozR:st.pozR,pozT:st.pozT,col:'#3a2418',life:3,type:'fire',trail:true,a:0});
+      ap:st.ap,pozR:st.pozR,pozT:st.pozT,mani:t.mani,col:'#3a2418',life:3,type:'fire',trail:true,a:0});
   }else if(cfg.pull){
     SFX.shoot();
     G.shots.push({x:t.x,y:t.y-8,target,lx:target.x,ly:target.y-4,speed:150,dmg:st.dmg,
-      ap:st.ap,pull:st.pull,col:'#8fa5b0',life:2.5,type:'bolt',trail:true,a:0});
+      ap:st.ap,pull:st.pull,mani:t.mani,col:'#8fa5b0',life:2.5,type:'bolt',trail:true,a:0});
   }else{
     SFX.shoot();
     // il mangano è lento e pesante: si vede partire
     const grosso=st.rate>=2;
     G.shots.push({x:t.x,y:t.y-8,target,lx:target.x,ly:target.y-4,speed:grosso?120:165,
-      dmg:st.dmg,ap:st.ap,col:grosso?'#9c8f78':'#cbbb98',life:2.5,type:'bolt',a:0});
+      dmg:st.dmg,ap:st.ap,mani:t.mani,col:grosso?'#9c8f78':'#cbbb98',life:2.5,type:'bolt',a:0});
     if(grosso){G.shake=Math.max(G.shake,1.2);}
   }
 }
@@ -3959,6 +4172,7 @@ function frame(now){
     const steps=G.speed;
     for(let i=0;i<steps;i++)update(dt);
     syncSoft();
+    avvisiTick(now);   // il tempo dell'avviso è quello vero, non quello di gioco
   }
   render();
   // a schermata aperta il fondale in parallasse la copre: il campo continua
@@ -4022,6 +4236,8 @@ function place(type,c,r){
 }
 function upgrade(){
   const t=G.sel;if(!t||t.lv>=MAXLV)return;
+  // il grado si guadagna prima di comprarlo: le lacrime da sole non bastano
+  if(t.lv+1>gradoMax(t.type)){SFX.err();return;}
   const c=upCost(t);if(G.lacrime<c){SFX.err();return;}
   G.lacrime-=c;t.spent+=c;t.lv++;t.sp=S[t.type+t.lv];
   ricalcolaTorri();   // se è una salmodia, cambia anche per i vicini
@@ -4101,9 +4317,15 @@ function openPanel(){
   else if(st.ap>=.5)s+='<span>IGNORA METÀ CORAZZA</span><br>';
   else if(st.ap>0)s+='<span>INTACCA LA CORAZZA</span><br>';
   if(t.buff>0)s+='<span>SOSTENUTO DALLA SALMODIA · +'+Math.round(t.buff*100)+'%</span><br>';
+  if(t.lv<MAXLV&&mancaGrado(t.type,t.lv+1)>0)
+    s+='GRADO '+ROMAN(t.lv+1)+': ancora <span>'+mancaGrado(t.type,t.lv+1)+
+       '</span> caduti con questo edificio<br>';
   el('pStats').innerHTML=s;
   const up=el('pUp');
+  const manca=t.lv<MAXLV?mancaGrado(t.type,t.lv+1):0;
   if(t.lv>=MAXLV){up.disabled=true;up.textContent=lex('ritoFatto');}
+  // un grado che non si è ancora guadagnato non dice il prezzo, dice il conto
+  else if(manca>0){up.disabled=true;up.textContent='GRADO '+ROMAN(t.lv+1)+' · −'+manca;}
   else{up.disabled=G.lacrime<upCost(t);up.textContent='POTENZIA ◈'+upCost(t);}
   el('pSell').textContent='DEMOLISCI +◈'+sellVal(t);
 }
@@ -4125,8 +4347,10 @@ function syncSoft(){
       d.classList.toggle('poor',G.lacrime<TOWERS[d.dataset.k].cost);
       d.classList.toggle('sel',G.build===d.dataset.k);
     }
+    // il tasto resta spento anche a lacrime abbondanti finché il grado non è
+    // stato guadagnato: se no basterebbe arricchirsi per aggirare il conto
     if(lacChanged&&G.sel&&G.sel.lv<MAXLV){
-      const dis=G.lacrime<upCost(G.sel);
+      const dis=G.lacrime<upCost(G.sel)||G.sel.lv+1>gradoMax(G.sel.type);
       if(UIC.up!==dis){UIC.up=dis;elUp.disabled=dis;}
     }
   }
@@ -4467,8 +4691,27 @@ function armSlotHtml(){
   }
   return h+'</div></div>';
 }
+/* Lo stato di un edificio in armeria, in una parola sola:
+   `aperto`     lo si può portare in campo
+   `sigillato`  il suo mondo è ancora chiuso — catena e lucchetto, e non c'è
+                nessun conto da mostrare: quei caduti non li si può nemmeno fare
+   `conto`      il mondo è aperto ma l'edificio no: via la catena, resta l'ombra
+                e compare la barra con quanti ne mancano */
+function armStato(k){
+  const c=TOWERS[k];
+  if(edificioAperto(k))return 'aperto';
+  return mondoAperto(c.mondo||1)?'conto':'sigillato';
+}
+function armBarra(k){
+  const c=TOWERS[k],fatti=uccMondo(c.mondo||1),manca=mancaEdificio(k);
+  const q=Math.max(0,Math.min(1,c.ucc?fatti/c.ucc:1));
+  return '<span class="armProg"><span class="apB"><span class="apF" style="width:'+
+    (q*100).toFixed(1)+'%"></span></span><span class="apT">ANCORA <b>'+manca+
+    '</b> CADUTI · '+fatti+' / '+c.ucc+'</span></span>';
+}
 function armRiga(k){
   const cfg=TOWERS[k],slot=armSel.indexOf(k),dentro=slot>=0;
+  const stato=armStato(k),chiuso=stato!=='aperto';
   const st=tstats({type:k,lv:1});
   let numeri;
   if(cfg.sostegno)numeri='sostegno · voce '+Math.round(st.range);
@@ -4479,18 +4722,26 @@ function armRiga(k){
     'aura '+Math.round(st.range)+' · '+(st.dmg/st.rate).toFixed(1)+' dps';
   else numeri='gittata '+Math.round(st.range)+' · '+(st.dmg/st.rate).toFixed(1)+' dps';
   let scegli='';
-  if(armScegli){
+  if(armScegli&&!chiuso){
     const et=slot===armSlot?'SCELTA':(dentro?'SPOSTA QUI':'SCEGLI');
     scegli='<button type="button" class="armPick'+(slot===armSlot?' on':'')+
       '" data-arm-choose="'+k+'">'+et+'</button>';
   }
-  return '<div class="armR'+(dentro?' on':'')+'" data-t="'+k+'">'+
-    '<span class="ap">'+spr(k+'1',2)+'</span>'+ 
+  // sotto la descrizione: la barra se c'è un conto aperto, la ragione se il
+  // mondo è ancora chiuso
+  let piede='';
+  if(stato==='conto')piede=armBarra(k);
+  else if(stato==='sigillato')piede='<span class="ad"><i>'+MONDO[cfg.mondo||1].nome+
+    ' · ancora sigillato</i></span>';
+  return '<div class="armR'+(dentro?' on':'')+(chiuso?' chiuso':'')+
+    (stato==='sigillato'?' sigillato':'')+'" data-t="'+k+'">'+
+    '<span class="ap">'+spr(k+'1',2)+'</span>'+
     '<span class="at"><span class="an">'+cfg.short+
-      '<span class="ar">'+(cfg.ruolo||'')+'</span></span>'+ 
-      '<span class="ad">'+cfg.desc+'<br><i>'+numeri+'</i></span></span>'+ 
+      '<span class="ar">'+(cfg.ruolo||'')+'</span></span>'+
+      '<span class="ad">'+cfg.desc+'<br><i>'+numeri+'</i></span>'+piede+'</span>'+
     '<span class="armActions">'+scegli+
-      '<button type="button" class="armMore" data-arm-info="'+k+'">INFO</button></span></div>';
+      '<button type="button" class="armMore" data-arm-info="'+k+'">INFO</button></span>'+
+    (stato==='sigillato'?'<span class="armLucch"><i></i><b></b></span>':'')+'</div>';
 }
 function armCosto(k,lv){
   const cfg=TOWERS[k];
@@ -4528,19 +4779,29 @@ function armStatistiche(k,lv){
   return v.join('<br>');
 }
 function armDettaglio(k){
-  const cfg=TOWERS[k];
-  let h=armSlotHtml()+'<button type="button" class="armBack" data-arm-back="1">← TUTTI GLI EDIFICI</button>'+ 
-    '<div class="armInfoHead"><div class="nome">'+cfg.name+'</div><div class="ruolo">'+cfg.ruolo+'</div>'+ 
+  const cfg=TOWERS[k],stato=armStato(k),g=gradoMax(k);
+  let h=armSlotHtml()+'<button type="button" class="armBack" data-arm-back="1">← TUTTI GLI EDIFICI</button>'+
+    '<div class="armInfoHead"><div class="nome">'+cfg.name+'</div><div class="ruolo">'+cfg.ruolo+'</div>'+
     '<div class="desc">'+cfg.desc+'</div></div>';
-  if(armScegli)h+='<button type="button" class="armInfoPick" data-arm-choose="'+k+'">ASSEGNA ALLO SLOT '+
-    ROMAN(armSlot+1)+'</button>';
+  if(stato==='sigillato')h+='<div class="cmpT cmpI">Appartiene a <b>'+MONDO[cfg.mondo||1].nome+
+    '</b>, che è ancora sigillato. Finché quella soglia non si apre non c\'è conto da fare.</div>';
+  else if(stato==='conto')h+='<div class="cmpT cmpI">Si concede dopo <b>'+cfg.ucc+
+    '</b> caduti in <b>'+MONDO[cfg.mondo||1].nome+'</b>. Ne hai contati <b>'+
+    uccMondo(cfg.mondo||1)+'</b>.</div>'+armBarra(k);
+  if(armScegli&&stato==='aperto')h+='<button type="button" class="armInfoPick" data-arm-choose="'+k+
+    '">ASSEGNA ALLO SLOT '+ROMAN(armSlot+1)+'</button>';
   h+='<div class="cmpH">I CINQUE GRADI</div>';
+  h+='<div class="cmpT cmpI">I gradi non si comprano soltanto: si aprono usando l\'edificio. '+
+    'Con questo hai contato <b>'+uccTorre(k)+'</b> caduti — sei al grado <b>'+ROMAN(g)+'</b>.</div>';
   for(let lv=1;lv<=MAXLV;lv++){
     const c=armCosto(k,lv),prezzo=lv===1?'ERIGI <b>◈'+c.passo+'</b>':
       lex('rito',msel)+' <b>◈'+c.passo+'</b> · INVESTITO <b>◈'+c.tot+'</b>';
-    h+='<div class="armLv'+(lv===MAXLV?' max':'')+'"><div class="lvPic">'+spr(k+lv,2)+
-      '<span class="lvN">GRADO '+ROMAN(lv)+'</span></div><div class="lvStat">'+prezzo+'<br>'+ 
-      armStatistiche(k,lv)+(lv===MAXLV?'<br><i>MARMO · ORO · RITO COMPIUTO</i>':'')+'</div></div>';
+    const manca=mancaGrado(k,lv);
+    h+='<div class="armLv'+(lv===MAXLV?' max':'')+(lv>g?' chiuso':'')+'"><div class="lvPic">'+spr(k+lv,2)+
+      '<span class="lvN">GRADO '+ROMAN(lv)+'</span></div><div class="lvStat">'+prezzo+'<br>'+
+      armStatistiche(k,lv)+(lv===MAXLV?'<br><i>MARMO · ORO · RITO COMPIUTO</i>':'')+
+      (manca>0?'<span class="lvChiuso">ANCORA <b>'+manca+'</b> CADUTI CON QUESTO EDIFICIO</span>':'')+
+      '</div></div>';
   }
   return h;
 }
@@ -4551,13 +4812,22 @@ const LETT=['nessuno','uno','due','tre','quattro','cinque','sei','sette','otto',
 const conta=n=>LETT[n]||String(n);
 function buildArmeria(){
   if(armInfo&&TOWERS[armInfo])return armDettaglio(armInfo);
-  let h=armSlotHtml()+'<div class="cmpT cmpI">'+conta(TORDER.length).replace(/^./,c=>c.toUpperCase())+
-    ' edifici, <b>'+conta(NSLOT)+'</b> in campo. La quaterna si sceglie prima di scendere e non '+
-    'si cambia più: sceglila guardando la veglia che ti aspetta, non l\'ultima che hai vinto.'+
-    '<br><br>Ogni edificio ha <b>cinque gradi</b>: i primi quattro crescono di sagoma, il quinto '+
-    'cambia materia — marmo e oro, fiamma fredda — e non si ingrandisce più.</div>';
-  h+='<div class="cmpH">LE CONSACRAZIONI</div>';
-  for(const k of TORDER)h+=armRiga(k);
+  const aperti=TORDER.filter(edificioAperto).length;
+  let h=armSlotHtml()+'<div class="cmpT cmpI"><b>'+conta(aperti)+'</b> edifici su '+
+    conta(TORDER.length)+', <b>'+conta(NSLOT)+'</b> in campo. La quaterna si sceglie prima di '+
+    'scendere e non si cambia più: sceglila guardando la veglia che ti aspetta, non l\'ultima '+
+    'che hai vinto.'+
+    '<br><br>Gli altri si guadagnano contando caduti nel mondo a cui appartengono, e ogni '+
+    'edificio ha <b>cinque gradi</b> che si aprono usandolo: i primi quattro crescono di sagoma, '+
+    'il quinto cambia materia — marmo e oro, fiamma fredda — e non si ingrandisce più.</div>';
+  // un blocco per mondo: così si vede a colpo d'occhio che cosa manca e dove
+  for(let m=1;m<=NMONDI;m++){
+    const righe=TORDER.filter(k=>(TOWERS[k].mondo||1)===m);
+    if(!righe.length)continue;
+    h+='<div class="cmpH">'+MONDO[m].nome+' · '+righe.filter(edificioAperto).length+
+      ' SU '+righe.length+'</div>';
+    for(const k of righe)h+=armRiga(k);
+  }
   return h;
 }
 function armeriaAggiorna(){
@@ -4571,7 +4841,8 @@ function armeriaAggiorna(){
     el('scMain').textContent='SCENDI · '+ATTO[tsel].nome;
     el('scMain').disabled=!armPronta();
   }else{
-    sc.innerHTML=conta(TORDER.length).toUpperCase()+' EDIFICI · '+conta(NSLOT).toUpperCase()+' IN CAMPO';
+    sc.innerHTML='<b>'+TORDER.filter(edificioAperto).length+'</b> EDIFICI SU '+TORDER.length+
+      ' · '+conta(NSLOT).toUpperCase()+' IN CAMPO';
   }
 }
 function armeria(scegli){
@@ -4602,6 +4873,10 @@ el('scLore').addEventListener('click',ev=>{
   if(!scegli||!armScegli)return;
   audio();
   const k=scegli.dataset.armChoose,altro=armSel.indexOf(k),vecchio=armSel[armSlot];
+  // il tasto non c'è sugli edifici chiusi, ma un tocco storto non deve poterli
+  // far entrare lo stesso nella quaterna
+  if(!edificioAperto(k)){armAvviso='<b>'+TOWERS[k].short+'</b> non è ancora tuo';
+    armeriaAggiorna();return;}
   if(altro!==armSlot){
     armSel[armSlot]=k;
     if(altro>=0)armSel[altro]=vecchio||null;
@@ -4662,6 +4937,7 @@ function azzeraCampo(a){
   G.enemies.length=0;G.towers.length=0;G.shots.length=0;G.beams.length=0;
   G.parts.length=0;G.rings.length=0;G.queue.length=0;G.pozze.length=0;
   G.sel=null;G.build=null;G.waveOn=false;G.t=0;G.killed=0;G.shake=0;
+  CODA_AVVISI.length=0;   // gli avvisi di ieri non si affacciano sulla veglia di oggi
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(grid[r][c]===3)grid[r][c]=0;
   rebuildFree();
   hideScreen();chiudiPausa();
@@ -4809,15 +5085,20 @@ function restaAVegliare(){endless();salvaPartita();}
    `veglia:save` le partite sospese, che sono grosse. Tenerle separate vuol
    dire che un salvataggio malandato non si porta dietro l'albo d'oro. */
 function progSalva(){
+  progSporco=false;
   try{if(window.storage&&window.storage.set)
     window.storage.set(COLLAUDO?'veglia:prog:test':'veglia:prog',JSON.stringify(PROG));}catch(e){}
 }
 function sblocca(a){
-  if(a>PROG.unl&&a<=NSCEN){PROG.unl=a;progSalva();}
+  if(a>PROG.unl&&a<=NSCEN){PROG.unl=a;progSalva();
+    // un mondo che si apre mette in conto i suoi edifici: la prossima soglia
+    // da guardare non è più la stessa
+    ricalcolaSoglie();}
 }
 /* L'albo: si infila la serie, si riordina per ondata (a parità, per caduti)
    e si tiene solo la cima. Ci passa ogni fine partita, anche l'abbandono. */
 function segna(){
+  progSalvaSeSporco();   // anche una veglia senza ondate compiute ha contato caduti
   if(G.wave<1)return;
   const l=albo(G.act).slice();
   l.push({w:G.wave,k:G.killed});
@@ -4855,10 +5136,12 @@ async function cambiaProfilo(){
       PROFILO_NORMALE={prog:copiaMemoria(PROG),save:copiaMemoria(SAVE)};
       COLLAUDO=true;
       const p=await leggiMemoria('veglia:prog:test'),s=await leggiMemoria('veglia:save:test');
-      sostituisciMemoria(PROG,p||{unl:NSCEN,fin:{},rec:{},arm:{}});
+      sostituisciMemoria(PROG,p||{unl:NSCEN,fin:{},rec:{},arm:{},ucc:{},tk:{}});
       PROG.fin=PROG.fin&&typeof PROG.fin==='object'?PROG.fin:{};
       PROG.rec=PROG.rec&&typeof PROG.rec==='object'?PROG.rec:{};
       PROG.arm=PROG.arm&&typeof PROG.arm==='object'?PROG.arm:{};
+      PROG.ucc=PROG.ucc&&typeof PROG.ucc==='object'?PROG.ucc:{};
+      PROG.tk=PROG.tk&&typeof PROG.tk==='object'?PROG.tk:{};
       PROG.unl=NSCEN;sostituisciMemoria(SAVE,s||{});migraProg();progSalva();
       tsel=MONDO[2].scen[0];msel=2;applyAct(tsel);
     }else{
@@ -4870,17 +5153,22 @@ async function cambiaProfilo(){
       PROG.unl=Math.min(NSCEN,Math.max(1,PROG.unl|0)||1);
       tsel=PROG.unl;msel=mondoDi(tsel);applyAct(tsel);
     }
+    ricalcolaSoglie();   // cambia il profilo, cambia quel che è già guadagnato
     menu();
   }finally{CAMBIO_PROFILO=false;}
 }
+/* `mani` sono gli edifici che le hanno messo le mani addosso: senza, una
+   creatura ripresa a metà rogo cadrebbe per opera di nessuno e i gradi di chi
+   ci stava lavorando non avanzerebbero */
 const CAMPI_NEMICO=['type','hp','max','speed','armor','bounty','seg','segD','x','y',
-  'dir','prog','slowAmt','burn','burnT','flash','bob','spawnT','stepT','broken'];
+  'dir','prog','slowAmt','burn','burnT','flash','bob','spawnT','stepT','broken',
+  'mani'];
 /* Un proiettile insegue un oggetto, e un oggetto non si scrive su disco: il
    bersaglio si salva come posto nella lista delle creature, e al ritorno si
    riaggancia. Sono pochi e vivono un attimo, ma bastano a far divergere due
    partite altrimenti identiche — una caldaia ne ha quasi sempre uno per aria. */
 const CAMPI_COLPO=['x','y','lx','ly','speed','dmg','ap','splash','burn','pull',
-  'pozR','pozT','col','life','type','trail','a'];
+  'pozR','pozT','col','life','type','trail','a','mani'];
 function istantanea(){
   const e2=[],indice=new Map();
   for(const e of G.enemies){
@@ -4902,7 +5190,7 @@ function istantanea(){
     enemies:e2,shots:s2,
     queue:G.queue.map(q=>({t:q.t,at:q.at,wave:q.wave})),
     // la pece dura qualche secondo: troppo per buttarla via come una favilla
-    pozze:G.pozze.map(p=>({x:p.x,y:p.y,r:p.r,t:p.t,max:p.max,dps:p.dps,ap:p.ap}))};
+    pozze:G.pozze.map(p=>({x:p.x,y:p.y,r:p.r,t:p.t,max:p.max,dps:p.dps,ap:p.ap,mani:p.mani}))};
 }
 function ripristina(s){
   if(!s||!s.act)return false;
@@ -4934,7 +5222,7 @@ function ripristina(s){
   }
   for(const q of s.queue||[])if(ENEMIES[q.t])G.queue.push({t:q.t,at:+q.at||0,wave:q.wave|0});
   for(const p of s.pozze||[])G.pozze.push({x:+p.x||0,y:+p.y||0,r:+p.r||0,t:+p.t||0,
-    max:+p.max||1,dps:+p.dps||0,ap:+p.ap||0});
+    max:+p.max||1,dps:+p.dps||0,ap:+p.ap||0,mani:p.mani|0});
   el('bSpeed').textContent='×'+G.speed;
   el('bSpeed').classList.toggle('on',G.speed>1);
   uiDirty();syncUI();fit();
@@ -4948,7 +5236,7 @@ function saveSalva(){
 }
 function salvaPartita(){
   if(G.state!=='play')return false;
-  SAVE[G.act]=istantanea();saveSalva();return true;
+  SAVE[G.act]=istantanea();saveSalva();progSalvaSeSporco();return true;
 }
 function scartaSalvataggio(a){
   if(!SAVE[a])return;
@@ -4976,6 +5264,8 @@ function riprendiOScendi(a){if(!riprendi(a))startScen(a);}
       if(p.fin&&typeof p.fin==='object')PROG.fin=p.fin;
       if(p.rec&&typeof p.rec==='object')PROG.rec=p.rec;
       if(p.arm&&typeof p.arm==='object')PROG.arm=p.arm;
+      if(p.ucc&&typeof p.ucc==='object')PROG.ucc=p.ucc;
+      if(p.tk&&typeof p.tk==='object')PROG.tk=p.tk;
     }
   }else{
     // dalla vecchia campagna unica da sessanta ondate al conto per veglia
@@ -4990,6 +5280,7 @@ function riprendiOScendi(a){if(!riprendi(a))startScen(a);}
     }
   }
   migraProg();
+  ricalcolaSoglie();   // la memoria è arrivata: si sa da dove si riparte
   const sv=await window.storage.get('veglia:save');
   if(sv&&sv.value){
     const p=JSON.parse(sv.value);
@@ -5020,6 +5311,7 @@ if('serviceWorker' in navigator&&location.protocol.startsWith('http'))
   navigator.serviceWorker.register('sw.js').catch(()=>{});
 
 /* ─────────── AVVIO ─────────── */
+ricalcolaSoglie();   // prima di ogni cosa: senza, nessuna soglia scatterebbe mai
 buildBar();
 menu();
 fit();

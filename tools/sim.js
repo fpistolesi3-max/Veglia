@@ -90,7 +90,13 @@ function veglia(a, maxOndate) {
       if (G.lacrime > costo + (coda.length ? 200 : 0)) { G.sel = t; T.upgrade(); G.sel = null; }
     }
   };
+  // Il bot gioca un profilo che comincia adesso: edifici e gradi se li deve
+  // guadagnare contando caduti, e la prima Veglia si apre con i quattro storici
+  // al primo grado. È voluto — questo banco è il metro di chi comincia, non di
+  // chi torna. Chi vuole misurare a gradi liberi chiama T.apriTutto().
+  const gradi = () => G.loadout.map(k => `${T.TOWERS[k].short.toLowerCase()} ${T.gradoMax(k)}`).join(' · ');
   console.log(`\n── ${T.ATTO[a].nome} · base HP ×${T.ATTO[a].hp} · ${T.ATTO[a].lac} lacrime ──`);
+  console.log(`  gradi in mano all'inizio: ${gradi()}`);
   for (let w = 1; w <= maxOndate; w++) {
     bot();
     T.startWave();
@@ -112,12 +118,14 @@ function veglia(a, maxOndate) {
     if (G.state === 'won') {
       // venti ondate compiute: oltre si va solo per l'infinito
       if (w >= maxOndate) {
+        console.log(`  gradi alla fine: ${gradi()}`);
         console.log(`  === ${T.ATTO[a].nome}: compiuta ===`);
         return { a, esito: 'compiuta', w: G.wave };
       }
       T.endless();
     }
   }
+  console.log(`  gradi alla fine: ${gradi()}`);
   console.log(`  === ${T.ATTO[a].nome}: retta fino alla ${G.wave} ===`);
   return { a, esito: 'retta', w: G.wave };
 }

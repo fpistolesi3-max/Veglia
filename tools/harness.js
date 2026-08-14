@@ -13,7 +13,11 @@ function estraiScript(file) {
 }
 
 function carica(opzioni = {}) {
-  const file = opzioni.file || path.join(__dirname, '..', 'ultima-veglia.html');
+  // VEGLIA_FILE fa girare un banco qualunque su un'altra copia del gioco: è
+  // così che si confronta una modifica con la versione da cui si è partiti
+  // (`git show HEAD:ultima-veglia.html > prima.html`) senza toccare i banchi.
+  const file = opzioni.file || process.env.VEGLIA_FILE ||
+    path.join(__dirname, '..', 'ultima-veglia.html');
   let creaCanvas = null;
   if (opzioni.grafica) {
     // serve solo per gli screenshot: npm i @napi-rs/canvas
@@ -85,6 +89,8 @@ function carica(opzioni = {}) {
         'istantanea,ripristina,salvaPartita,scartaSalvataggio,riprendi,' +
         'haSalvataggio,scenariSospesi,SAVE,apriPausa,chiudiPausa,gameOver,' +
         'TORDER,NSLOT,QUATERNA_BASE,quaterneValida,ricalcolaTorri,arretra,buildBar,' +
+        'edificioAperto,gradoMax,mancaEdificio,mancaGrado,uccMondo,uccTorre,' +
+        'ricalcolaSoglie,GRADI_LIEVI,GRADI_ALTRI,contaCaduto,' +
         'armeria,buildArmeria,help,buildHelp,damage,tstats,makeSprite,ART,PAL_TOW,' +
         'cambiaProfilo,MUSICA,musicaAggiorna,musicaToggle,hideScreen,lex};' +
         '\nglobalThis.__T.getProfilo=()=>({collaudo:COLLAUDO,unl:PROG.unl,msel,tsel,smode});' +
@@ -96,6 +102,18 @@ function carica(opzioni = {}) {
   eval(js);
   const T = globalThis.__T;
   T.G.sound = false;
+  /* Un banco che vuole provare una quaterna qualunque deve prima averla
+     guadagnata: edifici e gradi si aprono contando caduti, e un profilo appena
+     nato ha in mano solo i quattro storici al primo grado. Chi misura il
+     bilanciamento di un insieme (quaterne.js) o il salvataggio (salva.js)
+     apre tutto e va dritto al punto; sim.js no — quello deve restare il metro
+     di chi comincia adesso. */
+  T.apriTutto = () => {
+    T.PROG.unl = T.NSCEN;
+    for (let m = 1; m <= T.NMONDI; m++) T.PROG.ucc[m] = 999999;
+    for (const k of T.TORDER) T.PROG.tk[k] = 999999;
+    T.ricalcolaSoglie();
+  };
   return { T, G: T.G, registro };
 }
 
