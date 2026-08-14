@@ -1,0 +1,14 @@
+node_modules/
+*.png.tmp
+/tmp/
+
+# uscite del banco di prova: si rigenerano, non si versionano.
+# Le icone dell'app (icona*.png) restano tracciate: quelle servono.
+/vie.png
+/mappa.png
+/menu.png
+/scena.png
+/torri.png
+/nemici.png
+/campo.png
+/X.js

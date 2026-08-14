@@ -54,6 +54,7 @@ canvas#game{display:block;image-rendering:pixelated;image-rendering:crisp-edges;
   background:linear-gradient(#1d1710,#120d13);color:#c9a227;
   font:600 12px/1 ui-monospace,monospace;letter-spacing:.22em}
 .big:active{background:#2a2016}
+.big:disabled{opacity:.4}
 .big.ghost{border-color:#332b3d;color:#8b7f6c;letter-spacing:.16em}
 
 /* ---------- PANNELLO TORRE ---------- */
@@ -86,9 +87,18 @@ canvas#game{display:block;image-rendering:pixelated;image-rendering:crisp-edges;
 .bsell{border:1px solid #4a2028;background:#170f13;color:#b4636b}
 
 /* ---------- SCHERMATE ---------- */
+/* fondale animato: sta sopra tutto il flusso normale (#panel è a 5) e sotto
+   la schermata, così copre anche il campo senza doverlo nascondere */
+canvas#menubg{position:absolute;left:0;top:0;z-index:19;pointer-events:none;
+  image-rendering:pixelated;image-rendering:crisp-edges;background:#07060a}
+canvas#menubg.off{display:none}
 #screen{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;
   align-items:center;justify-content:center;padding:26px 22px;text-align:center;
-  background:radial-gradient(ellipse at 50% 38%,#170f18 0%,#07060a 72%)}
+  /* velo verticale, non radiale: pesante dove corre il testo, leggero in
+     basso dove c'è il paesaggio, che altrimenti non si vedrebbe */
+  background:linear-gradient(180deg,
+    rgba(7,6,10,.50) 0%,rgba(10,7,13,.70) 25%,rgba(10,7,13,.72) 60%,
+    rgba(7,6,10,.48) 77%,rgba(7,6,10,.26) 89%,rgba(7,6,10,.20) 100%)}
 #screen.off{display:none}
 #screen h1{font-size:26px;letter-spacing:.3em;color:#d8cbb0;font-weight:600;
   text-shadow:0 0 22px rgba(142,27,37,.75);margin-left:.3em}
@@ -96,8 +106,10 @@ canvas#game{display:block;image-rendering:pixelated;image-rendering:crisp-edges;
 #screen .sub{font-size:9.5px;line-height:2;letter-spacing:.16em;color:#8b7f6c;max-width:300px}
 #screen .lore{font-size:9.5px;line-height:1.95;color:#7a6f60;max-width:310px;text-align:left;letter-spacing:.02em}
 #screen .lore b{color:#c9a227;font-weight:600}
-/* compendio illustrato */
-#screen.wide{justify-content:flex-start;padding:14px 16px}
+/* compendio illustrato: testo fitto, serve più velo sul fondale */
+#screen.wide{justify-content:flex-start;padding:14px 16px;
+  background:linear-gradient(180deg,rgba(7,6,10,.86) 0%,rgba(9,7,12,.92) 40%,
+    rgba(7,6,10,.92) 100%)}
 #screen.wide h1{font-size:17px;letter-spacing:.26em}
 #screen.wide .rule{margin:9px 0}
 #screen.wide .lore{max-width:340px;width:100%;flex:1 1 auto;min-height:0;
@@ -114,6 +126,97 @@ canvas#game{display:block;image-rendering:pixelated;image-rendering:crisp-edges;
 .cmpT i{color:#8fa5b0;font-style:normal}
 .cmpT u{color:#c14a4a;text-decoration:none}
 .cmpI{padding:2px 0 4px}
+/* mappa della campagna */
+#tappe{display:none;image-rendering:pixelated;image-rendering:crisp-edges;
+  margin:16px 0 6px;border:1px solid #2b2434;background:#0a0810;max-width:100%}
+#screen.mappa #tappe,#screen.mondi #tappe{display:block}
+/* come il compendio: si parte dall'alto e la classifica scorre, se lo
+   schermo è basso non deve traboccare */
+#screen.mappa,#screen.mondi{justify-content:flex-start;padding:18px 20px}
+#screen.mappa h1,#screen.mondi h1{font-size:19px;letter-spacing:.26em}
+#screen.mappa .lore,#screen.mondi .lore{max-width:320px;width:100%;flex:0 1 auto;
+  min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#screen.mappa .btns,#screen.mondi .btns{margin-top:14px}
+/* le voci della schermata dei mondi: nome grande, stato sottile */
+.mdR{padding:7px 2px;border-bottom:1px solid #17131f;text-align:left}
+.mdR .t{font-size:11px;letter-spacing:.18em;color:#c9a227;display:block}
+.mdR .s{font-size:8.5px;letter-spacing:.14em;color:#7d6a4a}
+.mdR.mut .t{color:#584f45}
+.mdR.on{background:rgba(201,162,39,.08)}
+.mdR .d{font-size:9px;line-height:1.8;color:#7a6f60;margin-top:4px}
+.clsH{font-size:8px;letter-spacing:.3em;color:#7d6a4a;margin:4px 0 2px;
+  border-bottom:1px solid #2b2434;padding-bottom:5px}
+.clsR{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:baseline;padding:6px 2px;
+  border-bottom:1px solid #17131f;font-size:9px;letter-spacing:.04em}
+.clsR .n{color:#7d6a4a;flex:0 0 22px;letter-spacing:.16em}
+.clsR .t{color:#c9a227;flex:1 1 auto;min-width:0}
+.clsR .v{color:#8b7f6c;flex:0 0 auto;font-size:8.5px}
+.clsR.mut .t{color:#584f45}
+.clsR.mut .v{color:#4a423a}
+.clsR.on{background:rgba(201,162,39,.08)}
+/* armeria: quattro slot espliciti, poi il catalogo degli edifici */
+.armSlotsW{position:sticky;top:0;z-index:2;margin:0 -2px 10px;padding:5px 2px 8px;
+  background:linear-gradient(180deg,#09070d 82%,rgba(9,7,13,0));text-align:left}
+.armSlotsH{font-size:8px;letter-spacing:.25em;color:#8b7f6c;margin-bottom:5px}
+.armSlots{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.armSlot{height:64px;padding:4px 2px;border:1px solid #332b3d;border-radius:3px;
+  background:#0d0a12;color:#7d6a4a;font:inherit;overflow:hidden;text-align:center}
+.armSlot.pick{border-color:#c9a227;background:#19130f;box-shadow:0 0 8px rgba(201,162,39,.18)}
+.armSlot .asN{display:block;font-size:7px;letter-spacing:.18em;color:#8b7f6c;text-align:left}
+.armSlot .asI{height:32px;display:flex;align-items:flex-end;justify-content:center}
+.armSlot .asI img{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+.armSlot .asT{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-size:7px;letter-spacing:.06em;color:#c9a227}
+.armSlot.vuoto .asT{color:#584f45}
+.armR{display:flex;gap:8px;align-items:flex-start;padding:8px 6px;text-align:left;
+  border:1px solid #332b3d;border-radius:3px;margin-bottom:5px;background:rgba(14,11,19,.58);
+  width:100%;font:inherit}
+.armR.on{border-color:#c9a227;background:rgba(201,162,39,.09)}
+.armR .ap{flex:0 0 auto;width:34px;display:flex;align-items:flex-end;justify-content:center;
+  padding-top:2px}
+.armR .ap img{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+.armR .at{flex:1 1 auto;min-width:0}
+.armR .an{display:block;font-size:9.5px;letter-spacing:.13em;color:#c9a227}
+.armR .ar{font-size:7.5px;letter-spacing:.18em;color:#7d6a4a;margin-left:6px}
+.armR .ad{display:block;font-size:8.5px;line-height:1.6;color:#7a6f60;margin-top:3px}
+.armR .ad i{color:#8fa5b0;font-style:normal}
+.armActions{flex:0 0 63px;display:flex;flex-direction:column;gap:5px}
+.armActions button,.armBack,.armInfoPick{min-height:24px;padding:4px 3px;border-radius:2px;
+  font:600 7.5px/1.2 ui-monospace,monospace;letter-spacing:.08em}
+.armPick{border:1px solid #5a4a22;background:#1b1510;color:#c9a227}
+.armPick.on{border-color:#8a6f1c;background:#2a2114;color:#f7e08a}
+.armMore,.armBack{border:1px solid #3a3344;background:#100d16;color:#8fa5b0}
+.armInfoHead{padding:7px 2px 10px;border-bottom:1px solid #332b3d}
+.armInfoHead .nome{font-size:12px;letter-spacing:.16em;color:#c9a227}
+.armInfoHead .ruolo{font-size:8px;letter-spacing:.2em;color:#8fa5b0;margin:3px 0 7px}
+.armInfoHead .desc{font-size:9px;line-height:1.65;color:#8b7f6c}
+.armBack{width:100%;margin:7px 0;text-align:center}
+.armInfoPick{width:100%;border:1px solid #5a4a22;background:#1b1510;color:#c9a227;margin-bottom:8px}
+.armLv{display:grid;grid-template-columns:62px 1fr;gap:9px;align-items:center;min-height:82px;
+  padding:8px 4px;border-bottom:1px solid #211b29}
+.armLv.max{background:rgba(201,162,39,.06);border-color:#5a4a22}
+.armLv .lvPic{height:68px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+.armLv .lvPic img{image-rendering:pixelated;image-rendering:crisp-edges;display:block;max-width:58px}
+.armLv .lvN{font-size:8px;letter-spacing:.18em;color:#c9a227;margin-top:3px}
+.armLv .lvStat{font-size:8px;line-height:1.65;color:#8b7f6c}
+.armLv .lvStat b{color:#d8cbb0;font-weight:600}.armLv .lvStat i{color:#8fa5b0;font-style:normal}
+#armCont{font-size:9px;letter-spacing:.12em;color:#8b7f6c;margin:2px 0 8px}
+#armCont b{color:#c9a227}
+/* pausa: stessa tipografia delle schermate, ma il velo è solo un velo —
+   sotto deve restare leggibile il campo con le torri e le creature ferme */
+#pausa{position:absolute;inset:0;z-index:21;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:26px 22px;text-align:center;
+  background:rgba(6,4,9,.80)}
+#pausa.off{display:none}
+#pausa h1{font-size:22px;letter-spacing:.28em;color:#d8cbb0;font-weight:600;
+  text-shadow:0 0 22px rgba(142,27,37,.75);margin-left:.28em}
+#pausa .rule{width:120px;height:1px;
+  background:linear-gradient(90deg,transparent,#c9a227,transparent);margin:14px 0}
+#pausa .sub{font-size:9.5px;line-height:2;letter-spacing:.14em;color:#8b7f6c;max-width:300px}
+#pausa .lore{font-size:9.5px;line-height:1.95;color:#7a6f60;max-width:300px;margin-top:12px}
+#pausa .lore b{color:#c9a227;font-weight:600}
+#pausa .btns{margin-top:22px;width:100%;max-width:300px;display:flex;flex-direction:column;gap:8px}
+.big.lascia{border-color:#4a2028;color:#b4636b}
 #screen .btns{margin-top:22px;width:100%;max-width:300px;display:flex;flex-direction:column;gap:8px}
 #screen .scoreline{font-size:10px;letter-spacing:.14em;color:#8b7f6c;margin-top:10px}
 #screen .scoreline b{color:#c9a227}
@@ -151,14 +254,34 @@ canvas#game{display:block;image-rendering:pixelated;image-rendering:crisp-edges;
   <div id="bar"></div>
   <div id="act"><button class="big" id="bWave">SUONA LA CAMPANA</button></div>
 
+  <canvas id="menubg"></canvas>
+
+  <!-- La pausa non è una schermata: sta per conto suo, senza fondale in
+       parallasse, perché il campo si deve continuare a intravedere. -->
+  <div id="pausa" class="off">
+    <h1 id="paTitle">VEGLIA<br>SOSPESA</h1>
+    <div class="rule"></div>
+    <div class="sub" id="paStato"></div>
+    <div class="lore" id="paLore"></div>
+    <div class="btns">
+      <button class="big" id="paMain">RIPRENDI</button>
+      <button class="big ghost" id="paSalva">SALVA ED ESCI</button>
+      <button class="big lascia" id="paLascia">ABBANDONA</button>
+    </div>
+  </div>
+
   <div id="screen">
     <h1 id="scTitle">L'ULTIMA<br>VEGLIA</h1>
     <div class="rule"></div>
     <div class="sub" id="scSub">TOWER DEFENSE · SAGRATO DI CENERE</div>
+    <canvas id="tappe"></canvas>
     <div class="lore" id="scLore"></div>
     <div class="scoreline hidden" id="scScore"></div>
+    <!-- scAlt è sempre l'ultimo: è il tasto che riporta indietro -->
     <div class="btns">
       <button class="big" id="scMain">INIZIA LA VEGLIA</button>
+      <button class="big ghost hidden" id="scAlt2"></button>
+      <button class="big ghost hidden" id="scAlt3"></button>
       <button class="big ghost" id="scAlt">IL RITO — COME SI GIOCA</button>
     </div>
   </div>
@@ -184,34 +307,40 @@ const C={
   bone:'#d8cbb0', gold:'#c9a227', gold2:'#8a6f1c',
   blood:'#8e1b25', ember:'#e8703a', flame:'#f2c14e', spirit:'#7fa8b8'
 };
+/* Identità visiva corrente: i primi tre atti sono il mondo gotico, dal
+   quarto al sesto si entra nella città neon. È dichiarata prima del percorso
+   perché anche gli ingombri decorativi cambiano materia fra i mondi. */
+let INF=false,APO=false,CYBER=false,CYFASE=0;
 
 /* ─────────── PIXEL ART ─────────── */
 const ART={};
 ART.penitente=[
-'..hhhh..','.hhaahh.','.haffah.','.haffah.','.hhaahh.',
-'..rrrr..','.rrggrr.','.rrrrrr.','.rr..rr.','.rr..rr.','.kk..kk.'];
+'...hhhh...','..hhhhhh..','..haffah..','.hhffffhh.','.haa..aah.',
+'..hhaahh..','...rrrr...','..rrggrr..','.rrrrrrrr.','.rrr..rrr.',
+'..rr..rr..','..kk..kk..'];
 const PAL_PEN={h:'#3d2f45',a:'#2b2032',f:'#0c0913',r:'#332536',g:'#c9a227',k:'#1a141f'};
 
 ART.flagellante=[
-'..hhh...','.hhhhh..','.hfffh..','..sss...','.ssssb..',
-'.ssss.b.','..ss..b.','..ss....','.ss.ss..','.ss.ss..','.kk.kk..'];
+'..hhhhh...','.hhhhhh...','.hffffh...','..ssss....','.sssssb...',
+'.sssss.b..','..sss..b..','..sss...b.','.ss.ss....','.ss.ss....','.kk.kk....'];
 const PAL_FLA={h:'#7a1f28',f:'#0c0913',s:'#b89a7a',b:'#8a6b4a',k:'#241a20'};
 
 ART.portatore=[
-'...aaaa...','..aaaaaa..','..affffa..','..aaaaaa..','.gaaaaaag.',
-'.baaaaaab.','.baaaaaab.','..aaaaaa..','..aa..aa..','..aa..aa..','..aa..aa..','..kk..kk..'];
+'....aaaa....','...aaaaaa...','..aaffffaa..','.aaaaaaaaaa.','.gaaaggaaag.',
+'baaaaaaaaaab','bbaaaaaaaabb','.baaaaaaaab.','..aaaaaaaa..','..aaa..aaa..',
+'..aa....aa..','..kk....kk..'];
 const PAL_POR={a:'#4b4a52',f:'#0c0913',b:'#5f5747',g:'#c9a227',k:'#211c26'};
 
 ART.ombra=[
-'..vvvv..','.vvvvvv.','.vveeev.','.vvvvvv.','..vvvv..',
-'.vvvvvv.','.vvvvvv.','..vvvv..','..v.vv..','...v.v..','....v...'];
+'...vvvv...','..vvvvvv..','.vvveevvv.','.vvvvvvvv.','..vvvvvv..',
+'.vvvvvvvv.','.vvv..vvv.','..vvv.vv..','..vv...v..','...v...v..','...v......'];
 const PAL_OMB={v:'#2b3b47',e:'#9fd8e8'};
 
 ART.vescovo=[
-'......gg......','.....gmmg.....','.....gmmg.....','....gmmmmg....','....gmmmmg....',
-'...mmmmmmmm...','...mmffffmm...','...mmffffmm...','..mmmmmmmmmm..','..rrrrggrrrr..',
-'.rrrrrggrrrrr.','.rrrrrggrrrrr.','.rrrrrrrrrrrr.','.rrrrrrrrrrrr.','..rrrrrrrrrr..',
-'..rrrr..rrrr..','..rrrr..rrrr..','..kkkk..kkkk..'];
+'.......gg.......','......gyyg......','.....ggmmgg.....','.....gmmmmg.....','....gmmmmmmg....',
+'...gmmmmmmmmg...','...mmmffffmmm...','..mmmmffffmmmm..','..mmmmmmmmmmmm..','.rrrmmmggmmmrrr.',
+'.rrrrrrggrrrrrr.','rrrrrrrggrrrrrrr','rrrrrrrrrrrrrrrr','rrrrgggrrrgggrrr','rrrrrrrrrrrrrrrr',
+'.rrrrrrrrrrrrrr.','..rrrrrrrrrrrr..','..rrrr....rrrr..','..rrrr....rrrr..','..kkkk....kkkk..'];
 const PAL_VES={m:'#cfc2a6',g:'#c9a227',f:'#0c0913',r:'#5a1c28',k:'#241a20'};
 
 ART.spine=[
@@ -234,9 +363,9 @@ ART.reliquiario=[
 '....rryyrr....','....rrrrrr....','.....rrrr.....','.....rrrr.....','....rrrrrr....',
 '...ssssssss...','..ssssssssss..','..ss.s..s.ss..','..ssssssssss..','..ssssssssss..',
 '..ss.s..s.ss..','..ssssssssss..','...oooooooo...'];
-const PAL_TOW={w:'#6b4a30',d:'#5a4028',s:'#474055',o:'#262031',q:'#d3c7ad',t:'#7a1f28',x:'#0d0a12',m:'#8a8f9c',
-  b:'#8a6733',c:'#d1441f',p:'#544c66',g:'#b08c3a',y:'#c9a227',
-  r:'#5c2230',v:'#f0e6d0'};
+const PAL_TOW={w:'#7b5634',d:'#4a3325',s:'#545064',o:'#282431',q:'#ded1b8',t:'#812b36',x:'#0b0911',m:'#9da4b1',
+  b:'#9a7030',c:'#e05224',p:'#62576f',g:'#c39b32',y:'#edc447',
+  r:'#702733',v:'#f3ead8'};
 /* QUINTO GRADO — nessun ingrandimento: cambia la materia.
    La pietra diventa marmo bianco, il bronzo oro chiaro, il fuoco azzurro. */
 const PAL_TOW5={w:'#d8cbb0',d:'#b9a888',s:'#cfc4a8',o:'#8f836c',q:'#ffffff',t:'#c9a227',
@@ -254,7 +383,30 @@ ART.statua=['..nnn..','.nnnnn.','.nfffn.','.nnnnn.','nnnnnnn','nnnnnnn','.nnnnn.
 const PAL_STA={n:'#5b5568',f:'#100c14',m:'#332d3c'};
 
 /* ─────────── SPRITE CACHE (con outline automatico) ─────────── */
-function makeSprite(art,pal,outline){
+/* Righe di lunghezza diversa, o con uno spazio dentro, sono l'errore più
+   facile da introdurre disegnando: la larghezza viene dalla prima riga, e
+   tutto il resto scivola senza dire niente. Meglio fermarsi qui e dire dove. */
+function controllaArt(art){
+  const w=art[0].length;
+  for(let r=0;r<art.length;r++){
+    if(art[r].length!==w)
+      throw new Error('sprite storta: riga '+r+' è lunga '+art[r].length+' invece di '+w);
+    if(art[r].indexOf(' ')>=0)
+      throw new Error('sprite con uno spazio: riga '+r+' — usa il punto per il vuoto');
+  }
+}
+/* Il chiaroscuro non viene sfumato: nasce dai bordi dei gruppi di pixel.
+   Ogni materia guadagna un filo di luce in alto a sinistra e un taglio scuro
+   in basso a destra. Così le sagome restano nette ma non sembrano ritagli di
+   carta, e la stessa regola tiene insieme bestiario e architetture. */
+function miscelaPixel(col,to,k){
+  if(!/^#[0-9a-f]{6}$/i.test(col))return col;
+  const n=parseInt(col.slice(1),16),m=parseInt(to.slice(1),16);
+  const ch=s=>Math.round(((n>>s)&255)*(1-k)+((m>>s)&255)*k);
+  return '#'+[ch(16),ch(8),ch(0)].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+function makeSprite(art,pal,outline,rifinita){
+  controllaArt(art);
   const h=art.length,w=art[0].length;
   const cv=document.createElement('canvas'); cv.width=w+2; cv.height=h+2;
   const x=cv.getContext('2d');
@@ -271,13 +423,33 @@ function makeSprite(art,pal,outline){
     const col=pal[ch]; if(!col)continue;
     x.fillStyle=col; x.fillRect(c+1,r+1,1,1);
   }
+  if(rifinita!==false){
+    const same=(r,c,ch)=>r>=0&&c>=0&&r<h&&c<w&&art[r][c]===ch;
+    for(let r=0;r<h;r++)for(let c=0;c<w;c++){
+      const ch=art[r][c],col=pal[ch];if(ch==='.'||!col)continue;
+      const su=!same(r-1,c,ch),sx=!same(r,c-1,ch);
+      const giu=!same(r+1,c,ch),dx=!same(r,c+1,ch);
+      /* i dettagli di un solo pixel conservano il colore puro: il rilievo si
+         posa soltanto sui blocchi abbastanza larghi da leggerlo davvero */
+      if((su||sx)&&(same(r+1,c,ch)||same(r,c+1,ch))&&((r+c)&1)===0){
+        x.fillStyle=miscelaPixel(col,'#fff4dc',.22);x.fillRect(c+1,r+1,1,1);
+      }else if((giu||dx)&&(same(r-1,c,ch)||same(r,c-1,ch))&&((r*3+c)&1)===0){
+        x.fillStyle=miscelaPixel(col,'#08060c',.28);x.fillRect(c+1,r+1,1,1);
+      }else if(same(r-1,c,ch)&&same(r+1,c,ch)&&same(r,c-1,ch)&&same(r,c+1,ch)
+        &&(r*11+c*7)%19===0){
+        x.fillStyle=miscelaPixel(col,'#fff4dc',.12);x.fillRect(c+1,r+1,1,1);
+      }
+    }
+  }
   return {cv,w,h};
 }
 function flashPal(pal,col){const p={};for(const k in pal)p[k]=col;return p;}
 const S={};
 function reg(name,art,pal,fl){
-  S[name]=makeSprite(art,pal,C.out);
-  if(fl)S[name+'_f']=makeSprite(art,flashPal(pal,fl),'#ffffff');
+  // con più di cento sprite «riga 20 storta» non basta: serve sapere di chi
+  try{controllaArt(art);}catch(e){throw new Error(name+': '+e.message);}
+  S[name]=makeSprite(art,pal,C.out,true);
+  if(fl)S[name+'_f']=makeSprite(art,flashPal(pal,fl),'#ffffff',false);
 }
 reg('penitente',ART.penitente,PAL_PEN,'#ffd9d0');
 reg('flagellante',ART.flagellante,PAL_FLA,'#ffd9d0');
@@ -301,23 +473,24 @@ reg('colosso_b',ART.colosso,PAL_COL_B,'#ffd9d0');
 /* ═══════════ ATTO II — LE SCHIERE DELL'ABISSO ═══════════
    Ogni creatura eredita il ruolo di una del primo atto. */
 ART.ossame=[
-'..qqqq..','.qqqqqq.','.qe..eq.','.qqqqqq.','..q..q..','...qq...',
-'.qqqqqq.','.q.qq.q.','.qqqqqq.','..q..q..','..q..q..'];
+'...qqq...','..qqqqq..','.qqe.eq..','.qqqqqqq.','..q.q.q..','...qqq...',
+'..qqqqq..','.q.qqq.q.','.q.q.q.q.','...q.q...','..qq.qq..','..q...q..'];
 const PAL_OSS={q:'#cfc4a8',e:'#e8703a'};
 
 ART.imp=[
-'..h..h..','.rrrrrr.','.ry..yr.','.rrrrrr.','wrrrrrrw',
-'wwrrrrww','.rrrrrr.','..r..r..','..r..r..','..k..k..'];
+'..h....h..','.hh....hh.','..rrrrrr..','.rry..yrr.','.rrrrrrrr.',
+'wwrrrrrrww','.wrrrrrrw.','..rryyrr..','..rr..rr..','.rr....rr.','.kk....kk.'];
 const PAL_IMP={h:'#cfc4a8',r:'#8e2a1e',y:'#f2c14e',w:'#4a1218',k:'#2a1410'};
 
 ART.golem=[
-'...aaaa...','..aaaaaa..','..aeeeea..','..aaaaaa..','.eaaaaaae.','.aaeaaeaa.',
-'.aaaaaaaa.','..aaaaaa..','..ae..ea..','..aa..aa..','..aa..aa..','..kk..kk..'];
+'....aaaa....','..aaaaaaaa..','..aaeeeeaa..','.aaaaaaaaaa.','eeaaaaaaaaee',
+'eaaaeaaeaaae','.aaaaaaaaaa.','..aaeeeeaa..','..aaaaaaaa..','..aaa..aaa..',
+'.aaa....aaa.','..aa....aa..','..kk....kk..'];
 const PAL_GOL={a:'#3c3138',e:'#e8703a',k:'#221a20'};
 
 ART.dannata=[
-'...vv...','..vvvv..','.vveevv.','.vvvvvv.','..vvvv..','.vvvvvv.',
-'.vvvvvv.','..vvvv..','..v.vv..','...v.v..','....v...'];
+'...vvvv...','..vvvvvv..','.vvveevvv.','.vvvvvvvv.','..vvvvvv..',
+'.vvvvvvvv.','vvvvvvvvvv','.vvv..vvv.','..vvv.vv..','..vv...v..','...v...v..','...v......'];
 const PAL_DAN={v:'#6b2a2e',e:'#f2c14e'};
 
 ART.titano=[
@@ -332,10 +505,10 @@ const PAL_TIT={h:'#cfc4a8',a:'#3c3138',e:'#e8703a',k:'#221a20'};
 const PAL_TIT_B={h:'#cfc4a8',a:'#6b2a1e',e:'#f7e08a',k:'#2a1a18'};
 
 ART.arcidemone=[
-'..h........h..','..hh......hh..','...hh....hh...','....rrrrrr....','....reeeer....',
-'....rrrrrr....','....ryyyyr....','..wwrrrrrrww..','.wwrrrrrrrrww.','.wwrrrrrrrrww.',
-'..wrrrrrrrrw..','...rrrrrrrr...','...rrreerrr...','...rrrrrrrr...','...rrr..rrr...',
-'...rrr..rrr...','...rrr..rrr...','..kkkk..kkkk..'];
+'..h..........h..','..hh........hh..','...hh......hh...','....hh....hh....','.....rrrrrr.....',
+'....rreeeerr....','....rrrrrrrr....','...rrryyyyrrr...','..wwrrrrrrrrww..','.wwrrrrrrrrrrww.',
+'wwrrrrrrrrrrrrww','.wrrrrrrrrrrrrw.','..rrrrreerrrrr..','...rrreeeerrr...','...rrrrrrrrrr...',
+'...rrrr..rrrr...','...rrrr..rrrr...','...rrrr..rrrr...','..kkkk....kkkk..'];
 const PAL_ARC={h:'#cfc4a8',r:'#7a1f28',e:'#f2c14e',y:'#d8cbb0',w:'#3a1218',k:'#241a20'};
 
 reg('ossame',ART.ossame,PAL_OSS,'#ffd9d0');
@@ -396,23 +569,24 @@ reg('signore_b',ART.signore,PAL_SIG_B,'#ffe8d0');
    Osso e oro: non bruciano, sono già luce. Ogni figura eredita
    il ruolo della creatura infernale corrispondente. */
 ART.cherubino=[
-'..hhhh..','.hhhhhh.','.hbbbbh.','.hhhhhh.','..hhhh..',
-'..wwww..','.wwggww.','.wwwwww.','.ww..ww.','.ww..ww.','.kk..kk.'];
+'...hhhh...','..hhhhhh..','.hhhbbhhh.','.hhhhhhhh.','..hhhhhh..',
+'.wwwhhwww.','wwwwggwwww','.wwwwwwww.','..ww..ww..','..ww..ww..','..kk..kk..'];
 const PAL_CHE={h:'#e0d8c0',b:'#c9a227',w:'#c9c0a8',g:'#f7e08a',k:'#8a8270'};
 
 ART.serafino=[
-'...hhhh...','..hhhhhh..','..hggggh..','..hhhhhh..','ww.aaaa.ww',
-'.w.aaaa.w.','ww.aaaa.ww','...aaaa...','...a..a...','...k..k...'];
+'....hhhh....','...hhhhhh...','..hhgggghh..','...hhhhhh...','www.aaaa.www',
+'.wwaaaaaaww.','wwwaaaaaawww','.wwaaaaaaww.','...aaaaaa...','...aa..aa...','...kk..kk...'];
 const PAL_SER={h:'#e0d8c0',g:'#c9a227',a:'#d8cbb0',w:'#f2ecd8',k:'#8a8270'};
 
 ART.trono=[
-'...mmmm...','..mmmmmm..','..mggggm..','..mmmmmm..','.gmmmmmmg.',
-'.gmmmmmmg.','.mmmmmmmm.','..mggggm..','..mm..mm..','..mm..mm..','..mm..mm..','..kk..kk..'];
+'....mmmm....','..mmmmmmmm..','..mmggggmm..','.mmmmmmmmmm.','ggmmmmmmmmgg',
+'gmmmmmmmmmmg','.mmmmmmmmmm.','..mmggggmm..','..mmmmmmmm..','..mmm..mmm..',
+'.mmm....mmm.','..mm....mm..','..kk....kk..'];
 const PAL_TRO={m:'#cfc8b0',g:'#c9a227',k:'#8a8270'};
 
 ART.voce=[
-'..llll..','.llllll.','.llgggl.','.llllll.','..llll..',
-'.llllll.','.llllll.','..llll..','..l.ll..','...l.l..','....l...'];
+'...llll...','..llllll..','.lllgglll.','.llllllll.','..llllll..',
+'.llllllll.','llllllllll','.lll..lll.','..lll.ll..','..ll...l..','...l...l..','...l......'];
 const PAL_VOC={l:'#eae4d0',g:'#c9a227'};
 
 ART.mietitore=[
@@ -427,10 +601,10 @@ const PAL_MIE={h:'#cfc8b0',m:'#f2ecd8',g:'#c9a227',k:'#8a8270'};
 const PAL_MIE_B={h:'#c9a227',m:'#f7e08a',g:'#ffffff',k:'#8a6f1c'};
 
 ART.tromba=[
-'......gg......','.....gggg.....','....gg..gg....','....g....g....','.....mmmm.....',
-'.....mffm.....','.....mmmm.....','...mmmmmmmm...','..mmmmmmmmmm..','..mmggggggmm..',
-'.mmmmmmmmmmmm.','.mmmmmmmmmmmm.','.mmmggggggmmm.','.mmmmmmmmmmmm.','..mmmm..mmmm..',
-'..mmmm..mmmm..','..mmmm..mmmm..','..kkkk..kkkk..'];
+'.......gg.......','......gggg......','.....gg..gg.....','....gg....gg....','.....gg..gg.....',
+'......mmmm......','.....mmffmm.....','.....mmmmmm.....','...mmmmmmmmmm...','..mmmmmmmmmmmm..',
+'.mmmggggggggmmm.','mmmmmmmmmmmmmmmm','mmmmggmmmmggmmmm','mmmmmmmmmmmmmmmm','.mmmmmmmmmmmmmm.',
+'..mmmm....mmmm..','..mmmm....mmmm..','..mmmm....mmmm..','..kkkk....kkkk..'];
 const PAL_TRB={g:'#c9a227',m:'#e0d8c0',f:'#8a8270',k:'#8a8270'};
 
 ART.agnello=[
@@ -460,6 +634,280 @@ reg('mietitore_b',ART.mietitore,PAL_MIE_B,'#ffffff');
 reg('tromba',ART.tromba,PAL_TRB,'#ffffff');
 reg('agnello',ART.agnello,PAL_AGN,'#ffffff');
 reg('agnello_b',ART.agnello,PAL_AGN_B,'#ffffff');
+
+/* MONDO II — LE MACCHINE DELLA NOTTE. Le sagome sono generate su matrici
+   di pixel: restano codice nativo del gioco e non caricano immagini esterne. */
+const PAL_NEON=[
+ {s:'#292a38',m:'#494c62',x:'#080a12',c:'#21d7ff',r:'#ff2fb3',y:'#ffd34d',q:'#dffaff',p:'#7b3cff'},
+ {s:'#302c2c',m:'#655643',x:'#0b0d0d',c:'#33e6c2',r:'#ef5a3c',y:'#ffbf3f',q:'#e8ffd8',p:'#628f72'},
+ {s:'#252b3b',m:'#69758c',x:'#050814',c:'#5a8cff',r:'#845cff',y:'#ffffff',q:'#e8f2ff',p:'#3349a8'}
+];
+const PAL_NEON_B=[
+ {s:'#39213a',m:'#70405f',x:'#08030a',c:'#ffffff',r:'#ff4ac6',y:'#ffd34d',q:'#ffffff',p:'#9d4dff'},
+ {s:'#4a2c24',m:'#885139',x:'#0c0704',c:'#baffea',r:'#ff6d45',y:'#fff0a0',q:'#ffffff',p:'#7ab29a'},
+ {s:'#303b58',m:'#8297b8',x:'#03050d',c:'#b9d0ff',r:'#a78cff',y:'#ffffff',q:'#ffffff',p:'#5270d8'}
+];
+function matricePixel(w,h){return Array.from({length:h},()=>Array(w).fill('.'));}
+function pxPut(a,x,y,ch){if(y>=0&&y<a.length&&x>=0&&x<a[0].length)a[y][x]=ch;}
+function pxBox(a,x,y,w,h,ch){for(let Y=y;Y<y+h;Y++)for(let X=x;X<x+w;X++)pxPut(a,X,Y,ch);}
+function pxLine(a,x0,y0,x1,y1,ch){
+  const n=Math.max(Math.abs(x1-x0),Math.abs(y1-y0))||1;
+  for(let i=0;i<=n;i++)pxPut(a,Math.round(x0+(x1-x0)*i/n),Math.round(y0+(y1-y0)*i/n),ch);
+}
+function cyberMobArt(ruolo,variante){
+  const dim={base:[9,10],fast:[11,11],tank:[13,14],ghost:[11,13],big:[21,24],boss:[17,20],final:[29,30]}[ruolo];
+  const w=dim[0],h=dim[1],a=matricePixel(w,h),cx=Math.floor(w/2);
+  if(ruolo==='ghost'){
+    pxBox(a,cx-2,1,5,4,'s');pxBox(a,cx-1,2,3,2,'x');pxPut(a,cx,2,'c');
+    for(let y=5;y<h;y++)for(let x=1;x<w-1;x++)if(Math.abs(x-cx)<=Math.max(1,4-Math.floor((y-5)/2))&&((x+y)%3))pxPut(a,x,y,variante===1?'c':(variante===2?'p':'r'));
+    return a.map(r=>r.join(''));
+  }
+  if(ruolo==='final'){
+    for(let y=4;y<h;y++){const half=Math.min(cx-2,4+Math.floor((y-4)*.38));pxBox(a,cx-half,y,half*2+1,1,y>h-5?'x':'s');}
+    pxBox(a,cx-5,8,11,10,'m');pxBox(a,cx-3,10,7,6,'x');pxBox(a,cx-1,11,3,4,'c');
+    for(const dx of [-10,-6,6,10]){pxLine(a,cx+dx,h-5,cx+dx,7+Math.abs(dx)%4,'m');pxPut(a,cx+dx,6+Math.abs(dx)%4,'q');}
+    for(let x=2;x<w-2;x+=4)pxPut(a,x,h-7,variante===1?'y':(variante===2?'c':'r'));
+    return a.map(r=>r.join(''));
+  }
+  const grande=ruolo==='big'||ruolo==='boss',bodyW=grande?Math.floor(w*.62):(ruolo==='tank'?9:5);
+  const headY=grande?2:1,headW=grande?7:(ruolo==='tank'?5:4);
+  pxBox(a,cx-Math.floor(headW/2),headY,headW,4,'s');
+  pxBox(a,cx-1,headY+1,3,2,'x');pxPut(a,cx,headY+1,variante===1?'c':(variante===2?'y':'r'));
+  const bodyY=headY+4,bodyH=h-bodyY-3;
+  pxBox(a,cx-Math.floor(bodyW/2),bodyY,bodyW,bodyH,'s');
+  pxBox(a,cx-1,bodyY+1,3,Math.max(2,bodyH-2),ruolo==='tank'?'m':'x');
+  pxPut(a,cx,bodyY+2,variante===1?'r':(variante===2?'c':'y'));
+  if(ruolo==='fast'){
+    pxLine(a,cx-2,bodyY+2,0,h-3,'r');pxLine(a,cx+2,bodyY+2,w-1,h-5,'c');
+  }else{
+    pxLine(a,cx-Math.floor(bodyW/2),bodyY+1,1,h-5,'m');
+    pxLine(a,cx+Math.floor(bodyW/2),bodyY+1,w-2,h-5,'m');
+  }
+  const foot=Math.max(1,Math.floor(bodyW*.28));
+  pxBox(a,cx-Math.floor(bodyW/2),h-3,foot,3,'x');pxBox(a,cx+Math.floor(bodyW/2)-foot+1,h-3,foot,3,'x');
+  if(grande)for(let x=1;x<w-1;x+=4)pxPut(a,x,bodyY+Math.floor(bodyH/2),'c');
+  if(ruolo==='boss'){pxLine(a,1,4,cx-3,bodyY+2,'p');pxLine(a,w-2,4,cx+3,bodyY+2,'p');}
+  return a.map(r=>r.join(''));
+}
+/* ═══ I TRE CHE CHIUDONO LA CITTÀ ═══
+   Alla stessa scala del Santo e dell'Agnello (29×30), ma non si somigliano
+   fra loro: uno è ferro squadrato, uno è carne e tentacoli, uno è una figura
+   umana che non è umana. La sagoma deve dirlo prima del colore. */
+ART.nucleo=[                     // il robottone: torre di ferro con un visore
+'..............c..............',
+'..............m..............',
+'.........mmmmmmmmmmm.........',
+'........mmmmmmmmmmmmm........',
+'........mscccccccccsm........',
+'........mscccccccccsm........',
+'........msssssssssssm........',
+'............mmmmm............',
+'....mmmmmmmmmmmmmmmmmmmmm....',
+'...msssssssssssssssssssssm...',
+'...mmmm..sssssssssss..mmmm...',
+'...mssm..sxxxxxxxxxs..mssm...',
+'...mssm..sxxcccccxxs..mssm...',
+'...mssm..sxcccqcccxs..mssm...',
+'...mssm..sxxcccccxxs..mssm...',
+'...mssm..sxxxxxxxxxs..mssm...',
+'...mssm..sssssssssss..mssm...',
+'...mmmm..sssssssssss..mmmm...',
+'....xx...sssssssssss...xx....',
+'.........sssssssssss.........',
+'.........sssssssssss.........',
+'.........ssss...ssss.........',
+'........mssss...ssssm........',
+'........mssss...ssssm........',
+'........msssm...msssm........',
+'........msssm...msssm........',
+'.......mmsssmm.mmsssmm.......',
+'.......xxsssxx.xxsssxx.......',
+'......mmmmmmm...mmmmmmm......',
+'......xxxxxxx...xxxxxxx......'];
+ART.reattore=[                   // l'alieno: cupola di occhi e tentacoli
+'..........sssssssss..........',
+'........sssssssssssss........',
+'.......sssssssssssssss.......',
+'......sssssssssssssssss......',
+'.....sssssssssssssssssss.....',
+'....sssssssssssssssssssss....',
+'....ssssscsssssscssssscs.....',
+'....ssssqcsssssqcssssqcs.....',
+'....sssssssssssssssssssss....',
+'.....sssssssssssssssssss.....',
+'.....ssssxxxxxxxxxssssss.....',
+'.....ssssxrrrrrrrxssssss.....',
+'.....ssssxxxxxxxxxssssss.....',
+'......sssssssssssssssss......',
+'.......sssssssssssssss.......',
+'......mm.sssssssss.mm........',
+'.....mm...sssssss...mm.......',
+'....mm..m.sssssss.m..mm......',
+'...mm...m..sssss..m...mm.....',
+'..mm....m..sssss..m....mm....',
+'..m.....m...sss...m.....m....',
+'..m....mm...sss...mm....m....',
+'.mm....m.....s.....m....mm...',
+'.m....mm...........mm....m...',
+'.m....m.............m....m...',
+'mm...mm.............mm...mm..',
+'m....m...............m....m..',
+'m...mm...............mm...m..',
+'x...x.................x...x..',
+'x...x.................x...x..'];
+/* La matrice è l'unica dei tre che deve leggersi come *una persona*: testa,
+   spalle, braccia staccate dal busto, gambe. Il primo tentativo la faceva a
+   diamante e veniva fuori un cristallo — a questa scala conta la silhouette,
+   e la silhouette di un uomo è la cosa più riconoscibile che ci sia. Che poi
+   non sia un uomo lo dicono il volto spento e i piedi che si sfilacciano. */
+ART.matrice=[
+'..............q..............',
+'.............qqq.............',
+'............ccccc............',
+'...........ccccccc...........',
+'...........cqqqqqc...........',
+'...........cqxxxqc...........',
+'...........cqqqqqc...........',
+'...........ccccccc...........',
+'.............ccc.............',
+'........ccccccccccccc........',
+'......ccccccccccccccccc......',
+'.....cc...ccccccccc...cc.....',
+'.....cc...ccccccccc...cc.....',
+'.....cc...ccqqqqqcc...cc.....',
+'.....cc...ccqqqqqcc...cc.....',
+'.....cc...ccccccccc...cc.....',
+'.....cc...ccccccccc...cc.....',
+'.....cc...ccccccccc...cc.....',
+'.....cc....ccccccc....cc.....',
+'.....c.....ccccccc.....c.....',
+'...........ccccccc...........',
+'...........ccc.ccc...........',
+'..........ccc...ccc..........',
+'..........ccc...ccc..........',
+'..........ccc...ccc..........',
+'.........ccc.....ccc.........',
+'.........cc.......cc.........',
+'........ccc.......ccc........',
+'........qq.........qq........',
+'.......qq...........qq.......'];
+/* ═══ LE SCHIERE DEI BASSIFONDI ═══
+   Atto IV. Gente e cose che la città lascia in strada: un pacco che non ha
+   trovato destinatario, un corriere che non si ferma, un agente antisommossa,
+   il fantasma di una trasmissione, un esoscheletro da porto, un indovino con
+   gli schermi al posto della faccia. */
+ART.pacchetto=[
+'...ccc...',
+'..mmmmm..',
+'.mmsssmm.',
+'.msxxxsm.',
+'.msxcxsm.',
+'.mmsssmm.',
+'..mmmmm..',
+'..x...x..',
+'..m...m..',
+'..x...x..'];
+ART.corridore=[
+'.....ccc...',
+'....cmmmc..',
+'....cxmxc..',
+'.....mmm...',
+'..rr.mmmm..',
+'.r...mmmm..',
+'.....mmm...',
+'....mm.mm..',
+'...mm...m..',
+'..mm....mm.',
+'..x......x.'];
+ART.sbirro=[
+'....mmmmm....',
+'...mmmmmmm...',
+'...mcccccm...',
+'...mmmmmmm...',
+'..sssssssss..',
+'.mmsssssssss.',
+'.mmsssssssss.',
+'.mmssscsssss.',
+'.mmsssssssss.',
+'.mmsssssssss.',
+'..sssssssss..',
+'..sss...sss..',
+'..sss...sss..',
+'..xxx...xxx..'];
+ART.eco=[
+'...ccccc...',
+'..c.....c..',
+'..c.xxx.c..',
+'..c.xcx.c..',
+'...ccccc...',
+'....ccc....',
+'..c.ccc.c..',
+'....ccc....',
+'..c.ccc.c..',
+'....ccc....',
+'...c.c.c...',
+'..c..c..c..',
+'.....c.....'];
+ART.scaricatore=[
+'.......mmmmmmm.......',
+'......mmmmmmmmm......',
+'......mcccccccm......',
+'......mmmmmmmmm......',
+'...mmmmmmmmmmmmmmm...',
+'..mmmsssssssssssmmm..',
+'..mmmsssssssssssmmm..',
+'..mmmsssxxxxxsssmmm..',
+'..mmmsssxcccxsssmmm..',
+'..mmmsssxxxxxsssmmm..',
+'..mmmsssssssssssmmm..',
+'..mmmsssssssssssmmm..',
+'..xxxsssssssssssxxx..',
+'.....sssssssssss.....',
+'.....sssssssssss.....',
+'.....sssssssssss.....',
+'.....ssss...ssss.....',
+'....mssss...ssssm....',
+'....mssss...ssssm....',
+'....mssss...ssssm....',
+'....msss.....sssm....',
+'...mmsss.....sssmm...',
+'...xxsss.....sssxx...',
+'...mmmmm.....mmmmm...'];
+ART.oracolo=[
+'......mmmmm......',
+'.....mmmmmmm.....',
+'....mmmmmmmmm....',
+'....mmxxxxxmm....',
+'....mmxcccxmm....',
+'....mmxxxxxmm....',
+'....mmmmmmmmm....',
+'...mmmmmmmmmmm...',
+'..mmmmmmmmmmmmm..',
+'..mmmsssssssmmm..',
+'..mmmscccccsmmm..',
+'..mmmscqqqcsmmm..',
+'..mmmscccccsmmm..',
+'..mmmsssssssmmm..',
+'..mmmmmmmmmmmmm..',
+'...mmmmmmmmmmm...',
+'....mmmmmmmmm....',
+'....mmm...mmm....',
+'....mmm...mmm....',
+'....xxx...xxx....'];
+const CY_SCHIERE=[
+ {base:'pacchetto',fast:'corridore',tank:'sbirro',ghost:'eco',big:'scaricatore',boss:'oracolo',final:'nucleo'},
+ {base:'acaro',fast:'lama',tank:'hazmat',ghost:'fantasma_dati',big:'mutante',boss:'direttore',final:'reattore'},
+ {base:'frammento',fast:'ciclista',tank:'sentinella',ghost:'nulla',big:'assedio',boss:'arconte',final:'matrice'}
+];
+/* `cyberMobArt` ricava la sagoma dal solo ruolo: fra un atto e l'altro cambia
+   la tinta e due pixel, e in campo le schiere sembrano le stesse ridipinte.
+   Chi ha una sagoma disegnata a mano in ART la usa; il generatore resta come
+   ripiego per quelle non ancora fatte, e sparirà quando saranno tutte. */
+for(let v=0;v<CY_SCHIERE.length;v++)for(const ruolo in CY_SCHIERE[v]){
+  const nome=CY_SCHIERE[v][ruolo],art=ART[nome]||cyberMobArt(ruolo,v);
+  reg(nome,art,PAL_NEON[v],'#ffffff');
+  if(ruolo==='big'||ruolo==='final')reg(nome+'_b',art,PAL_NEON_B[v],'#ffffff');
+}
 
 
 
@@ -545,17 +993,619 @@ ART.reliquiario4=[
 '..ssssssssssssssss..','..ss.kk.ssss.kk.ss..','..ssssssssssssssss..','.llllllllllllllllll.','..oooooooooooooooo..'];
 
 PAL_TOW.l='#4e465e';PAL_TOW.k='#2a2630';
+
+/* ═══ OSSARIO ═══
+   Non è una torre: è una catasta. Bassa e larga dove le altre sono alte e
+   strette, così si riconosce dalla sagoma prima che dal colore — che è poi
+   l'unica cosa che si legge a quattordici pixel. */
+ART.ossario=[
+'..............',
+'..............',
+'...qqq..qqq...',
+'..qxqxq.qxqxq.',
+'...qqq..qqq...',
+'..qqqqqqqqqq..',
+'..q.qq.qq.qq..',
+'...ssssssss...',
+'..ssssssssss..',
+'..ss.s..s.ss..',
+'..ssssssssss..',
+'..ssssssssss..',
+'..ss.s..s.ss..',
+'...oooooooo...'];
+ART.ossario2=[
+'..............',
+'...qqq..qqq...',
+'..qxqxq.qxqxq.',
+'...qqq..qqq...',
+'..qqq.qq.qqq..',
+'.qxq.qxq.qxq..',
+'..qqq.qq.qqq..',
+'.qqqqqqqqqqqq.',
+'.q.qq.qq.qq.q.',
+'..ssssssssss..',
+'.ssssssssssss.',
+'.ss.s..ss.s.s.',
+'.ssssssssssss.',
+'.ssssssssssss.',
+'.ss.s..ss.s.s.',
+'.ssssssssssss.',
+'..oooooooooo..'];
+ART.ossario3=[
+'................',
+'....qqq..qqq....',
+'...qxqxq.qxqxq..',
+'....qqq..qqq....',
+'...qqq.qq.qqq...',
+'..qxq.qxq.qxq...',
+'...qqq.qq.qqq...',
+'..qqq.qqq.qqq...',
+'.qxq.qxqxq.qxq..',
+'..qqq.qqq.qqq...',
+'.qqqqqqqqqqqqqq.',
+'.q.qq.qq.qq.qq..',
+'.qqqqqqqqqqqqqq.',
+'..ssssssssssss..',
+'.ssssssssssssss.',
+'.ss.s..ss..s.ss.',
+'.ssssssssssssss.',
+'.ssssssssssssss.',
+'.ss.s..ss..s.ss.',
+'..oooooooooooo..'];
+ART.ossario4=[
+'..................',
+'.....qqq..qqq.....',
+'....qxqxq.qxqxq...',
+'.....qqq..qqq.....',
+'....qqq.qq.qqq....',
+'...qxq.qxq.qxq....',
+'....qqq.qq.qqq....',
+'...qqq.qqq.qqq....',
+'..qxq.qxqxq.qxq...',
+'...qqq.qqq.qqq....',
+'..qqq.qqq.qqq.qq..',
+'.qxq.qxqxq.qxq.q..',
+'..qqq.qqq.qqq.qq..',
+'.qqqqqqqqqqqqqqqq.',
+'.q.qq.qq.qq.qq.q..',
+'.qqqqqqqqqqqqqqqq.',
+'.yyyyyyyyyyyyyyyy.',
+'..ssssssssssssss..',
+'.ssssssssssssssss.',
+'.ss.s..ss..ss.s.s.',
+'.ssssssssssssssss.',
+'.ssssssssssssssss.',
+'.ss.s..ss..ss.s.s.',
+'..oooooooooooooo..'];
+
+/* ═══ CALDAIA DI PECE ═══
+   Un paiolo di ferro su un treppiede, con il fuoco sotto. Tozza e panciuta:
+   la pancia è la cosa che si deve vedere. */
+ART.caldaia=[
+'..............',
+'..............',
+'...m....m.....',
+'...mmmmmmm....',
+'..mxxxxxxxm...',
+'..mxxxxxxxm...',
+'..mmxxxxxmm...',
+'...mmxxxmm....',
+'....mmmmm.....',
+'....c.c.c.....',
+'...ssssssss...',
+'..ssssssssss..',
+'..ss.s..s.ss..',
+'..ssssssssss..',
+'...oooooooo...'];
+ART.caldaia2=[
+'................',
+'....m......m....',
+'....mmmmmmmm....',
+'...mxxxxxxxxm...',
+'...mxxxxxxxxm...',
+'...mxxxxxxxxm...',
+'...mmxxxxxxmm...',
+'....mmxxxxmm....',
+'.....mmmmmm.....',
+'.....c.cc.c.....',
+'....cc.cc.cc....',
+'...ssssssssss...',
+'..ssssssssssss..',
+'..ss.s..ss.s.s..',
+'..ssssssssssss..',
+'..ssssssssssss..',
+'..ss.s..ss.s.s..',
+'...oooooooooo...'];
+ART.caldaia3=[
+'..................',
+'.....m......m.....',
+'.....mmmmmmmm.....',
+'....mxxxxxxxxm....',
+'...mmxxxxxxxxmm...',
+'...mxxxccccxxxm...',
+'...mxxccxxccxxm...',
+'...mxxxccccxxxm...',
+'...mmxxxxxxxxmm...',
+'....mmxxxxxxmm....',
+'.....mmmmmmmm.....',
+'.....c.cc.cc.c....',
+'....cc.cc.cc.cc...',
+'...ssssssssssss...',
+'..ssssssssssssss..',
+'..ss.s..ss..s.ss..',
+'..ssssssssssssss..',
+'..ssssssssssssss..',
+'..ss.s..ss..s.ss..',
+'...oooooooooooo...'];
+ART.caldaia4=[
+'....................',
+'......m......m......',
+'......mmmmmmmm......',
+'.....mxxxxxxxxm.....',
+'....mmxxxxxxxxmm....',
+'....mxxxccccxxxm....',
+'...mmxxccxxccxxmm...',
+'...mxxxccxxccxxxm...',
+'...mxxxxxccccxxxm...',
+'...mmxxxxxxxxxxmm...',
+'....mmxxxxxxxxmm....',
+'.....mmmmmmmmmm.....',
+'.....yyyyyyyyyy.....',
+'.....c.cc.cc.c.c....',
+'....cc.cc.cc.cc.c...',
+'...cc.cc.cc.cc.cc...',
+'...ssssssssssssss...',
+'..ssssssssssssssss..',
+'..ss.s..ss..ss.s.s..',
+'..ssssssssssssssss..',
+'..ssssssssssssssss..',
+'..ss.s..ss..ss.s.s..',
+'...oooooooooooooo...'];
+
+/* ═══ MANGANO ═══
+   Legno, non pietra: un cavalletto con il braccio teso e il contrappeso.
+   Il braccio è in grigio metallo e il contrappeso in nero, non in legno: sul
+   marrone del telaio due toni vicini si impastano in una macchia sola, e a
+   quattordici pixel una macchia non è un'arma da assedio. */
+ART.mangano=[
+'..............',
+'...........m..',
+'..........mm..',
+'.........mm...',
+'........mm....',
+'.......mm.....',
+'..kk..mm......',
+'..kk.mm.......',
+'..kkdwd.......',
+'..wwwwww......',
+'..dwwwwwd.....',
+'...ssssssss...',
+'..ssssssssss..',
+'..ss.s..s.ss..',
+'..ssssssssss..',
+'..ssssssssss..',
+'...oooooooo...'];
+ART.mangano2=[
+'................',
+'.............m..',
+'............mm..',
+'...........mm...',
+'..........mm....',
+'.........mm.....',
+'........mm......',
+'..kkk..mm.......',
+'..kkk.mm........',
+'..kkkdwd........',
+'..kkdwwwd.......',
+'..wwwwwwww......',
+'..dwwwwwwwd.....',
+'...ssssssssss...',
+'..ssssssssssss..',
+'..ss.s..ss.s.s..',
+'..ssssssssssss..',
+'..ssssssssssss..',
+'..ss.s..ss.s.s..',
+'...oooooooooo...'];
+ART.mangano3=[
+'..................',
+'...............m..',
+'..............mm..',
+'.............mm...',
+'............mm....',
+'...........mm.....',
+'..........mm......',
+'.........mm.......',
+'..kkkk..mm........',
+'..kkkk.mm.........',
+'..kkkkdwd.........',
+'..kkkdwwwd........',
+'..kkdwwwwwd.......',
+'..wwwwwwwwww......',
+'..dwwwwwwwwwd.....',
+'...ssssssssssss...',
+'..ssssssssssssss..',
+'..ss.s..ss..s.ss..',
+'..ssssssssssssss..',
+'..ssssssssssssss..',
+'..ss.s..ss..s.ss..',
+'...oooooooooooo...'];
+ART.mangano4=[
+'....................',
+'.................mm.',
+'................mm..',
+'...............mm...',
+'..............mm....',
+'.............mm.....',
+'............mm......',
+'...........mm.......',
+'..........mm........',
+'..kkkkk..mm.........',
+'..kkkkk.mm..........',
+'..kkkkkdwd..........',
+'..kkkkdwwwd.........',
+'..kkkdwwwwwd........',
+'..kkdwwwwwwwd.......',
+'..wwwwwwwwwwww......',
+'..dwwwwwwwwwwwd.....',
+'..yyyyyyyyyyyyyy....',
+'...ssssssssssssss...',
+'..ssssssssssssssss..',
+'..ss.s..ss..ss.s.s..',
+'..ssssssssssssssss..',
+'..ssssssssssssssss..',
+'..ss.s..ss..ss.s.s..',
+'...oooooooooooooo...'];
+
+/* ═══ SALMODIA ═══
+   Canne d'organo: una fila di tubi di altezza diversa su un somiere. Sale in
+   verticale come la campana, ma dove quella ha un arco vuoto questa ha pieno,
+   e il profilo a gradini si riconosce anche a sagoma nera. */
+ART.salmodia=[
+'..............',
+'.......b......',
+'.....b.b......',
+'.....b.b......',
+'...b.b.b.b....',
+'...b.b.b.b....',
+'...b.b.b.b....',
+'...b.b.b.b....',
+'...bbbbbbb....',
+'...ggggggg....',
+'...ssssssss...',
+'..ssssssssss..',
+'..ss.s..s.ss..',
+'..ssssssssss..',
+'..ssssssssss..',
+'..ss.s..s.ss..',
+'...oooooooo...'];
+ART.salmodia2=[
+'..............',
+'.......b......',
+'.....b.b......',
+'.....b.b.b....',
+'...b.b.b.b....',
+'.b.b.b.b.b.b..',
+'.b.b.b.b.b.b..',
+'.b.b.b.b.b.b..',
+'.b.b.b.b.b.b..',
+'.b.b.b.b.b.b..',
+'.bbbbbbbbbbb..',
+'.ggggggggggg..',
+'..ssssssssss..',
+'.ssssssssssss.',
+'.ss.s..ss.s.s.',
+'.ssssssssssss.',
+'.ssssssssssss.',
+'.ss.s..ss.s.s.',
+'..oooooooooo..'];
+ART.salmodia3=[
+'................',
+'........b.......',
+'......b.b.......',
+'......b.b.b.....',
+'....b.b.b.b.....',
+'..b.b.b.b.b.b...',
+'..b.b.b.b.b.b.b.',
+'..b.b.b.b.b.b.b.',
+'..b.b.b.b.b.b.b.',
+'..b.b.b.b.b.b.b.',
+'..b.b.b.b.b.b.b.',
+'..b.b.b.b.b.b.b.',
+'..bbbbbbbbbbbbb.',
+'..ggggggggggggg.',
+'..yyyyyyyyyyyyy.',
+'..ssssssssssss..',
+'.ssssssssssssss.',
+'.ss.s..ss..s.ss.',
+'.ssssssssssssss.',
+'.ssssssssssssss.',
+'.ss.s..ss..s.ss.',
+'..oooooooooooo..'];
+ART.salmodia4=[
+'..................',
+'.........b........',
+'.......b.b........',
+'.......b.b.b......',
+'.....b.b.b.b......',
+'...b.b.b.b.b.b....',
+'...b.b.b.b.b.b.b..',
+'.b.b.b.b.b.b.b.b..',
+'.b.b.b.b.b.b.b.b..',
+'.b.b.b.b.b.b.b.b..',
+'.b.b.b.b.b.b.b.b..',
+'.b.b.b.b.b.b.b.b..',
+'.b.b.b.b.b.b.b.b..',
+'.b.b.b.b.b.b.b.b..',
+'.bbbbbbbbbbbbbbb..',
+'.ggggggggggggggg..',
+'.yyyyyyyyyyyyyyy..',
+'.ggggggggggggggg..',
+'..ssssssssssssss..',
+'.ssssssssssssssss.',
+'.ss.s..ss..ss.s.s.',
+'.ssssssssssssssss.',
+'.ssssssssssssssss.',
+'.ss.s..ss..ss.s.s.',
+'..oooooooooooooo..'];
+
+/* ═══ ARPIONE ═══
+   Una balestra da assedio: i bracci dell'arco aperti in orizzontale e il
+   dardo puntato in alto. È l'unica sagoma che si allarga in cima invece di
+   stringersi, e basta quello a distinguerla da lontano. */
+ART.arpione=[
+'..............',
+'..............',
+'......v.......',
+'......m.......',
+'.m....m....m..',
+'..m...m...m...',
+'...mmmmmmm....',
+'.....www......',
+'....wwwww.....',
+'...dwwwwwd....',
+'...ssssssss...',
+'..ssssssssss..',
+'..ss.s..s.ss..',
+'..ssssssssss..',
+'..ssssssssss..',
+'..ss.s..s.ss..',
+'...oooooooo...'];
+ART.arpione2=[
+'..............',
+'......v.......',
+'......v.......',
+'......m.......',
+'m.....m.....m.',
+'.m....m....m..',
+'..m...m...m...',
+'...mmmmmmm....',
+'...mmmmmmm....',
+'.....www......',
+'....wwwww.....',
+'...wwwwwww....',
+'...dwwwwwd....',
+'..ssssssssss..',
+'.ssssssssssss.',
+'.ss.s..ss.s.s.',
+'.ssssssssssss.',
+'.ssssssssssss.',
+'.ss.s..ss.s.s.',
+'..oooooooooo..'];
+ART.arpione3=[
+'................',
+'.......v........',
+'.......v........',
+'.......v........',
+'.......m........',
+'m......m......m.',
+'.m.....m.....m..',
+'..m....m....m...',
+'...m...m...m....',
+'....mmmmmmm.....',
+'....mmmmmmm.....',
+'......www.......',
+'.....wwwww......',
+'....wwwwwww.....',
+'...wwwwwwwww....',
+'...dwwwwwwwd....',
+'..ssssssssssss..',
+'.ssssssssssssss.',
+'.ss.s..ss..s.ss.',
+'.ssssssssssssss.',
+'.ssssssssssssss.',
+'.ss.s..ss..s.ss.',
+'..oooooooooooo..'];
+ART.arpione4=[
+'..................',
+'........v.........',
+'........v.........',
+'........v.........',
+'........v.........',
+'........m.........',
+'m.......m.......m.',
+'.m......m......m..',
+'..m.....m.....m...',
+'...m....m....m....',
+'....m...m...m.....',
+'.....mmmmmmm......',
+'.....mmmmmmm......',
+'.....mmmmmmm......',
+'.......www........',
+'......wwwww.......',
+'.....wwwwwww......',
+'....wwwwwwwww.....',
+'...wwwwwwwwwww....',
+'...yyyyyyyyyyy....',
+'..ssssssssssssss..',
+'.ssssssssssssssss.',
+'.ss.s..ss..ss.s.s.',
+'.ssssssssssssssss.',
+'.ssssssssssssssss.',
+'.ss.s..ss..ss.s.s.',
+'..oooooooooooooo..'];
+
+/* ═══ SCONGIURO ═══
+   Una stele con l'occhio inciso. Non ha né bocca né fuoco né armi: guarda, e
+   basta. La cima è a punta e l'occhio è a mandorla — stretto sopra e sotto,
+   largo al centro, con la pupilla dentro. Con la cima tonda e una macchia
+   scura in mezzo veniva fuori una lapide, che è un'altra cosa e per giunta
+   già suggerita dall'ossario. */
+ART.scongiuro=[
+'..............',
+'......p.......',
+'.....ppp......',
+'....ppppp.....',
+'...ppppppp....',
+'....pvvvp.....',
+'...pvvxvvp....',
+'....pvvvp.....',
+'...ppppppp....',
+'...ppppppp....',
+'...ssssssss...',
+'..ssssssssss..',
+'..ss.s..s.ss..',
+'..ssssssssss..',
+'..ssssssssss..',
+'..ss.s..s.ss..',
+'...oooooooo...'];
+ART.scongiuro2=[
+'..............',
+'......p.......',
+'.....ppp......',
+'....ppppp.....',
+'...ppppppp....',
+'..ppppppppp...',
+'..ppppppppp...',
+'...pvvvvvp....',
+'..pvvvxvvvp...',
+'..vvvxxxvvv...',
+'..pvvvxvvvp...',
+'...pvvvvvp....',
+'..ppppppppp...',
+'..ppppppppp...',
+'..ppppppppp...',
+'..ssssssssss..',
+'.ssssssssssss.',
+'.ss.s..ss.s.s.',
+'.ssssssssssss.',
+'.ssssssssssss.',
+'.ss.s..ss.s.s.',
+'..oooooooooo..'];
+ART.scongiuro3=[
+'................',
+'.......p........',
+'......ppp.......',
+'.....ppppp......',
+'....ppppppp.....',
+'...ppppppppp....',
+'..ppppppppppp...',
+'..ppppppppppp...',
+'....pvvvvvp.....',
+'...pvvvvvvvp....',
+'..pvvvvxvvvvp...',
+'..vvvvxxxvvvv...',
+'..vvvxxxxxvvv...',
+'..vvvvxxxvvvv...',
+'..pvvvvxvvvvp...',
+'...pvvvvvvvp....',
+'....pvvvvvp.....',
+'..ppppppppppp...',
+'..ppppppppppp...',
+'..yyyyyyyyyyy...',
+'..ssssssssssss..',
+'.ssssssssssssss.',
+'.ss.s..ss..s.ss.',
+'.ssssssssssssss.',
+'.ssssssssssssss.',
+'.ss.s..ss..s.ss.',
+'..oooooooooooo..'];
+ART.scongiuro4=[
+'..................',
+'........p.........',
+'.......ppp........',
+'......ppppp.......',
+'.....ppppppp......',
+'....ppppppppp.....',
+'...ppppppppppp....',
+'..ppppppppppppp...',
+'..ppppppppppppp...',
+'.....pvvvvvp......',
+'....pvvvvvvvp.....',
+'...pvvvvvvvvvp....',
+'..pvvvvvxvvvvvp...',
+'..vvvvvxxxvvvvv...',
+'..vvvvxxxxxvvvv...',
+'..vvvxxxxxxxvvv...',
+'..vvvvxxxxxvvvv...',
+'..vvvvvxxxvvvvv...',
+'..pvvvvvxvvvvvp...',
+'...pvvvvvvvvvp....',
+'....pvvvvvvvp.....',
+'.....pvvvvvp......',
+'..ppppppppppppp...',
+'..ppppppppppppp...',
+'..yyyyyyyyyyyyy...',
+'..ssssssssssssss..',
+'.ssssssssssssssss.',
+'.ss.s..ss..ss.s.s.',
+'.ssssssssssssssss.',
+'.ssssssssssssssss.',
+'.ss.s..ss..ss.s.s.',
+'..oooooooooooooo..'];
+
+const PAL_CY_TOW={s:'#343746',o:'#171a24',m:'#656b80',x:'#070a12',c:'#20d8ff',r:'#ff35b8',
+  y:'#ffca48',q:'#e8fbff',p:'#7040d8',w:'#45495a',d:'#252936',b:'#556070',v:'#bff7ff',t:'#8a255f'};
+const PAL_CY_TOW5={s:'#dce7ef',o:'#78889a',m:'#ffffff',x:'#101624',c:'#55eaff',r:'#ff65cf',
+  y:'#fff2a6',q:'#ffffff',p:'#8b72ff',w:'#eef8ff',d:'#aab8c8',b:'#e8f2ff',v:'#ffffff',t:'#cf55ae'};
+const CY_TOWER_SET=new Set(['impulso','plasma','stasi','rotaia','sciame','disturbo']);
+function cyberTowerArt(tipo,lv){
+  const w=14+(lv-1)*2,h=17+(lv-1)*3,a=matricePixel(w,h),cx=Math.floor(w/2),base=h-5;
+  pxBox(a,2,base,w-4,4,'s');pxBox(a,3,base+1,w-6,1,'m');pxBox(a,4,h-2,w-8,1,'o');
+  for(let x=4;x<w-4;x+=4)pxPut(a,x,base+2,(x+lv)%2?'c':'r');
+  if(tipo==='impulso'){
+    pxBox(a,cx-2,5,5,base-5,'s');pxBox(a,cx-1,7,3,base-8,'x');pxPut(a,cx,8,'c');
+    const n=1+Math.floor(lv/2);for(let i=-n;i<=n;i+=2){pxBox(a,cx+i-1,2,2,5,'m');pxPut(a,cx+i,1,'c');}
+  }else if(tipo==='plasma'){
+    pxBox(a,cx-4,6,9,base-6,'s');pxBox(a,cx-2,7,5,base-8,'x');
+    pxBox(a,cx-1,8,3,Math.max(3,base-10),lv===4?'q':'y');
+    pxLine(a,cx-5,5,cx-3,2,'m');pxLine(a,cx+5,5,cx+3,2,'m');
+  }else if(tipo==='stasi'){
+    pxBox(a,cx-2,7,5,base-7,'s');
+    for(let d=0;d<4+lv;d++){pxPut(a,cx-d,6+Math.abs(d-2),'p');pxPut(a,cx+d,6+Math.abs(d-2),'p');}
+    pxBox(a,cx-1,5,3,3,'q');pxPut(a,cx,6,'r');
+  }else if(tipo==='rotaia'){
+    pxBox(a,cx-3,3,7,base-3,'s');pxBox(a,cx-1,1,3,base-2,'x');pxBox(a,cx,2,1,base-4,'r');
+    pxLine(a,cx-4,base-1,cx-2,5,'m');pxLine(a,cx+4,base-1,cx+2,5,'m');
+  }else if(tipo==='sciame'){
+    pxBox(a,cx-3,7,7,base-7,'s');pxBox(a,cx-1,9,3,3,'p');
+    const n=2+lv;for(let i=0;i<n;i++){const side=i%2?-1:1,dx=side*(4+(i%3)*2),dy=3+(i*3)%(base-4);pxBox(a,cx+dx-1,dy,3,2,'m');pxPut(a,cx+dx,dy,'c');pxLine(a,cx+side*3,9,cx+dx,dy+1,'o');}
+  }else{
+    pxBox(a,cx-3,7,7,base-7,'s');pxBox(a,cx-1,8,3,base-10,'r');
+    pxLine(a,cx,7,cx,2,'m');pxPut(a,cx,1,'c');
+    for(let n=1;n<=Math.min(3,lv);n++){pxPut(a,cx-n*2,2+n,'p');pxPut(a,cx+n*2,2+n,'p');pxPut(a,cx-n*2-1,3+n,'p');pxPut(a,cx+n*2+1,3+n,'p');}
+  }
+  return a.map(r=>r.join(''));
+}
+
 const TSKIN={
   spine:[ART.spine,ART.spine2,ART.spine3,ART.spine4],
   braciere:[ART.braciere,ART.braciere2,ART.braciere3,ART.braciere4],
   campana:[ART.campana,ART.campana2,ART.campana3,ART.campana4],
-  reliquiario:[ART.reliquiario,ART.reliquiario2,ART.reliquiario3,ART.reliquiario4]
+  reliquiario:[ART.reliquiario,ART.reliquiario2,ART.reliquiario3,ART.reliquiario4],
+  ossario:[ART.ossario,ART.ossario2,ART.ossario3,ART.ossario4],
+  caldaia:[ART.caldaia,ART.caldaia2,ART.caldaia3,ART.caldaia4],
+  mangano:[ART.mangano,ART.mangano2,ART.mangano3,ART.mangano4],
+  salmodia:[ART.salmodia,ART.salmodia2,ART.salmodia3,ART.salmodia4],
+  arpione:[ART.arpione,ART.arpione2,ART.arpione3,ART.arpione4],
+  scongiuro:[ART.scongiuro,ART.scongiuro2,ART.scongiuro3,ART.scongiuro4]
 };
+for(const k of CY_TOWER_SET)TSKIN[k]=[1,2,3,4].map(lv=>cyberTowerArt(k,lv));
 for(const k in TSKIN){
-  TSKIN[k].forEach((a,i)=>{S[k+(i+1)]=makeSprite(a,PAL_TOW,'#17131f');});
+  const cy=CY_TOWER_SET.has(k),pal=cy?PAL_CY_TOW:PAL_TOW,pal5=cy?PAL_CY_TOW5:PAL_TOW5;
+  TSKIN[k].forEach((a,i)=>{S[k+(i+1)]=makeSprite(a,pal,'#100d16',true);});
   // il quinto riusa la sagoma del quarto: stessa mole, materia diversa
   TSKIN[k].push(TSKIN[k][3]);
-  S[k+'5']=makeSprite(TSKIN[k][3],PAL_TOW5,'#6b5a3a');
+  S[k+'5']=makeSprite(TSKIN[k][3],pal5,cy?'#2b5d72':'#6b5a3a',true);
 }
 /* punto da cui parte il colpo, misurato dall'alto dello sprite */
 const TTIP={spine:[4,4,5,6,6],braciere:[6,5,5,6,6],campana:[8,10,12,14,14],reliquiario:[4,5,5,6,6]};
@@ -565,6 +1615,13 @@ const TFLAME=[[[0,5,1.0]],[[0,4,1.3]],[[0,4,1.5]],[[0,4,1.8],[-8,12,.55],[8,12,.
 S.candela=makeSprite(ART.candela,PAL_CAN,C.out);
 S.croce=makeSprite(ART.croce,PAL_CRO,C.out);
 S.statua=makeSprite(ART.statua,PAL_STA,C.out);
+ART.antenna=['...c...','..cmc..','...m...','...m...','.m.m.m.','..mmm..','...m...','..sss..','.ssoss.'];
+ART.terminale=['..cccc..','.mssssm.','.msxxsm.','.mscxsm.','.mssssm.','..srrs..','.ssssss.','.so..os.'];
+ART.segnale=['...c...','..cpc..','.c.p.c.','...p...','...m...','...m...','..sss..','.ssoss.'];
+const PAL_CY_DEC={s:'#343746',o:'#171a24',m:'#697084',x:'#070a12',c:'#20d8ff',r:'#ff35b8',p:'#7b3cff'};
+S.antenna=makeSprite(ART.antenna,PAL_CY_DEC,'#080a12',true);
+S.terminale=makeSprite(ART.terminale,PAL_CY_DEC,'#080a12',true);
+S.segnale=makeSprite(ART.segnale,PAL_CY_DEC,'#080a12',true);
 function blit(x,sp,px,py,flip,alpha){
   if(alpha!==undefined)x.globalAlpha=alpha;
   if(flip){x.save();x.translate(Math.round(px)+sp.w/2,0);x.scale(-1,1);
@@ -574,45 +1631,126 @@ function blit(x,sp,px,py,flip,alpha){
 }
 
 /* ─────────── PERCORSO ─────────── */
-const WP=[[1,-2],[1,2],[10,2],[10,6],[2,6],[2,10],[9,10],[9,14],[5,14],[5,19]];
-const PATHPX=WP.map(p=>({x:p[0]*TILE+TILE/2,y:p[1]*TILE+TILE/2}));
-const SEGLEN=[];for(let i=0;i<PATHPX.length-1;i++){
-  const a=PATHPX[i],b=PATHPX[i+1];SEGLEN.push(Math.hypot(b.x-a.x,b.y-a.y));}
-const pathSet=new Set();
-for(let i=0;i<WP.length-1;i++){
-  const [c1,r1]=WP[i],[c2,r2]=WP[i+1];
-  const dc=Math.sign(c2-c1),dr=Math.sign(r2-r1);
-  let c=c1,r=r1;
-  for(let g=0;g<80;g++){
-    if(c>=0&&c<COLS&&r>=0&&r<ROWS)pathSet.add(r*COLS+c);
-    if(c===c2&&r===r2)break; c+=dc; r+=dr;
-  }
-}
+/* Un tracciato per scenario. Gli estremi non si toccano: il valico a nord è
+   disegnato sulla colonna 1 e il cancello in basso sulla colonna 5, cuciti
+   nella scenografia (drawNord, drawSagrato, buildFG, buildBG) e nel punto in
+   cui si conta una fuga. A variare è solo il modo di andare dall'uno all'altro:
+   quattro traverse nella Veglia, tre nella Discesa, due nel Giudizio. Meno
+   serpentina vuol dire meno tempo sotto tiro, ed è per questo che il gradino
+   di ATTO[a].hp è tarato sul percorso dell'atto, non in astratto. */
+const WPS={
+  1:[[1,-2],[1,2],[10,2],[10,6],[2,6],[2,10],[9,10],[9,14],[5,14],[5,19]],  // 53 caselle
+  2:[[1,-2],[1,3],[9,3],[9,9],[2,9],[2,14],[5,14],[5,19]],                  // 39 caselle
+  3:[[1,-2],[1,5],[8,5],[8,12],[5,12],[5,19]],                              // 31 caselle
+  4:[[1,-2],[1,3],[10,3],[10,7],[3,7],[3,12],[8,12],[8,15],[5,15],[5,19]],
+  5:[[1,-2],[1,4],[9,4],[9,9],[2,9],[2,14],[5,14],[5,19]],
+  6:[[1,-2],[1,5],[10,5],[10,11],[4,11],[4,15],[5,15],[5,19]]
+};
+let WP=WPS[1];
+const PATHPX=[],SEGLEN=[],pathSet=new Set();
 const isPath=(c,r)=>pathSet.has(r*COLS+c);
 
-const DECOR=[[0,0,'statua'],[11,0,'croce'],[6,1,'candela'],[11,5,'candela'],[4,4,'croce'],
+/* Le decorazioni sono una lista sola: quelle che cadono sulla via dell'atto
+   corrente semplicemente non si posano. Con i tracciati attuali ne salta una
+   nella Discesa e una nel Giudizio. */
+const DECOR_ALL=[[0,0,'statua'],[11,0,'croce'],[6,1,'candela'],[11,5,'candela'],[4,4,'croce'],
  [0,9,'statua'],[6,9,'candela'],[7,8,'croce'],[8,12,'candela'],[3,13,'statua'],
  [1,16,'croce'],[10,16,'candela'],[0,17,'croce'],[11,17,'statua']];
-const blocked=new Set(DECOR.map(d=>d[1]*COLS+d[0]));
-const LIGHTS=DECOR.filter(d=>d[2]==='candela').map(d=>({x:d[0]*TILE+8,y:d[1]*TILE+4}));
+const DECOR=[];
+const blocked=new Set();
+const LIGHTS=[];
+
+/* Rifà percorso, ingombri e griglia per uno scenario. Va chiamata solo a campo
+   vuoto: i nemici portano `seg`/`segD`, indici dentro SEGLEN, e cambiare il
+   tracciato sotto ai loro piedi li spedirebbe fuori strada. */
+function buildPercorso(a){
+  WP=WPS[a]||WPS[1];
+  PATHPX.length=0;
+  for(const p of WP)PATHPX.push({x:p[0]*TILE+TILE/2,y:p[1]*TILE+TILE/2});
+  SEGLEN.length=0;
+  for(let i=0;i<PATHPX.length-1;i++){
+    const p=PATHPX[i],q=PATHPX[i+1];SEGLEN.push(Math.hypot(q.x-p.x,q.y-p.y));}
+  pathSet.clear();
+  for(let i=0;i<WP.length-1;i++){
+    const [c1,r1]=WP[i],[c2,r2]=WP[i+1];
+    const dc=Math.sign(c2-c1),dr=Math.sign(r2-r1);
+    let c=c1,r=r1;
+    for(let g=0;g<80;g++){
+      if(c>=0&&c<COLS&&r>=0&&r<ROWS)pathSet.add(r*COLS+c);
+      if(c===c2&&r===r2)break; c+=dc; r+=dr;
+    }
+  }
+  DECOR.length=0;blocked.clear();LIGHTS.length=0;
+  for(const d of DECOR_ALL){
+    if(isPath(d[0],d[1]))continue;
+    const tipo=CYBER?(d[2]==='candela'?'terminale':(d[2]==='croce'?'antenna':'segnale')):d[2];
+    DECOR.push([d[0],d[1],tipo]);blocked.add(d[1]*COLS+d[0]);
+    if(tipo==='candela'||tipo==='terminale')LIGHTS.push({x:d[0]*TILE+8,y:d[1]*TILE+4});
+  }
+}
+buildPercorso(1);
 
 /* ─────────── TORRI ─────────── */
+/* Dieci edifici, quattro in campo: la quaterna si sceglie prima di scendere e
+   non si cambia più fino alla fine della veglia. Ognuno ha un mestiere che gli
+   altri non fanno — chi macina a contatto, chi sostiene i vicini, chi apre le
+   corazze da lontano — perché la scelta sia laterale e non una classifica.
+   `ruolo` è quel mestiere in una parola, e serve all'armeria. */
 const TOWERS={
-  spine:{name:'TORRE DELLE SPINE',short:'SPINE',cost:45,dmg:9,rate:.55,range:48,ap:0,
+  spine:{name:'TORRE DELLE SPINE',short:'SPINE',ruolo:'TIRO RAPIDO',cost:45,dmg:9,rate:.55,range:48,ap:0,
     desc:'Quadrelli rapidi su un solo bersaglio.'},
-  braciere:{name:'BRACIERE VOTIVO',short:'BRACIERE',cost:80,dmg:11,rate:1.25,range:42,ap:.5,
+  braciere:{name:'BRACIERE VOTIVO',short:'BRACIERE',ruolo:'AREA',cost:80,dmg:11,rate:1.25,range:42,ap:.5,
     splash:15,burn:5,desc:'Fuoco ad area, incendia e ignora metà corazza.'},
-  campana:{name:'CAMPANA DEL SILENZIO',short:'CAMPANA',cost:65,dmg:7,rate:1.9,range:40,ap:1,
+  campana:{name:'CAMPANA DEL SILENZIO',short:'CAMPANA',ruolo:'RALLENTA',cost:65,dmg:7,rate:1.9,range:40,ap:1,
     aura:true,slow:.45,desc:'Rallenta del 45% e percuote tutti nell\'aura.'},
-  reliquiario:{name:'RELIQUIARIO',short:'RELIQUIARIO',cost:140,dmg:52,rate:2.2,range:82,ap:1,
-    beam:true,desc:'Raggio istantaneo, lunga gittata, trapassa ogni corazza.'}
+  reliquiario:{name:'RELIQUIARIO',short:'RELIQUIARIO',ruolo:'GITTATA',cost:140,dmg:52,rate:2.2,range:82,ap:1,
+    beam:true,desc:'Raggio istantaneo, lunga gittata, trapassa ogni corazza.'},
+  ossario:{name:'OSSARIO',short:'OSSARIO',ruolo:'MACINA',cost:45,dmg:8,rate:.45,range:31,ap:.25,
+    aura:true,slow:0,desc:'Non mira: rode chiunque gli passi accanto. Gittata cortissima, '+
+    'va dove la via si stringe.'},
+  salmodia:{name:'SALMODIA',short:'SALMODIA',ruolo:'SOSTEGNO',cost:95,dmg:0,rate:0,range:44,ap:0,
+    sostegno:{dmg:.22,rate:.11},desc:'Non colpisce: gli edifici che la odono battono '+
+    '<i>più forte e più spesso</i>.'},
+  mangano:{name:'MANGANO',short:'MANGANO',ruolo:'COLPO GROSSO',cost:112,dmg:84,rate:2.8,range:54,ap:.8,
+    desc:'Un colpo solo, lento ed enorme, che sfonda quasi ogni corazza. Sulla truppa fitta '+
+    'è uno spreco.'},
+  arpione:{name:'ARPIONE',short:'ARPIONE',ruolo:'ARRETRA',cost:80,dmg:7,rate:1.8,range:50,ap:.5,
+    pull:13,desc:'Fa poco male: <i>ributta indietro</i> lungo la via. Le cose grosse le smuove '+
+    'poco, il Signore quasi niente.'},
+  caldaia:{name:'CALDAIA DI PECE',short:'CALDAIA',ruolo:'PECE',cost:95,dmg:13,rate:2.2,range:44,ap:.5,
+    pozza:{r:19,dur:4.5},desc:'Versa pece che <i>resta a bruciare</i>: non un colpo, un tratto '+
+    'di strada che fa male finché dura.'},
+  scongiuro:{name:'SCONGIURO',short:'SCONGIURO',ruolo:'SCORTICA',cost:78,dmg:0,rate:0,range:42,ap:0,
+    cut:.55,desc:'Non fa male: <i>scrosta la corazza</i> di chi passa, e i colpi degli altri '+
+    'mordono. Il rovescio della salmodia.'},
+  impulso:{name:'RIPETITORE A IMPULSI',short:'IMPULSO',ruolo:'RAFFICA',cost:58,dmg:8,rate:.34,range:52,ap:.12,
+    desc:'Una raffica di fotoni: poco per colpo, quasi nessuna pausa.'},
+  plasma:{name:'FORGIA AL PLASMA',short:'PLASMA',ruolo:'AREA',cost:105,dmg:16,rate:1.35,range:46,ap:.55,
+    splash:18,burn:7,desc:'Fonde gruppi e corazze in una pozza di luce.'},
+  stasi:{name:'FARO DI STASI',short:'STASI',ruolo:'RALLENTA',cost:88,dmg:6,rate:1.55,range:46,ap:1,
+    aura:true,slow:.52,desc:'Piega il tempo locale e consuma ogni intruso nell’aura.'},
+  rotaia:{name:'OBELISCO A ROTAIA',short:'ROTAIA',ruolo:'PRECISIONE',cost:155,dmg:66,rate:2.35,range:90,ap:1,
+    beam:true,desc:'Un colpo lineare, istantaneo, oltre ogni corazza.'},
+  sciame:{name:'NIDO DI DRONI',short:'SCIAME',ruolo:'SOSTEGNO',cost:118,dmg:0,rate:0,range:50,ap:0,
+    sostegno:{dmg:.25,rate:.14},desc:'I droni riallineano le armi vicine: più danno, meno attesa.'},
+  disturbo:{name:'JAMMER DEL VUOTO',short:'JAMMER',ruolo:'DISARMA',cost:96,dmg:0,rate:0,range:48,ap:0,
+    cut:.62,desc:'Spegne i protocolli difensivi e apre le corazze al fuoco alleato.'}
 };
-const TORDER=['spine','braciere','campana','reliquiario'];
+/* l'ordine in cui l'armeria li mostra: prima i quattro di sempre */
+const TORDER=['spine','braciere','campana','reliquiario',
+  'ossario','salmodia','mangano','arpione','caldaia','scongiuro',
+  'impulso','plasma','stasi','rotaia','sciame','disturbo'];
+const NSLOT=4;   // quanti se ne portano in campo
 function tstats(t){
   const b=TOWERS[t.type],l=t.lv-1,m=Math.pow(1.62,l);
   return {dmg:Math.round(b.dmg*m),rate:b.rate*Math.pow(.9,l),range:b.range*Math.pow(1.12,l),
     ap:b.ap,splash:b.splash?b.splash+l*3:0,burn:b.burn?b.burn*m:0,
-    slow:b.slow?Math.min(.72,b.slow+l*.08):0};
+    slow:b.slow?Math.min(.72,b.slow+l*.08):0,
+    pull:b.pull?b.pull*Math.pow(1.22,l):0,
+    cut:b.cut?Math.min(.92,b.cut+l*.09):0,
+    pozR:b.pozza?b.pozza.r+l*2:0,pozT:b.pozza?b.pozza.dur:0,
+    sdmg:b.sostegno?b.sostegno.dmg*(1+l*.28):0,
+    srate:b.sostegno?b.sostegno.rate*(1+l*.24):0};
 }
 const MAXLV=5, UPMUL=[.85,1.5,2.6,4.2];
 const upCost=t=>Math.round(TOWERS[t.type].cost*UPMUL[t.lv-1]);
@@ -651,7 +1789,31 @@ const ENEMIES={
     big:true,slowResist:.45,breakAt:.5},
   tromba:{name:'La Tromba',hp:1350,speed:16,armor:12,bounty:130,dmg:6,boss:true,spawner:4},
   agnello:{name:'L\'Agnello',hp:290,speed:9,armor:18,bounty:600,dmg:99,
-    final:true,big:true,slowResist:.7,breakAt:.45,spawner:4}
+    final:true,big:true,slowResist:.7,breakAt:.45,spawner:4},
+  // MONDO II · I BASSIFONDI NEON
+  pacchetto:{name:'Pacchetto Randagio',hp:42,speed:34,armor:2,bounty:8,dmg:1},
+  corridore:{name:'Corridore Cromato',hp:31,speed:67,armor:1,bounty:9,dmg:1},
+  sbirro:{name:'Sbirro Antisommossa',hp:175,speed:20,armor:10,bounty:18,dmg:2},
+  eco:{name:'Eco Olografica',hp:70,speed:54,armor:4,bounty:13,dmg:1,slowResist:.68,alpha:.76,float:true},
+  scaricatore:{name:'Scaricatore Industriale',hp:510,speed:13,armor:15,bounty:72,dmg:3,big:true,slowResist:.5,breakAt:.5},
+  oracolo:{name:'Oracolo di Quartiere',hp:1450,speed:17,armor:14,bounty:145,dmg:6,boss:true,spawner:4},
+  nucleo:{name:'Nucleo di Sorveglianza',hp:310,speed:9,armor:20,bounty:700,dmg:99,final:true,big:true,slowResist:.75,breakAt:.45,spawner:5},
+  // MONDO II · IL DISTRETTO ACIDO
+  acaro:{name:'Acaro Sintetico',hp:48,speed:35,armor:3,bounty:9,dmg:1},
+  lama:{name:'Lama Corriere',hp:35,speed:69,armor:2,bounty:10,dmg:1},
+  hazmat:{name:'Hazmat Corazzato',hp:205,speed:20,armor:12,bounty:20,dmg:2},
+  fantasma_dati:{name:'Fantasma di Dati',hp:78,speed:55,armor:5,bounty:14,dmg:1,slowResist:.7,alpha:.78,float:true},
+  mutante:{name:'Mutante da Carico',hp:590,speed:13,armor:17,bounty:82,dmg:3,big:true,slowResist:.52,breakAt:.5},
+  direttore:{name:'Direttore Esecutivo',hp:1650,speed:17,armor:16,bounty:165,dmg:6,boss:true,spawner:4},
+  reattore:{name:'Bestia Reattore',hp:340,speed:9,armor:22,bounty:800,dmg:99,final:true,big:true,slowResist:.78,breakAt:.45,spawner:5},
+  // MONDO II · LA GRIGLIA NERA
+  frammento:{name:'Frammento di Sicurezza',hp:55,speed:36,armor:4,bounty:10,dmg:1},
+  ciclista:{name:'Ciclista di Luce',hp:39,speed:72,armor:3,bounty:11,dmg:1},
+  sentinella:{name:'Sentinella Bianca',hp:235,speed:21,armor:14,bounty:22,dmg:2},
+  nulla:{name:'Spettro Null',hp:86,speed:57,armor:6,bounty:15,dmg:1,slowResist:.72,alpha:.8,float:true},
+  assedio:{name:'Costrutto d’Assedio',hp:675,speed:13,armor:19,bounty:94,dmg:3,big:true,slowResist:.55,breakAt:.5},
+  arconte:{name:'Arconte di Sistema',hp:1880,speed:17,armor:18,bounty:188,dmg:6,boss:true,spawner:4},
+  matrice:{name:'La Matrice Nera',hp:380,speed:9,armor:24,bounty:900,dmg:99,final:true,big:true,slowResist:.8,breakAt:.45,spawner:5}
 };
 /* i due atti condividono la struttura delle ondate, non le creature */
 const ROSTER={
@@ -660,13 +1822,93 @@ const ROSTER={
   2:{base:'ossame',   fast:'imp',        tank:'golem',    ghost:'dannata',big:'titano',
      boss:'arcidemone', final:'signore'},
   3:{base:'cherubino',fast:'serafino',   tank:'trono',    ghost:'voce',   big:'mietitore',
-     boss:'tromba',     final:'agnello'}
+     boss:'tromba',     final:'agnello'},
+  4:CY_SCHIERE[0],
+  5:CY_SCHIERE[1],
+  6:CY_SCHIERE[2]
 };
 const mob=k=>ROSTER[G.act][k];
-const ATTO={1:{hud:'VEGLIA ',btn:'SUONA LA CAMPANA · '},
-            2:{hud:'DISCESA ',btn:'APRI LA CREPA · '},
-            3:{hud:'GIUDIZIO ',btn:'ROMPI IL SIGILLO · '}};
-const BIGCRY={1:'SCENDE IL COLOSSO',2:'SALE IL TITANO',3:'AVANZA IL MIETITORE'};
+/* ═══ LA CAMPAGNA ═══
+   Ogni scenario è una veglia a sé: venti ondate che ripartono da capo, con
+   tutto da rierigere. Per aggiungerne uno quarto basta una riga qui (più la
+   sua tavolozza e il suo ROSTER): il resto — mappa, record, sblocchi — lo
+   legge da questa tabella.
+   `hp` è il moltiplicatore di partenza delle creature, `lac` le lacrime
+   concesse all'inizio, `sig` i sigilli già in mano. Vanno insieme: si
+   riparte senza una torre, e chi apre duro deve dare di che reggere.
+   I tre valori vengono da sweep successivi su sim.js, non a intuito:
+   ognuno è tarato perché il giocatore-tipo arrivi in fondo e si rompa
+   se lo si moltiplica per 1.15-1.3 — lo stesso agio che ha sempre avuto
+   la Veglia. `sig` esiste perché alla prima ondata si ha un solo sigillo
+   di margine: nella Veglia non pesa, altrove è morte al primo errore.
+   I gradini sono più bassi di quanto sembri (2.8 e 4.6, non 3.2 e 6)
+   perché ogni scenario ha il suo percorso e i due dopo il primo lo hanno
+   più corto: meno tempo sotto tiro pesa quanto un moltiplicatore. */
+const ATTO={
+  1:{hud:'VEGLIA ',  btn:'SUONA LA CAMPANA · ', nome:"LA VEGLIA",
+     sotto:'IL SAGRATO DI CENERE', hp:1,   lac:130,  sig:0},
+  2:{hud:'DISCESA ', btn:'APRI LA CREPA · ',    nome:"LA DISCESA",
+     sotto:'IL FONDO CHE SALE',    hp:2.8, lac:850,  sig:2},
+  3:{hud:'GIUDIZIO ',btn:'ROMPI IL SIGILLO · ', nome:"IL GIUDIZIO",
+     sotto:'IL CIELO APERTO',      hp:4.6, lac:1350, sig:4},
+  4:{hud:'NEON ',btn:'APRI IL CANALE · ',nome:'I BASSIFONDI',
+     sotto:'PIOGGIA SUL LIVELLO ZERO',hp:5.8,lac:2100,sig:6},
+  5:{hud:'ACIDO ',btn:'SOVRACCARICA · ',nome:'IL DISTRETTO ACIDO',
+     sotto:'LE FABBRICHE NON DORMONO',hp:7.2,lac:3200,sig:8},
+  6:{hud:'GRIGLIA ',btn:'ESEGUI IL PROTOCOLLO · ',nome:'LA GRIGLIA NERA',
+     sotto:'OLTRE IL CODICE',hp:5.2,lac:4700,sig:10}
+};
+const NSCEN=Object.keys(ATTO).length;
+/* ═══ I MONDI ═══
+   Un piano sopra gli scenari: un mondo raccoglie le sue veglie, e finite
+   quelle si passa al mondo dopo. Del Campanaro sono le tre che ci sono; il
+   secondo è ancora sigillato e lo dice.
+   `scen` è la sola cosa che lega mondi e scenari: ATTO non sa dei mondi, così
+   hpMul, wAbs e la simulazione restano quelli. Per aprire un mondo nuovo
+   basta una riga qui e le righe di ATTO delle sue veglie. */
+const MONDO={
+  1:{nome:'IL CAMPANARO', sotto:'IL SAGRATO, IL FONDO, IL CIELO', scen:[1,2,3],
+     lore:'Tre veglie su una sola soglia: il sagrato consacrato, il fondo che '+
+       'sale a riprenderselo, il cielo che si apre a chiudere il conto. Chi le '+
+       'compie tutte e tre ha tenuto la porta contro tre mondi.'},
+  2:{nome:'LA CITTÀ SENZA ALBA', sotto:'NEON, ACIDO, GRIGLIA', scen:[4,5,6],
+     lore:'Sotto una pioggia che non finisce mai, la città ha sostituito i santi '+
+       'con protocolli e le campane con impulsi. Tre livelli conducono al cuore '+
+       'della rete: i bassifondi, le fabbriche, la Griglia Nera.'},
+  3:{nome:'IL TERZO MONDO',sotto:'PROSSIMAMENTE',scen:[],presto:true,
+     lore:'Una nuova soglia attende oltre il rumore bianco.'},
+  4:{nome:'IL QUARTO MONDO',sotto:'PROSSIMAMENTE',scen:[],presto:true,
+     lore:'La rotta esiste, ma nessun segnale è ancora tornato.'},
+  5:{nome:'IL QUINTO MONDO',sotto:'PROSSIMAMENTE',scen:[],presto:true,
+     lore:'L’ultima coordinata resta oscurata.'}
+};
+const NMONDI=Object.keys(MONDO).length;
+/* ═══ IL LESSICO DI OGNI MONDO ═══
+   «Rito», «erigere», «consacrare» sono parole del sagrato: nella città senza
+   alba non vogliono dire niente. Le poche che si vedono in interfaccia stanno
+   qui, una riga per mondo, e chi non le dichiara eredita quelle del primo.
+   Non è cosmesi: leggere PROTOCOLLO COMPIUTO sotto un neon è mezza differenza
+   fra due mondi e lo stesso mondo ridipinto. */
+const LEX0={
+  rito:'RITO', ritoFatto:'RITO COMPIUTO', compendio:'IL RITO',
+  compendioBtn:'IL RITO — LE SCHIERE', schiere:'LE SCHIERE',
+  erigi:'Erigi il tuo rito', daCapo:'Ricomincia da pietra nuda',
+  tuoRito:'Il tuo rito', pietraNuda:'da pietra nuda'
+};
+const LEXM={
+  2:{rito:'INNESTO', ritoFatto:'INNESTO COMPLETO', compendio:'IL PROTOCOLLO',
+     compendioBtn:'IL PROTOCOLLO — LE SCHIERE', schiere:'LE SCHIERE',
+     erigi:'Installa la tua rete', daCapo:'Si riparte da griglia spenta',
+     tuoRito:'La tua rete', pietraNuda:'da griglia spenta'}
+};
+/* il lessico del mondo a cui appartiene lo scenario in corso */
+const lex=(k,m)=>{const L=LEXM[m===undefined?mondoDi(G.act):m];return (L&&L[k])||LEX0[k];};
+const mondoDi=a=>{for(let m=1;m<=NMONDI;m++)if(MONDO[m].scen.indexOf(a)>=0)return m;return 1;};
+const mondoAperto=m=>{const s=MONDO[m].scen;return s.length>0&&s[0]<=PROG.unl;};
+const mondoCompiuto=m=>{const s=MONDO[m].scen;return s.length>0&&s.every(a=>!!PROG.fin[a]);};
+const ultimoDelMondo=a=>{const s=MONDO[mondoDi(a)].scen;return s[s.length-1]===a;};
+const BIGCRY={1:'SCENDE IL COLOSSO',2:'SALE IL TITANO',3:'AVANZA IL MIETITORE',
+  4:'ENTRA LO SCARICATORE',5:'IL MUTANTE È LIBERO',6:'SI AVVIA L’ASSEDIO'};
 const WAVENAMES=['I Penitenti','La Processione','Cilicio','I Flagellanti','Ceneri Vive',
  'Il Corteo Muto','Sangue e Voto','Le Ombre Lunghe','Novena Nera','IL VESCOVO MARCIO',
  'Dopo il Rintocco','Reliquie Infrante','Il Digiuno','Coro di Ossa','Miserere',
@@ -680,6 +1922,18 @@ const WAVENAMES3=['Il Primo Sigillo','Cielo Aperto','Il Sale','Ali Bianche','Gra
  'La Bilancia','Silenzio in Cielo','I Testimoni','Sette Coppe','LA TROMBA',
  'Dopo il Sigillo','Vendemmia','Il Torchio','Coro di Ali','Kyrie',
  'Nessuna Ombra','Il Libro','Ultimo Sigillo','Fine dei Nomi','L\'AGNELLO'];
+const WAVENAMES4=['Handshake','Pioggia al Neon','Pacchetti Persi','Corsa Cromata','Blocco Stradale',
+ 'Sovratensione','Mercato Nero','Echi in Rete','Zona Rossa','L’ORACOLO',
+ 'Linea Morta','Traffico Ostile','Nessun Umano','Sciame Urbano','Blackout',
+ 'Livello Zero','Occhi sulla Pioggia','Protocollo Rosso','Ultimo Accesso','IL NUCLEO'];
+const WAVENAMES5=['Perdita Acida','Turno di Notte','Acaro Sintetico','Lame in Transito','Vapore Verde',
+ 'Linea di Fusione','Reparto Vietato','Fantasmi di Fabbrica','Sirena Tossica','IL DIRETTORE',
+ 'Straordinario','Contenimento','Piano di Esodo','Carico Vivo','Fusione Fredda',
+ 'Settore Nove','Catena Spezzata','Codice Arancio','Pressione Critica','LA BESTIA REATTORE'];
+const WAVENAMES6=['Boot Freddo','La Griglia','Frammenti','Cicli di Luce','Sentinelle',
+ 'Protocollo Bianco','Null Pointer','Occhi di Sistema','Accesso Negato','L’ARCONTE',
+ 'Secondo Avvio','Memoria Ostile','Firewall','Processi Fantasma','Kernel Panic',
+ 'Zero Assoluto','Root','Ultima Chiave','Fine del Programma','LA MATRICE NERA'];
 const ROMAN=n=>{const m=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],
  [40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];let s='';for(const[v,r]of m)while(n>=v){s+=r;n-=v}return s};
 
@@ -696,18 +1950,62 @@ function waveDef(n){
   return g;
 }
 NOMI[1]=WAVENAMES;NOMI[2]=WAVENAMES2;NOMI[3]=WAVENAMES3;
-const HP20=Math.pow(1.16,19), HP40=HP20*Math.pow(1.09,20);
-const hpMul=n=>n<=20?Math.pow(1.16,n-1)
-  :(n<=40?HP20*Math.pow(1.09,n-20):HP40*Math.pow(1.05,n-40));
-const spdMul=n=>Math.min(1.45,1+ (n-1)*.014);
+NOMI[4]=WAVENAMES4;NOMI[5]=WAVENAMES5;NOMI[6]=WAVENAMES6;
+/* La curva dentro uno scenario è sempre la stessa: quello che cambia da uno
+   all'altro è il gradino di partenza (ATTO[a].hp). Oltre la ventesima si
+   entra nell'infinito, e lì la salita riprende senza fermarsi più. */
+const HP20=Math.pow(1.16,19);
+const hpCurva=n=>n<=20?Math.pow(1.16,n-1):HP20*Math.pow(1.115,n-20);
+const hpMul=(n,a)=>ATTO[a||G.act].hp*hpCurva(n);
+/* L'economia guarda la difficoltà complessiva — le lacrime devono tenere il
+   passo delle creature — ma corazza e andatura no: quelle il giocatore le
+   affronta con torri appena erette, e un salto di venti ondate lo
+   schiaccerebbe alla prima. Per loro lo scalino di scenario vale la metà. */
+const wAbs=(n,a)=>(((a||G.act)-1)*20)+n;
+const wDur=(n,a)=>(((a||G.act)-1)*10)+n;
+const spdMul=(n,a)=>Math.min(1.45,1+(wDur(n,a)-1)*.014);
 
 /* ─────────── STATO ─────────── */
 const G={state:'menu',act:1,bossRef:null,bossIn:false,wave:0,lacrime:130,sigilli:0,speed:1,paused:false,sound:true,
-  enemies:[],towers:[],shots:[],beams:[],parts:[],rings:[],queue:[],
-  sel:null,build:null,waveOn:false,t:0,shake:0,best:0,endless:false,killed:0};
+  enemies:[],towers:[],shots:[],beams:[],parts:[],rings:[],queue:[],pozze:[],
+  sel:null,build:null,waveOn:false,t:0,shake:0,endless:false,killed:0,
+  /* la quaterna in campo: si sceglie prima di scendere e non cambia più fino
+     alla fine della veglia. I quattro di sempre sono anche il riferimento su
+     cui è tarato il bilanciamento. */
+  loadout:['spine','braciere','campana','reliquiario']};
+const QUATERNA_BASE=['spine','braciere','campana','reliquiario'];
+/* Quel che sopravvive alla partita.
+   `unl`  fin dove si è arrivati nella campagna (scenario più profondo aperto)
+   `fin`  quali scenari sono stati compiuti: unl non basta, perché l'ultimo
+          scenario di tutti non ha un successivo da sbloccare
+   `rec`  l'albo d'oro: per ogni scenario fino a cinque serie {w ondate,
+          k caduti}, dalla più lunga. Non si distingue fra chi si è fermato
+          alle venti e chi ha tirato avanti nell'infinito: conta l'ondata. */
+const PROG={unl:1,fin:{},rec:{},arm:{}};
+let COLLAUDO=false,CAMBIO_PROFILO=false,PROFILO_NORMALE=null;
+const NALBO=5;
+/* Una quaterna dalla memoria non è mai da fidarsi: può venire da una versione
+   con altri edifici, o essere stata scritta male. Qui si ripulisce — nomi che
+   esistono, niente doppioni, esattamente NSLOT voci — completandola con i
+   quattro di sempre. */
+function quaterneValida(q){
+  const out=[];
+  for(const k of (Array.isArray(q)?q:[]))
+    if(TOWERS[k]&&out.indexOf(k)<0&&out.length<NSLOT)out.push(k);
+  for(const k of QUATERNA_BASE){if(out.length>=NSLOT)break;
+    if(out.indexOf(k)<0)out.push(k);}
+  for(const k of TORDER){if(out.length>=NSLOT)break;
+    if(out.indexOf(k)<0)out.push(k);}
+  return out;
+}
 const grid=[];for(let r=0;r<ROWS;r++){grid.push(new Array(COLS).fill(0));}
-for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
-  if(isPath(c,r))grid[r][c]=1; else if(blocked.has(r*COLS+c))grid[r][c]=2;}
+/* 0 lastra libera · 1 via · 2 ingombro · 3 torre eretta. Si rifà a ogni
+   cambio di percorso: le torri non sopravvivono al passaggio di scenario. */
+function buildGrid(){
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+    grid[r][c]=isPath(c,r)?1:(blocked.has(r*COLS+c)?2:0);}
+}
+buildGrid();
 
 /* ─────────── AUDIO ─────────── */
 let AC=null,noiseBuf=null;
@@ -780,7 +2078,6 @@ const CF={
   sagA:'#494256',sagB:'#413a4e',sagC:'#524a61',sagGold:'#a5852c',
   cath:'#141020',cathHi:'#241d33',trim:'#a08d55',win:'#e8c452',portal:'#050409'
 };
-let INF=false,APO=false;
 const CKEYS=['void','stoneA','stoneB','stoneC','crack','pathA','pathB','pathC','pathEdge'];
 const PAL_DAY={C:{},CF:{}};
 for(const k of CKEYS)PAL_DAY.C[k]=C[k];
@@ -803,14 +2100,24 @@ const PAL_APO={C:{void:'#05060a',stoneA:'#232838',stoneB:'#2a3042',stoneC:'#3137
   niche:'#070910',moss:'#8f9ab0',
   sagA:'#4a5060',sagB:'#42485a',sagC:'#565d70',sagGold:'#e8e0c0',
   cath:'#12161f',cathHi:'#222838',trim:'#d8cbb0',win:'#ffffff',portal:'#04050a'}};
+const PAL_CYBER=[
+ {C:{void:'#03070d',stoneA:'#101724',stoneB:'#141d2b',stoneC:'#192437',crack:'#213652',pathA:'#15192a',pathB:'#101525',pathC:'#16334a',pathEdge:'#20d8ff'},
+  CF:{star:'#20d8ff',star2:'#ff35b8',mtnFar:'#16243a',mtnFarTop:'#28517a',mtnNear:'#0b1322',mtnNearTop:'#18334f',treeA:'#0b1820',treeAHi:'#0d5160',treeB:'#060b12',treeBHi:'#123044',trunk:'#10131c',wall:['#111824','#172131','#0d1420','#1b2738'],mortar:'#050912',wallLip:'#25455d',niche:'#03060b',moss:'#ff35b8',sagA:'#172333',sagB:'#111a28',sagC:'#203146',sagGold:'#20d8ff',cath:'#070c15',cathHi:'#101b2a',trim:'#ff35b8',win:'#20d8ff',portal:'#010308'}},
+ {C:{void:'#050909',stoneA:'#17201e',stoneB:'#1d2925',stoneC:'#24342d',crack:'#30453a',pathA:'#282319',pathB:'#211d16',pathC:'#49351d',pathEdge:'#ffbf3f'},
+  CF:{star:'#33e6c2',star2:'#ef5a3c',mtnFar:'#21362f',mtnFarTop:'#3e7c66',mtnNear:'#111e1b',mtnNearTop:'#295044',treeA:'#12211d',treeAHi:'#28705d',treeB:'#080f0d',treeBHi:'#1b4036',trunk:'#19130c',wall:['#1c2522','#25312d','#151d1a','#2a3732'],mortar:'#080e0c',wallLip:'#3c6154',niche:'#050a08',moss:'#ef5a3c',sagA:'#2b3028',sagB:'#20251f',sagC:'#354033',sagGold:'#ffbf3f',cath:'#0c1210',cathHi:'#18241f',trim:'#33e6c2',win:'#ffbf3f',portal:'#020604'}},
+ {C:{void:'#02040a',stoneA:'#101626',stoneB:'#151d31',stoneC:'#1b2540',crack:'#2b3960',pathA:'#171b2c',pathB:'#111625',pathC:'#273b68',pathEdge:'#5a8cff'},
+  CF:{star:'#ffffff',star2:'#5a8cff',mtnFar:'#202b46',mtnFarTop:'#6584c2',mtnNear:'#0b1020',mtnNearTop:'#30446f',treeA:'#11182a',treeAHi:'#354c82',treeB:'#060a14',treeBHi:'#25365f',trunk:'#0c1020',wall:['#131a2b','#1a243a','#0e1524','#202c45'],mortar:'#050814',wallLip:'#3d5482',niche:'#02040b',moss:'#845cff',sagA:'#202b43',sagB:'#171f33',sagC:'#2a3858',sagGold:'#ffffff',cath:'#070a13',cathHi:'#11182a',trim:'#5a8cff',win:'#ffffff',portal:'#010207'}}
+];
 function applyAct(a){
-  G.act=a;INF=(a===2);APO=(a===3);
-  const src=a===2?PAL_INF:(a===3?PAL_APO:PAL_DAY);
+  G.act=a;INF=(a===2);APO=(a===3);CYBER=a>=4&&a<=6;CYFASE=CYBER?a-4:0;
+  const src=CYBER?PAL_CYBER[CYFASE]:(a===2?PAL_INF:(a===3?PAL_APO:PAL_DAY));
   // riparto sempre dalla veglia, così nessuna tinta resta appiccicata
   for(const k in PAL_DAY.C)C[k]=PAL_DAY.C[k];
   for(const k in PAL_DAY.CF)CF[k]=PAL_DAY.CF[k];
   for(const k in src.C)C[k]=src.C[k];
   for(const k in src.CF)CF[k]=src.CF[k];
+  // il percorso prima del fondale: buildBG e buildFG leggono isPath
+  buildPercorso(a);buildGrid();rebuildFree();
   seed=20260811;
   buildFG();buildBG();
 }
@@ -845,7 +2152,34 @@ function conifer(g,cx,by,h,col,hi){
   rect(g,CF.trunk,cx,by-2,1,3);
 }
 
+function drawNordCyber(g){
+  const sky=CYFASE===0?[[2,5,13],[8,18,32]]:(CYFASE===1?[[4,9,8],[12,34,28]]:[[2,4,12],[12,18,42]]);
+  for(let y=0;y<OY;y++){
+    const t=y/OY,a=sky[0],b=sky[1];
+    rect(g,'rgb('+Math.round(a[0]+(b[0]-a[0])*t)+','+Math.round(a[1]+(b[1]-a[1])*t)+','+Math.round(a[2]+(b[2]-a[2])*t)+')',0,y,CW,1);
+  }
+  // pioggia di dati e sole artificiale
+  for(let i=0;i<55;i++){
+    const X=(rnd()*CW)|0,Y=(rnd()*25)|0,len=1+((rnd()*4)|0);
+    rect(g,rnd()<.72?CF.star:CF.star2,X,Y,1,len);
+  }
+  const sx=CW-45,sy=10,rad=6;
+  for(let r=rad+7;r>=rad;r-=2){g.globalAlpha=r===rad?1:.18;g.strokeStyle=CYFASE===1?'#ffbf3f':(CYFASE===2?'#ffffff':'#20d8ff');g.strokeRect(sx-r,sy-r,r*2,r*2);}
+  g.globalAlpha=1;rect(g,CYFASE===1?'#ffbf3f':(CYFASE===2?'#ffffff':'#20d8ff'),sx-2,sy-2,5,5);
+  // skyline a terrazze, antenne e finestre
+  let X=-2;
+  while(X<CW){const bw=5+((rnd()*9)|0),bh=8+((rnd()*17)|0),top=OY-bh;
+    rect(g,CF.mtnNear,X,top,bw,bh);rect(g,CF.mtnNearTop,X,top,bw,1);
+    if(rnd()<.55)rect(g,CF.mtnNearTop,X+Math.floor(bw/2),top-3,1,3);
+    for(let wy=top+3;wy<OY-2;wy+=4)for(let wx=X+2;wx<X+bw-1;wx+=3)
+      if(rnd()<.6)rect(g,rnd()<.25?CF.trim:CF.win,wx,wy,1,1);
+    X+=bw+1;
+  }
+  const gx=OX+TILE+TILE/2;
+  for(let y=18;y<OY;y++){const w=2+Math.round((y-18)/(OY-18)*6);rect(g,y%2?C.pathB:C.pathA,gx-w,y,w*2,1);rect(g,C.pathEdge,gx-w,y,1,1);rect(g,C.pathEdge,gx+w-1,y,1,1);}
+}
 function drawNord(g){
+  if(CYBER){drawNordCyber(g);return;}
   // cielo
   for(let y=0;y<OY;y++){
     const t=y/OY;
@@ -929,7 +2263,81 @@ function nicchia(g,X,Y,kind){
     rect(g,'#5a1c28',X+3,Y+13,2,1);rect(g,'#5a1c28',X+6,Y+13,2,1);
   }
 }
+/* ═══ LE PARETI DELLA CITTÀ ═══
+   Al posto dei conci, delle merlature e delle nicchie con i teschi: facciate
+   di pannelli, condotti che corrono in verticale, finestre accese e insegne.
+   Le insegne prendono il posto delle nicchie una per una — stessa cadenza,
+   stessa funzione (rompere la parete e fare luce), altro mondo. */
+function insegnaCyber(g,X,Y,kind){
+  const acc=CF.trim,vet=CF.win;
+  rect(g,'#04070d',X-1,Y+1,13,17);            // cassa spenta
+  rect(g,CF.wallLip,X-1,Y+1,13,1);
+  rect(g,CF.wallLip,X-1,Y+17,13,1);
+  if(kind===0){                                // schermo con scansione
+    rect(g,'#071320',X+1,Y+3,9,13);
+    for(let i=0;i<6;i++)rect(g,i%2?vet:'#0d2438',X+1,Y+4+i*2,9,1);
+    rect(g,acc,X+1,Y+3,9,1);
+    LIGHTS.push({x:X+5-OX,y:Y+9-OY});
+  }else if(kind===1){                          // colonna di caratteri
+    rect(g,'#050d16',X+1,Y+3,9,13);
+    for(let i=0;i<5;i++){
+      const w=2+((rnd()*4)|0);
+      rect(g,rnd()<.4?vet:acc,X+2+((rnd()*3)|0),Y+4+i*2.4,w,1);
+    }
+    LIGHTS.push({x:X+5-OX,y:Y+9-OY});
+  }else if(kind===2){                          // condotto e valvola
+    rect(g,'#0a1220',X+3,Y+2,5,15);
+    for(let i=0;i<4;i++)rect(g,CF.wallLip,X+3,Y+4+i*3,5,1);
+    rect(g,acc,X+4,Y+9,3,3);rect(g,vet,X+5,Y+10,1,1);
+  }else{                                       // insegna al neon, un glifo
+    rect(g,'#060b14',X+1,Y+3,9,13);
+    rect(g,acc,X+3,Y+5,5,1);rect(g,acc,X+3,Y+5,1,9);
+    rect(g,acc,X+3,Y+9,4,1);rect(g,acc,X+3,Y+13,5,1);
+    rect(g,vet,X+7,Y+6,1,3);
+    LIGHTS.push({x:X+5-OX,y:Y+9-OY});
+  }
+}
+function drawMuraCyber(g){
+  for(const lato of [0,1]){
+    const x0=lato?CW-OX:0;
+    // facciata: pannelli larghi separati da giunti orizzontali
+    let y=-2;
+    while(y<CH+6){
+      const h=7+((rnd()*4)|0);
+      rect(g,CF.wall[(rnd()*4)|0],x0,y,OX,h);
+      rect(g,CF.mortar,x0,y+h-1,OX,1);
+      // finestre accese, rade
+      let X=x0+2;
+      while(X<x0+OX-3){
+        if(rnd()<.30){
+          const w=2+((rnd()*3)|0),hh=Math.max(1,h-4);
+          rect(g,rnd()<.35?CF.win:'#0d1c2c',X,y+2,w,hh);
+        }
+        X+=4+((rnd()*4)|0);
+      }
+      y+=h;
+    }
+    // condotti verticali
+    for(let k=0;k<2;k++){
+      const cx=x0+3+k*11;
+      rect(g,'#070c16',cx,0,3,CH);
+      for(let Y=-2;Y<CH;Y+=9)rect(g,CF.wallLip,cx,Y,3,1);
+      if(k===1)for(let Y=0;Y<CH;Y+=26)rect(g,CF.trim,cx+1,Y,1,4);
+    }
+    // insegne, alla stessa cadenza delle nicchie
+    let k=lato?2:0;
+    for(let ny=48;ny<CH-58;ny+=46){insegnaCyber(g,x0+(lato?7:6),ny,k%4);k++;}
+    // spigolo interno: un tubo acceso invece della lesena
+    const li=lato?x0:x0+OX-3;
+    rect(g,'#05090f',li,0,3,CH);
+    rect(g,CF.trim,li+(lato?0:2),0,1,CH);
+    for(let Y=0;Y<CH;Y+=7)rect(g,CF.wallLip,li,Y,3,1);
+    // gocce di pioggia sul filo interno: la città non smette mai
+    for(let Y=0;Y<CH;Y++)if(rnd()<.05)rect(g,CF.star,li+(lato?3:-1),Y,1,1+((rnd()*3)|0));
+  }
+}
 function drawMura(g){
+  if(CYBER){drawMuraCyber(g);return;}
   for(const lato of [0,1]){
     const x0=lato?CW-OX:0;
     // conci
@@ -967,7 +2375,27 @@ function drawMura(g){
   }
 }
 
+function drawTerminaleCyber(g){
+  const y0=CH-OY,gx=OX+5*TILE+TILE/2;
+  rect(g,CF.sagB,0,y0,CW,8);
+  for(let X=0;X<CW;X+=8){rect(g,CF.sagC,X,y0,6,6);rect(g,CF.sagGold,X,y0+6,6,1);}
+  for(let Y=y0;Y<y0+8;Y++){const w=8-Math.round((Y-y0)*.5);rect(g,Y%2?C.pathA:C.pathB,gx-w,Y,w*2,1);}
+  rect(g,CF.cath,0,y0+8,CW,OY-8);rect(g,CF.cathHi,0,y0+8,CW,2);
+  // data center fortificato e portale ottico
+  for(const tx of [18,CW-34]){
+    rect(g,CF.cathHi,tx,y0+2,16,OY-2);rect(g,CF.cath,tx+2,y0+5,12,OY-5);
+    for(let y=y0+8;y<CH-3;y+=5){rect(g,CF.win,tx+4,y,2,1);rect(g,CF.trim,tx+10,y+2,2,1);}
+    rect(g,CF.trim,tx+7,y0-3,2,5);
+  }
+  const py=y0+18;rect(g,CF.cathHi,gx-13,py-3,27,CH-py+3);
+  rect(g,CF.portal,gx-9,py,19,CH-py);
+  for(let i=0;i<5;i++){rect(g,CF.trim,gx-11+i,py-2-i,23-i*2,1);rect(g,CF.win,gx-8+i,py+1-i,17-i*2,1);}
+  rect(g,CF.win,gx-1,y0+10,3,3);rect(g,CF.portal,gx,y0+11,1,1);
+  // piste luminose e terminali
+  for(const cx of [gx-48,gx-30,gx+30,gx+48]){rect(g,CF.cathHi,cx-2,y0+2,5,5);rect(g,CF.win,cx,y0+3,2,2);LIGHTS.push({x:cx+1-OX,y:y0+3-OY});}
+}
 function drawSagrato(g){
+  if(CYBER){drawTerminaleCyber(g);return;}
   const y0=CH-OY, gx=OX+5*TILE+TILE/2, pav=7;
   // lastricato consacrato
   rect(g,CF.sagB,0,y0,CW,pav);
@@ -1058,10 +2486,13 @@ function drawBordo(g){
   }
   rect(g,'#0a070c',OX-2,OY-2,W+4,2);rect(g,'#0a070c',OX-2,CH-OY,W+4,2);
   rect(g,'#0a070c',OX-2,OY-2,2,H+4);rect(g,'#0a070c',CW-OX,OY-2,2,H+4);
-  rect(g,'#5a4a22',OX-1,OY-1,W+2,1);rect(g,'#5a4a22',OX-1,CH-OY,W+2,1);
-  rect(g,'#5a4a22',OX-1,OY-1,1,H+2);rect(g,'#5a4a22',CW-OX,OY-1,1,H+2);
+  // il filo attorno al campo prende la tinta del mondo: oro sul sagrato,
+  // neon nella città
+  const filo=CYBER?CF.trim:'#5a4a22',stud=CYBER?CF.win:C.gold,studIn=CYBER?CF.trim:'#8a6f1c';
+  rect(g,filo,OX-1,OY-1,W+2,1);rect(g,filo,OX-1,CH-OY,W+2,1);
+  rect(g,filo,OX-1,OY-1,1,H+2);rect(g,filo,CW-OX,OY-1,1,H+2);
   for(const [cx,cy] of [[OX-2,OY-2],[CW-OX,OY-2],[OX-2,CH-OY-1],[CW-OX,CH-OY-1]]){
-    rect(g,C.gold,cx,cy,3,3);rect(g,'#8a6f1c',cx+1,cy+1,1,1);
+    rect(g,stud,cx,cy,3,3);rect(g,studIn,cx+1,cy+1,1,1);
   }
 }
 
@@ -1071,6 +2502,19 @@ const fg=fgc.getContext('2d');fg.imageSmoothingEnabled=false;
 function buildFG(){
   fg.clearRect(0,0,CW,CH);
   const gx=OX+TILE+TILE/2;
+  if(CYBER){
+    // cavi e tetti tecnici stringono il varco d'ingresso; il centro resta libero
+    for(const side of [-1,1]){
+      const ax=gx+side*20;
+      rect(fg,'#03060b',ax-(side<0?16:0),0,16,18);
+      for(let i=0;i<4;i++){rect(fg,CF.cathHi,ax+side*i*3,2+i*4,side*3,1);rect(fg,CF.win,ax+side*i*3,2+i*4,1,1);}
+    }
+    const rx=OX+5*TILE+TILE/2,py0=CH-OY+28;
+    rect(fg,CF.portal,rx-9,py0,19,CH-py0);
+    for(let i=0;i<5;i++)rect(fg,CF.portal,rx-9+i,py0-i,19-i*2,2);
+    rect(fg,CF.win,rx-10,py0-1,1,CH-py0+1);rect(fg,CF.trim,rx+10,py0-1,1,CH-py0+1);
+    return;
+  }
   // limitare del bosco: fronde fitte da cui esce la processione
   for(let X=gx-24;X<=gx+24;X++){
     const t=Math.abs(X-gx)/24;
@@ -1107,30 +2551,584 @@ let atime=0;
 function drawNebbia(){
   for(let i=0;i<3;i++){
     const off=Math.sin(atime*.22+i*2.1)*26;
-    x.globalAlpha=(APO?.075:(INF?.06:.045))+.022*Math.sin(atime*.7+i);
-    x.fillStyle=APO?'#e8e8f0':(INF?'#c0664a':'#9fb0c0');
+    x.globalAlpha=(CYBER?.035:(APO?.075:(INF?.06:.045)))+.022*Math.sin(atime*.7+i);
+    x.fillStyle=CYBER?(CYFASE===1?'#82ff75':'#20d8ff'):(APO?'#e8e8f0':(INF?'#c0664a':'#9fb0c0'));
     x.fillRect(-OX,-OY+24+i*4,CW,2);
-    x.fillStyle=APO?'#b9c0d0':(INF?'#8e3a24':'#7d8ea0');
+    x.fillStyle=CYBER?'#ff3bd4':(APO?'#b9c0d0':(INF?'#8e3a24':'#7d8ea0'));
     x.fillRect(-OX+off,-OY+26+i*4,CW*.5,1);
   }
   x.globalAlpha=1;
 }
 function drawCenere(){
-  x.fillStyle=APO?'#f2ecd8':(INF?'#e8703a':'#c3b9d0');
+  x.fillStyle=CYBER?(CYFASE===1?'#b7ff45':'#20d8ff'):(APO?'#f2ecd8':(INF?'#e8703a':'#c3b9d0'));
   for(let i=0;i<FLAKES.length;i++){
     const f=FLAKES[i];
     const t=(atime*f.sp+f.ph*9)%(CH+30);
-    const Y=(INF?(CH+30-t):t)-OY-15;
-    const X=-OX+((f.x+Math.sin(atime*f.dr+f.ph)*8)%CW+CW)%CW;
+    const Y=(INF&&!CYBER?(CH+30-t):t)-OY-15;
+    const X=-OX+((f.x+(CYBER?atime*f.dr:Math.sin(atime*f.dr+f.ph)*8))%CW+CW)%CW;
     x.globalAlpha=Y<-OY+6?.12:.3;
-    x.fillRect(X|0,Y|0,f.s,f.s);
+    x.fillRect(X|0,Y|0,f.s,CYBER?f.s+2:f.s);
   }
   x.globalAlpha=1;
 }
 
+/* ═══ SFONDO DELLE SCHERMATE: parallasse ═══
+   Sei strati che scorrono a velocità diverse dietro menu, compendio, fine
+   atto, vittoria e sconfitta. Il cielo con la luna sta fermo (è lontano
+   all'infinito), le creste vanno piano, il bosco in fretta, la sterpaglia
+   di corsa. Ogni strato mobile è una tela larga MW disegnata due volte —
+   a -off e a MW-off — così il giro si chiude senza cuciture.
+   La tinta segue l'atto: gli strati leggono C/CF correnti, che applyAct
+   ha già cambiato. Il seme viene salvato e rimesso a posto: è lo stesso
+   di buildBG, e sporcarlo cambierebbe il fondale del campo. */
+const mcv=document.getElementById('menubg');
+const mg=mcv.getContext('2d');mg.imageSmoothingEnabled=false;
+let MW=0,MH=0,MSC=0,MHZ=0,MACT=0,MMX=0,MMY=0,MMR=0,MHALO=null,MFOG=null,MFOFF=0,mtime=0;
+const MLAY=[],MOFF=[0,0,0,0,0,0,0],MSPD=[0,4,7,11,17,28,40],MFLAKES=[];
+
+/* la tela riempie il viewport a scala intera: pixel quadrati, niente sbavature */
+function menuBgFit(){
+  const a=document.getElementById('app');
+  const vw=Math.max(1,a.clientWidth||CW),vh=Math.max(1,a.clientHeight||CH);
+  const s=Math.max(2,Math.round(vw/150));
+  const w=Math.ceil(vw/s),h=Math.ceil(vh/s);
+  if(w===MW&&h===MH&&s===MSC)return false;
+  /* l'orizzonte segue l'altezza dello schermo — il cielo sta dietro il testo,
+     il paesaggio dietro i bottoni. Tutto il resto è misurato sulla LARGHEZZA:
+     su un telefono alto MH cambia molto, MW quasi niente, e legare i rilievi
+     all'altezza li stirava fino a farne guglie. */
+  MW=w;MH=h;MSC=s;MHZ=Math.round(MH*.72);
+  mcv.width=MW;mcv.height=MH;
+  mg.imageSmoothingEnabled=false;
+  if(mcv.style){mcv.style.width=(MW*s)+'px';mcv.style.height=(MH*s)+'px';}
+  return true;
+}
+function mLayer(){
+  const c=document.createElement('canvas');c.width=MW;c.height=MH;
+  const q=c.getContext('2d');q.imageSmoothingEnabled=false;return q;
+}
+/* chi sta a cavallo del bordo va ridisegnato dall'altra parte, altrimenti
+   il punto di ricongiunzione si vede. I casuali si tirano PRIMA di chiamare
+   questa, se no le due copie escono diverse. */
+function mWrap(f,cx){
+  f(cx);
+  if(cx>MW-16)f(cx-MW);
+  if(cx<16)f(cx+MW);
+}
+/* cielo: bande, stelle, luna. Due terne per atto: il colore allo zenit
+   e quello all'orizzonte, interpolati riga per riga */
+const MSKY=[[9,7,17,26,20,35],[14,6,6,46,18,14],[8,10,18,34,40,58],
+  [2,5,13,8,22,38],[3,8,7,18,38,25],[2,3,12,16,12,45]];
+function mkCielo(){
+  const q=mLayer(),k=MSKY[CYBER?3+CYFASE:(APO?2:(INF?1:0))];
+  for(let y=0;y<MHZ;y++){
+    const t=y/MHZ;
+    rect(q,'rgb('+Math.round(k[0]+t*(k[3]-k[0]))+','+Math.round(k[1]+t*(k[4]-k[1]))
+      +','+Math.round(k[2]+t*(k[5]-k[2]))+')',0,y,MW,1);
+  }
+  for(let i=0,n=Math.round(MW*MHZ/230);i<n;i++)
+    rect(q,rnd()<.3?CF.star:CF.star2,(rnd()*MW)|0,(rnd()*MHZ*.86)|0);
+  // luna di sangue, la stessa dell'orizzonte del campo ma più grande
+  MMR=Math.max(5,Math.round(MW*.088));MMX=Math.round(MW*.72);MMY=Math.round(MHZ*.28);
+  const mr=MMR,alo=Math.round(mr*2.1);
+  for(let dy=-alo;dy<=alo;dy++)for(let dx=-alo;dx<=alo;dx++){
+    const d=Math.sqrt(dx*dx+dy*dy);
+    if(d>mr&&d<alo&&rnd()<(alo-d)/(alo*.6))
+      rect(q,d<alo*.72?(CYBER?(CYFASE===1?'#5b4215':'#163d55'):(APO?'#b9c0d0':(INF?'#7a2a12':'#3a1622')))
+                      :(CYBER?'#071523':(APO?'#6a7488':(INF?'#3d1408':'#251020'))),MMX+dx,MMY+dy);
+  }
+  for(let dy=-mr;dy<=mr;dy++)for(let dx=-mr;dx<=mr;dx++){
+    const d=dx*dx+dy*dy;
+    if(d>mr*mr)continue;
+    if(CYBER)rect(q,d>mr*mr-mr*2?(CYFASE===1?'#ffd34f':'#73f4ff'):'#050912',MMX+dx,MMY+dy);
+    else if(APO)rect(q,d>mr*mr-mr*2?'#e8e0c0':'#ffffff',MMX+dx,MMY+dy);
+    else if(INF)rect(q,d>mr*mr-mr*2?'#e8703a':'#090405',MMX+dx,MMY+dy);
+    else rect(q,d>mr*mr-mr*1.6?'#a3424a':(dx+dy<-mr*.5?'#8a2f3a':'#68202c'),MMX+dx,MMY+dy);
+  }
+  if(CYBER){
+    rect(q,CYFASE===2?'#ff3bd4':'#20d8ff',MMX-mr-4,MMY-1,mr*2+8,2);
+    for(let i=0;i<22;i++){const a=rnd()*6.283,l=mr+2+rnd()*mr*1.4;
+      rect(q,rnd()<.7?'#20d8ff':'#ff3bd4',MMX+Math.cos(a)*l,MMY+Math.sin(a)*l);}
+  }else if(APO)for(let i=0;i<40;i++){const a=rnd()*6.283,l=mr+1+rnd()*mr*1.6;
+    rect(q,rnd()<.5?'#ffffff':'#c9d4e8',MMX+Math.cos(a)*l,MMY+Math.sin(a)*l);}
+  else if(INF)for(let i=0;i<18;i++){const a=rnd()*6.283,l=mr+2+rnd()*mr;
+    rect(q,'#a3421a',MMX+Math.cos(a)*l,MMY+Math.sin(a)*l);}
+  else{rect(q,'#521a24',MMX-5,MMY-2,3,3);rect(q,'#521a24',MMX+2,MMY+3,4,2);
+    rect(q,'#521a24',MMX+3,MMY-5,2,2);}
+  return q.canvas;
+}
+/* creste: ridgePts apre e chiude alla stessa quota, quindi si cuciono da sole */
+function mkCresta(base,minH,maxH,passo,col,top,neve){
+  const q=mLayer();
+  fillRidge(q,ridgePts(0,MW,base,minH,maxH,passo),MH,col,top,neve);
+  return q.canvas;
+}
+/* Abbazia lontana: il nuovo punto focale del panorama. È abbastanza bassa da
+   lasciare respiro al titolo e vive in uno strato proprio, quindi scorre con
+   la valle senza strappare il loop. Le due copie non sono identiche: una è
+   una grande rovina, l'altra poco più di una cappella spezzata. */
+function mkAbbazia(){
+  const q=mLayer(),base=MHZ+Math.round(MW*.16);
+  const corpo=CF.treeA,profilo=CF.mtnNearTop;
+  const luce=APO?'#e8d98a':(INF?'#e8703a':'#b08c3a');
+  const rovina=(cx,sc,cappella)=>mWrap(x0=>{
+    const w=Math.round(MW*(cappella?.12:.25)*sc),h=Math.round(MW*(cappella?.20:.38)*sc);
+    const l=x0-Math.floor(w/2),t=base-h;
+    rect(q,corpo,l,t+Math.round(h*.36),w,h);
+    // tetto della navata: una cuspide larga, diversa dalle punte degli abeti
+    const tettoY=t+Math.round(h*.18),tettoH=Math.max(3,Math.round(h*.19));
+    const navX=l+Math.round(w*.43),navW=Math.round(w*.40);
+    for(let yy=0;yy<=tettoH;yy++){
+      const hw=Math.max(1,Math.round(navW*.5*yy/tettoH));
+      rect(q,corpo,navX-hw,tettoY+yy,hw*2+1,1);
+      rect(q,profilo,navX-hw,tettoY+yy,1,1);
+    }
+    // contrafforti e tetti mozzati
+    for(let i=0;i<4;i++){
+      const px=l+Math.round(w*(.10+i*.27));
+      rect(q,corpo,px,t+Math.round(h*(.18+(i%2)*.10)),2,h);
+      rect(q,corpo,px-1,t+Math.round(h*(.18+(i%2)*.10))+2,4,2);
+    }
+    const torreX=l+Math.round(w*.56),tw=Math.max(3,Math.round(w*.18));
+    rect(q,corpo,torreX,t,tw,h);
+    for(let y=0;y<Math.round(h*.30);y++)rect(q,corpo,torreX+Math.floor(tw/2)-Math.floor(y*.22),t-y,1+Math.floor(y*.44),1);
+    // finestre a feritoia e rosone: pochi lumi, leggibili da lontano
+    // due torri laterali spezzate danno alla rovina una sagoma inconfondibile
+    if(!cappella)for(const tx of [l+2,l+w-5]){
+      const th=Math.round(h*(tx===l+2?.56:.48));
+      rect(q,corpo,tx,base-th,4,th);rect(q,profilo,tx,base-th,1,th);
+      rect(q,corpo,tx+1,base-th-3,2,3);rect(q,profilo,tx+1,base-th-3,1,2);
+    }
+    // luce lunare sui profili rivolti a sinistra
+    rect(q,profilo,l,t+Math.round(h*.36),1,Math.round(h*.64));
+    rect(q,profilo,torreX,t,1,h);
+    rect(q,profilo,torreX+1,t,Math.max(1,tw-2),1);
+    if(!cappella){
+      const ry=t+Math.round(h*.31),rx=torreX+Math.floor(tw/2);
+      rect(q,luce,rx,ry-1,1,4);rect(q,luce,rx-1,ry,3,2);
+      rect(q,corpo,rx,ry,1,1);
+      rect(q,luce,l+Math.round(w*.18),t+Math.round(h*.63),1,2);
+      rect(q,luce,l+Math.round(w*.82),t+Math.round(h*.67),1,2);
+    }
+    // denti di muro irregolari
+    for(let i=0;i<w;i+=3)if(((i*7+w)&3)!==0)rect(q,corpo,l+i,t+Math.round(h*.34)-1,2,2);
+  },cx);
+  rovina(MW*.67,1,false);rovina(MW*.12,.72,true);
+  return q.canvas;
+}
+function mkBosco(by,hMin,hMax,passo,col,hi,croci){
+  const q=mLayer();
+  /* il terreno non è un righello: ondeggia. Il seno fa un numero intero di
+     giri sulla larghezza, così il bordo combacia con sé stesso al loop. */
+  const k=2+((rnd()*2)|0),amp=Math.max(1,Math.round(MW*.02));
+  for(let X=0;X<MW;X++){
+    const dy=Math.round(Math.sin(X/MW*6.2832*k)*amp)+(rnd()<.3?1:0);
+    rect(q,col,X,by+dy,1,MH-by-dy);
+  }
+  let cx=-8;
+  while(cx<MW+10){
+    const h=hMin+((rnd()*(hMax-hMin+1))|0),X=cx;
+    mWrap(x0=>conifer(q,x0,by+2,h,col,hi),X);
+    cx+=passo*(.55+rnd()*.95);
+  }
+  // croci sul limitare: pali storti con la traversa e un lume d'oro
+  if(croci)for(let i=0;i<4;i++){
+    const X=(rnd()*MW)|0,ht=Math.round(MW*.11)+((rnd()*5)|0),br=2+((rnd()*2)|0);
+    const ty=Math.round(ht*.32);
+    mWrap(x0=>{
+      rect(q,CF.cathHi,x0,by-ht,1,ht+2);
+      rect(q,CF.cathHi,x0-br,by-ht+ty,br*2+1,1);
+      rect(q,CF.cathHi,x0-br,by-ht+ty+1,1,1);
+      rect(q,CF.cathHi,x0+br,by-ht+ty+1,1,1);
+      rect(q,CF.trim,x0,by-ht,1,1);
+    },X);
+  }
+  return q.canvas;
+}
+/* foschia sul limitare: retinata a mano, non una barra piena.
+   Il rilievo lungo X compie giri interi, quindi si cuce come gli altri. */
+function mkNebbia(){
+  const q=mLayer();
+  const y0=MHZ+Math.round(MW*.09),hh=Math.max(6,Math.round(MW*.12));
+  const col=CYBER?(CYFASE===1?'#4ca36a':'#225b78'):(APO?'#c9d4e8':(INF?'#b0563a':'#8fa0b4'));
+  const k1=2+((rnd()*2)|0),k2=k1+4,k3=1+((rnd()*2)|0);
+  const amp=Math.max(2,Math.round(hh*.35));
+  for(let X=0;X<MW;X++){
+    const u=X/MW*6.2832;
+    // due onde a giri interi: la fascia serpeggia invece di stare in riga
+    const sp=Math.round(Math.sin(u*k1+1.3)*amp+Math.sin(u*k2+.7)*amp*.4);
+    const gonf=.6+.4*Math.sin(u*k3+2.2);
+    for(let Y=0;Y<hh;Y++){
+      const t=Y/hh,d=gonf*(1-Math.abs(t*2-1));
+      // il cuore è pieno, i bordi si sfrangiano: così è foschia e non grandine
+      if(d>.6||rnd()<d*d)rect(q,col,X,y0+sp+Y,1,1);
+    }
+  }
+  return q.canvas;
+}
+/* sterpaglia in controluce: rovi neri sul bordo basso */
+function mkSterpi(){
+  const q=mLayer();
+  const by=MH-Math.round(MW*.05);
+  rect(q,CF.portal,0,by,MW,MH-by);
+  // due sagome alte spezzano il bordo basso, come le conifere di buildFG
+  for(let i=0;i<2;i++){
+    const X=(rnd()*MW)|0,h=Math.round(MW*.18)+((rnd()*6)|0);
+    mWrap(x0=>conifer(q,x0,by+1,h,CF.portal,CF.portal),X);
+  }
+  let cx=0;
+  while(cx<MW+10){
+    const h=3+((rnd()*8)|0),cur=(rnd()<.5?-1:1)*(1+((rnd()*2)|0));
+    mWrap(x0=>{
+      for(let i=0;i<h;i++)rect(q,CF.portal,x0+Math.round(cur*i*i/(h*h)*3),by-i,1,1);
+      rect(q,CF.portal,x0-1,by-1,3,1);
+    },cx);
+    cx+=1+((rnd()*4)|0);
+  }
+  // lapidi e croci in primissimo piano: grandi, rade, mai tagliate dal bordo
+  for(let i=0;i<Math.max(4,Math.round(MW/30));i++){
+    const X=8+rnd()*(MW-16),h=4+((rnd()*7)|0),tipo=rnd();
+    mWrap(x0=>{
+      if(tipo<.42){
+        rect(q,CF.portal,x0-2,by-h+2,5,h+3);
+        rect(q,CF.portal,x0-1,by-h,3,2);
+        rect(q,CF.treeBHi,x0-1,by-h+1,1,1);
+      }else if(tipo<.74){
+        rect(q,CF.portal,x0,by-h,1,h+3);rect(q,CF.portal,x0-2,by-h+2,5,1);
+        rect(q,CF.treeBHi,x0,by-h,1,1);
+      }else{
+        rect(q,CF.portal,x0-1,by-h,3,h+3);rect(q,CF.portal,x0-2,by-h+2,5,2);
+      }
+    },X);
+  }
+  return q.canvas;
+}
+/* Mondo II: una megalopoli a strati, costruita in pixel e cucita sul bordo.
+   Ogni fascia ha una grammatica diversa: torri lontane, blocchi industriali,
+   sopraelevate, insegne e tetti tecnici in primo piano. */
+function mkCyberCitta(base,minH,maxH,passo,prof){
+  const q=mLayer();
+  const corpi=['#06101a','#071520','#081923','#030811','#02050a'];
+  const bordi=CYFASE===1?['#316747','#4a8b55']:['#12445d','#176786'];
+  const luci=CYFASE===1?['#b7ff45','#ffd34f','#ff5cba']:['#20d8ff','#ff3bd4','#9b7bff'];
+  let X=0;
+  while(X<MW){
+    const w=Math.max(4,Math.round(passo*(.65+rnd()*.8))),h=minH+((rnd()*(maxH-minH+1))|0),top=base-h;
+    rect(q,corpi[Math.min(prof,corpi.length-1)],X,top,w,MH-top);
+    rect(q,bordi[prof%2],X,top,w,1);
+    if(rnd()<.42)rect(q,bordi[(prof+1)%2],X+Math.floor(w*.55),top-3-((rnd()*5)|0),1,4+((rnd()*5)|0));
+    for(let wy=top+3;wy<base-2;wy+=3+prof)for(let wx=X+2;wx<X+w-1;wx+=3)
+      if(rnd()<.52)rect(q,luci[(wx+wy+prof)%luci.length],wx,wy,prof<2?1:2,1);
+    if(w>9&&rnd()<.36){
+      const sy=top+3+((rnd()*Math.max(2,h-8))|0),sw=Math.min(w-3,5+((rnd()*8)|0));
+      rect(q,'#02040a',X+2,sy,sw,4);rect(q,luci[(X+prof)%luci.length],X+2,sy,sw,1);
+      rect(q,luci[(X+prof+1)%luci.length],X+3,sy+2,Math.max(1,sw-3),1);
+    }
+    X+=w+1;
+  }
+  return q.canvas;
+}
+function mkCyberPasserelle(){
+  const q=mLayer(),y=MHZ+Math.round(MW*.18),c=CYFASE===1?'#b7ff45':'#20d8ff';
+  rect(q,'#02050a',0,y,MW,5);rect(q,c,0,y,MW,1);rect(q,'#112233',0,y+4,MW,1);
+  for(let X=3;X<MW;X+=13){rect(q,'#02050a',X,y-8,2,16);rect(q,c,X,y-2,1,2);}
+  for(let X=7;X<MW;X+=29){
+    rect(q,'#030811',X,y-14,12,8);rect(q,'#ff3bd4',X,y-14,12,1);
+    rect(q,c,X+2,y-11,8,2);
+  }
+  return q.canvas;
+}
+function buildMenuBg(){
+  if(!MW||!MH)return;
+  const semeVero=seed;seed=77010203;   // seme proprio: quello del campo non si tocca
+  MLAY.length=0;
+  MLAY.push(mkCielo());
+  if(CYBER){
+    MLAY.push(mkCyberCitta(MHZ+Math.round(MW*.06),Math.round(MW*.12),Math.round(MW*.29),Math.round(MW*.09),0));
+    MLAY.push(mkCyberCitta(MHZ+Math.round(MW*.16),Math.round(MW*.10),Math.round(MW*.24),Math.round(MW*.075),1));
+    MLAY.push(mkCyberCitta(MHZ+Math.round(MW*.28),Math.round(MW*.12),Math.round(MW*.25),Math.round(MW*.09),2));
+    MLAY.push(mkCyberPasserelle());
+    MLAY.push(mkCyberCitta(MHZ+Math.round(MW*.46),Math.round(MW*.16),Math.round(MW*.30),Math.round(MW*.12),3));
+    MLAY.push(mkCyberCitta(MH-Math.round(MW*.02),Math.round(MW*.12),Math.round(MW*.24),Math.round(MW*.10),4));
+    MFOG=mkNebbia();MFOFF=0;
+    MFLAKES.length=0;
+    for(let i=0,n=Math.min(84,Math.round(MW*MH/300));i<n;i++)
+      MFLAKES.push({x:rnd()*MW,ph:rnd()*90,sp:8+rnd()*15,dr:.2+rnd()*.8,s:rnd()<.12?2:1});
+    MHALO=glowTex(MMR*3,CYFASE===1?183:32,CYFASE===1?255:216,CYFASE===1?69:255);
+    MACT=G.act;seed=semeVero;return;
+  }
+  MLAY.push(mkCresta(MHZ,Math.round(MW*.08),Math.round(MW*.24),Math.round(MW*.13),
+    CF.mtnFar,CF.mtnFarTop,MHZ-Math.round(MW*.16)));
+  MLAY.push(mkCresta(MHZ+Math.round(MW*.05),Math.round(MW*.06),Math.round(MW*.17),
+    Math.round(MW*.10),CF.mtnNear,CF.mtnNearTop,0));
+  MLAY.push(mkAbbazia());
+  MLAY.push(mkBosco(MHZ+Math.round(MW*.13),Math.round(MW*.05),Math.round(MW*.09),
+    Math.round(MW*.06),CF.treeA,CF.treeAHi,false));
+  MLAY.push(mkBosco(MHZ+Math.round(MW*.30),Math.round(MW*.08),Math.round(MW*.16),
+    Math.round(MW*.08),CF.treeB,CF.treeBHi,true));
+  MLAY.push(mkSterpi());
+  MFOG=mkNebbia();MFOFF=0;
+  MFLAKES.length=0;
+  for(let i=0,n=Math.min(64,Math.round(MW*MH/380));i<n;i++)
+    MFLAKES.push({x:rnd()*MW,ph:rnd()*90,sp:3+rnd()*8,dr:.4+rnd()*1.6,s:rnd()<.16?2:1});
+  MHALO=APO?glowTex(MMR*3,232,224,192):(INF?glowTex(MMR*3,232,112,58):glowTex(MMR*3,163,66,74));
+  MACT=G.act;
+  seed=semeVero;
+}
+/* da chiamare all'apertura di una schermata: ricostruisce solo se serve */
+function menuBgSync(){
+  const cambiata=menuBgFit();
+  if(cambiata||MACT!==G.act||!MLAY.length)buildMenuBg();
+}
+function drawMenuBg(dt){
+  if(!MLAY.length)return;
+  mtime+=dt;
+  mg.drawImage(MLAY[0],0,0);
+  // alone della luna: sopra il cielo, sotto i monti
+  if(MHALO){
+    mg.globalCompositeOperation='lighter';
+    mg.globalAlpha=.16+Math.sin(mtime*.9)*.05;
+    mg.drawImage(MHALO,MMX-MMR*3,MMY-MMR*3);
+    mg.globalAlpha=1;mg.globalCompositeOperation='source-over';
+  }
+  for(let i=1;i<MLAY.length;i++){
+    MOFF[i]=(MOFF[i]+MSPD[i]*dt)%MW;
+    const o=Math.round(MOFF[i]);
+    mg.drawImage(MLAY[i],-o,0);
+    mg.drawImage(MLAY[i],MW-o,0);
+    // la foschia si posa fra il bosco lontano e quello vicino
+    if(i===4&&MFOG){
+      MFOFF=(MFOFF+6*dt)%MW;
+      const fo=Math.round(MFOFF);
+      mg.globalAlpha=(CYBER?.16:(APO?.24:(INF?.21:.18)))+.05*Math.sin(mtime*.5);
+      mg.drawImage(MFOG,-fo,0);
+      mg.drawImage(MFOG,MW-fo,0);
+      mg.globalAlpha=1;
+    }
+  }
+  // cenere
+  mg.fillStyle=CYBER?(CYFASE===1?'#b7ff45':'#20d8ff'):(APO?'#f2ecd8':(INF?'#e8703a':'#c3b9d0'));
+  mg.globalAlpha=.28;
+  for(let i=0;i<MFLAKES.length;i++){
+    const f=MFLAKES[i],t=(mtime*f.sp+f.ph*9)%(MH+30);
+    const Y=(INF&&!CYBER?(MH+30-t):t)-15;
+    const X=((f.x+(CYBER?mtime*f.dr:Math.sin(mtime*f.dr+f.ph)*8))%MW+MW)%MW;
+    mg.fillRect(X|0,Y|0,f.s,CYBER?f.s+2:f.s);
+  }
+  mg.globalAlpha=1;
+}
+
+/* ═══ MAPPA DELLA CAMPAGNA ═══
+   Due pergamene sulla stessa tela: i mondi e, dentro un mondo, le sue veglie.
+   Un sentiero che sale da sinistra a destra, una tappa per voce. Le posizioni
+   si ricavano dal numero di voci: aggiungendo una veglia — o un mondo — la
+   mappa si riadatta da sola. La tavolozza è tutta sua: la mappa è una
+   pergamena, non una scena, e non deve cambiare tinta con l'atto in corso. */
+const TW=144,TH=80;
+const tcv=document.getElementById('tappe');
+const tg=tcv.getContext('2d');tcv.width=TW;tcv.height=TH;tg.imageSmoothingEnabled=false;
+const tbc=document.createElement('canvas');tbc.width=TW;tbc.height=TH;
+const tb=tbc.getContext('2d');tb.imageSmoothingEnabled=false;
+let tsel=1,msel=1;
+const TCOL={via:'#332b3e',viaOn:'#6d5a3a',disco:'#241f2b',discoHi:'#332b3e',
+  rim:'#c9a227',rimOff:'#3a3348',sigillo:'#5a1c28',sospesa:'#8fa5b0',
+  em:[null,{a:'#8fa5b0',b:'#c9a227',c:'#2d2637'},
+           {a:'#e8703a',b:'#f2c14e',c:'#2c2126'},
+           {a:'#b9c0d0',b:'#ffffff',c:'#232838'}]};
+/* posto i-esimo di n lungo il sentiero, dal basso a sinistra all'alto a destra */
+function viaPos(i,n){
+  return {x:Math.round(TW*(i+.5)/n),
+          y:Math.round(TH-15-(n<2?0:i/(n-1))*(TH-33))};
+}
+const scenDelMondo=()=>MONDO[msel].scen;
+function tappaPos(a){
+  const s=scenDelMondo(),i=s.indexOf(a);
+  return viaPos(i<0?0:i,Math.max(1,s.length));
+}
+function mondoPos(m){return viaPos(m-1,NMONDI);}
+function tappeFit(){
+  const w=Math.max(120,(el('screen').clientWidth||300)-44);
+  const s=Math.max(1,Math.min(3,Math.floor(w/TW)));
+  tcv.style.width=(TW*s)+'px';tcv.style.height=(TH*s)+'px';
+}
+/* la via fra due tappe: un arco tratteggiato, acceso solo fin dove si è giunti */
+function tVia(p,q,acceso){
+  const mx=(p.x+q.x)/2,my=Math.min(p.y,q.y)-7;
+  for(let i=0;i<=44;i++){
+    if(i%3===2)continue;
+    const t=i/44,u=1-t;
+    rect(tb,acceso?TCOL.viaOn:TCOL.via,
+      u*u*p.x+2*u*t*mx+t*t*q.x, u*u*p.y+2*u*t*my+t*t*q.y,1,1);
+  }
+}
+/* Gli emblemi delle tappe: a nove pixel il disegno a rect non si legge,
+   quindi valgono le regole delle altre sprite — righe tutte della stessa
+   lunghezza, niente spazi, un carattere un colore. */
+const ART_TAPPA={
+  1:['....o....',   // la campana della veglia
+     '...hgg...',
+     '..hgggg..',
+     '..hgggg..',
+     '.hgggggg.',
+     '.hgggggg.',
+     'hgggggggg',
+     'ddddddddd',
+     '....g....'],
+  2:['..ttttttt..', // la crepa da cui sale il fondo
+     '.ttttrtttt.',
+     'ttttrirtttt',
+     'tttroiorttt',
+     'ttttrirtttt',
+     '.ttttrtttt.',
+     '..ttttttt..'],
+  3:['.....l.....', // il libro aperto sotto il cielo
+     '....lll....',
+     '.....l.....',
+     '...........',
+     '..eee.eee..',
+     '.ppppdpppp.',
+     'pppppdppppp',
+     'cccccdccccc',
+     '.ccccccccc.',
+     '..ccccccc..'],
+  4:['....n....',   // antenna dei bassifondi
+     '...nnn...',
+     '..n.c.n..',
+     '....c....',
+     '...ccc...',
+     '..c.m.c..',
+     '....c....',
+     '...bbb...',
+     '..bbbbb..'],
+  5:['...aaa...',   // serbatoio del distretto acido
+     '..agaga..',
+     '.aggggga.',
+     '.agllgga.',
+     '.aggggga.',
+     '..agaga..',
+     '...aaa...',
+     '..bbbbb..',
+     '.bbbbbbb.'],
+  6:['..mmmmmm.',   // occhio della Griglia Nera
+     '.mccccccm',
+     'mc......m',
+     'mc.ww...m',
+     'mc.ww...m',
+     'mc......m',
+     '.mccccccm',
+     '..mmmmmm.',
+     '....c....'],
+  chiuso:['..sssss..', // ceralacca sulla pietra
+          '.sswwwss.',
+          'sswwwwwss',
+          'swwwkwwws',
+          'swwkkkwws',
+          'swwwkwwws',
+          'sswwwwwss',
+          '.sswwwss.',
+          '..sssss..']
+};
+const PAL_TAPPA={
+  1:{o:'#f7e08a',h:'#f2c14e',g:'#c9a227',d:'#7a6320'},
+  2:{t:'#241a18',r:'#7a2a12',o:'#e8703a',i:'#f2c14e'},
+  3:{l:'#ffffff',e:'#f5ecd0',p:'#d8cbb0',d:'#2b2434',c:'#8f9ab0'},
+  4:{n:'#113749',c:'#20d8ff',m:'#ff3bd4',b:'#07131d'},
+  5:{a:'#497330',g:'#b7ff45',l:'#fff47a',b:'#07130d'},
+  6:{m:'#ff3bd4',c:'#20d8ff',w:'#ffffff'},
+  chiuso:{s:'#3a1018',w:'#5a1c28',k:'#7a2634'}
+};
+const SEM={};
+for(const k in ART_TAPPA)SEM[k]=makeSprite(ART_TAPPA[k],PAL_TAPPA[k],'#140f1a');
+/* pietra tonda con cerchione: dorato se il luogo è aperto, spento se no */
+function medaglione(p,r,aperta,sp){
+  for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){
+    const d=dx*dx+dy*dy;
+    if(d>r*r)continue;
+    let col;
+    if(d>r*r-r*2.2)col=aperta?TCOL.rim:TCOL.rimOff;   // cerchione
+    else if(d>r*r-r*4.6)col='#140f1a';                // ombra sotto il bordo
+    else col=(dx+dy<-r/3)?TCOL.discoHi:TCOL.disco;    // pietra, luce da nordovest
+    rect(tb,col,p.x+dx,p.y+dy);
+  }
+  if(sp)blit(tb,sp,p.x-sp.w/2,p.y-sp.h/2);
+}
+/* una veglia sospesa porta il suo segno sopra il medaglione: una candela
+   lasciata accesa, che è poi quello che è */
+function tSospesa(p,r){
+  const y=p.y-r-6;
+  rect(tb,'#241f2b',p.x-2,y+3,5,3);        // il moccolo
+  rect(tb,TCOL.sospesa,p.x-2,y+3,5,1);
+  rect(tb,'#f2c14e',p.x,y+1,1,2);          // la fiamma
+  rect(tb,'#f7e08a',p.x,y,1,1);
+  rect(tb,'#f5ecd0',p.x-1,y+1,1,1);rect(tb,'#f5ecd0',p.x+1,y+1,1,1);
+}
+function tMedaglione(a){
+  const p=tappaPos(a),r=9,aperta=a<=PROG.unl;
+  medaglione(p,r,aperta,SEM[aperta?a:'chiuso']||SEM.chiuso);
+  if(aperta&&haSalvataggio(a))tSospesa(p,r);
+}
+function mMedaglione(m){
+  const p=mondoPos(m),r=12,aperta=mondoAperto(m);
+  // l'emblema del mondo è quello della sua prima veglia
+  medaglione(p,r,aperta,SEM[aperta?MONDO[m].scen[0]:'chiuso']||SEM.chiuso);
+}
+/* fondo comune alle due pergamene: la stessa pietra macchiata */
+function tFondo(){
+  for(let y=0;y<TH;y++){
+    const t=y/TH;
+    rect(tb,'rgb('+Math.round(8+t*9)+','+Math.round(6+t*7)+','+Math.round(14+t*12)+')',0,y,TW,1);
+  }
+  for(let i=0;i<70;i++)rect(tb,rnd()<.35?'#2b2434':'#191320',(rnd()*TW)|0,(rnd()*TH)|0);
+}
+function buildTappe(){
+  const s0=seed;seed=31415926;   // la mappa ha il suo seme, come il fondale
+  tFondo();
+  const s=scenDelMondo();
+  for(let i=0;i<s.length-1;i++)
+    tVia(tappaPos(s[i]),tappaPos(s[i+1]),s[i]<PROG.unl);
+  for(const a of s)tMedaglione(a);
+  seed=s0;
+}
+function buildMondi(){
+  const s0=seed;seed=31415926;
+  tFondo();
+  for(let m=1;m<NMONDI;m++)tVia(mondoPos(m),mondoPos(m+1),mondoCompiuto(m));
+  for(let m=1;m<=NMONDI;m++)mMedaglione(m);
+  seed=s0;
+}
+/* la ghirlanda che gira attorno alla voce scelta */
+function tAlone(p,rag){
+  tg.drawImage(tbc,0,0);
+  tg.globalAlpha=.42+.42*Math.sin(mtime*2.4);
+  for(let i=0;i<18;i++){
+    const a=i/18*6.2832+mtime*.55;
+    rect(tg,'#f2c14e',p.x+Math.cos(a)*rag,p.y+Math.sin(a)*rag,1,1);
+  }
+  tg.globalAlpha=1;
+}
+function drawTappe(){tAlone(tappaPos(tsel),12);}
+function drawMondi(){tAlone(mondoPos(msel),15);}
+tcv.addEventListener('pointerdown',ev=>{
+  ev.preventDefault();audio();
+  if(smode!=='mappa'&&smode!=='mondi')return;
+  const r=tcv.getBoundingClientRect();
+  const px=(ev.clientX-r.left)/r.width*TW,py=(ev.clientY-r.top)/r.height*TH;
+  if(smode==='mondi'){
+    for(let m=1;m<=NMONDI;m++){
+      const p=mondoPos(m),dx=px-p.x,dy=py-p.y;
+      if(dx*dx+dy*dy<=225){msel=m;mondiAggiorna();return;}
+    }
+    return;
+  }
+  for(const a of scenDelMondo()){
+    if(a>PROG.unl)continue;
+    const p=tappaPos(a),dx=px-p.x,dy=py-p.y;
+    if(dx*dx+dy*dy<=144){tsel=a;mappaAggiorna();return;}
+  }
+});
+
 function buildBG(){
-  LIGHTS.length=0;
-  for(const d of DECOR)if(d[2]==='candela')LIGHTS.push({x:d[0]*TILE+8,y:d[1]*TILE+4});
+  // DECOR, blocked e LIGHTS li tiene buildPercorso: qui si disegna soltanto
   bx.setTransform(1,0,0,1,MARG,MARG);
   bx.fillStyle='#07060a';bx.fillRect(-MARG,-MARG,CW+MARG*2,CH+MARG*2);
   drawNord(bx);drawMura(bx);drawSagrato(bx);
@@ -1190,6 +3188,8 @@ const GLOW_CANDELA=glowTex(20,242,193,78);
 const GLOW_INFERNO=glowTex(22,232,112,58);
 const GLOW_FUOCO=glowTex(32,232,112,58);
 const GLOW_GELO=glowTex(32,90,175,232);
+const GLOW_NEON=glowTex(28,32,216,255);
+const GLOW_NEON_ACIDO=glowTex(28,183,255,69);
 const VIG=(()=>{
   const c=document.createElement('canvas');c.width=CW;c.height=CH;
   const q=c.getContext('2d');
@@ -1214,6 +3214,15 @@ const VIG_INF=(()=>{
   const g=q.createRadialGradient(CW/2,CH/2,CH*.34,CW/2,CH/2,CH*.86);
   g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.55,'rgba(26,4,6,.28)');
   g.addColorStop(1,'rgba(20,2,4,.74)');
+  q.fillStyle=g;q.fillRect(0,0,CW,CH);
+  return c;
+})();
+const VIG_CYBER=(()=>{
+  const c=document.createElement('canvas');c.width=CW;c.height=CH;
+  const q=c.getContext('2d');
+  const g=q.createRadialGradient(CW/2,CH/2,CH*.34,CW/2,CH/2,CH*.86);
+  g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.55,'rgba(0,10,20,.18)');
+  g.addColorStop(1,'rgba(0,2,9,.76)');
   q.fillStyle=g;q.fillRect(0,0,CW,CH);
   return c;
 })();
@@ -1247,11 +3256,11 @@ function coins(px,py,n){
 /* ─────────── NEMICI ─────────── */
 function spawn(type,wave,seg,segD){
   const d=ENEMIES[type];
-  const boost=G.endless?Math.pow(1.1,Math.max(0,wave-60)):1;
-  const hp=Math.round(d.hp*hpMul(wave)*boost);
+  const wa=wAbs(wave);
+  const hp=Math.round(d.hp*hpMul(wave));
   const e={type,def:d,hp,max:hp,speed:d.speed*spdMul(wave),
-    armor:d.armor+Math.floor(wave/7),
-    bounty:Math.round(d.bounty*(1+.055*(wave-1))),
+    armor:d.armor+Math.floor(wDur(wave)/7),
+    bounty:Math.round(d.bounty*(1+.055*(wa-1))),
     seg:seg||0,segD:segD||0,x:PATHPX[0].x,y:PATHPX[0].y,dir:1,prog:0,
     slowAmt:0,burn:0,burnT:0,flash:0,bob:Math.random()*6,alive:true,spawnT:0,
     stepT:.3,broken:false};
@@ -1261,7 +3270,9 @@ function spawn(type,wave,seg,segD){
   return e;
 }
 function damage(e,amt,ap){
-  const eff=Math.max(1,amt-e.armor*(1-(ap||0)));
+  // lo scongiuro scrosta: la corazza che conta è quella che gli resta addosso
+  const arm=e.armor*(1-(e.armorCut||0));
+  const eff=Math.max(1,amt-arm*(1-(ap||0)));
   e.hp-=eff;e.flash=.09;
   checkBreak(e);
   if(e.hp<=0&&e.alive)kill(e);
@@ -1299,7 +3310,7 @@ function kill(e){
 /* ─────────── ONDATE ─────────── */
 function startWave(){
   if(G.state!=='play')return;
-  if(G.waveOn){G.lacrime+=10+G.wave*2;coins(W/2,H/2,4);}
+  if(G.waveOn){G.lacrime+=10+wAbs(G.wave)*2;coins(W/2,H/2,4);}
   G.wave++;
   G.sigilli++;
   const n=G.wave;
@@ -1310,11 +3321,10 @@ function startWave(){
   }
   G.waveOn=true;
   SFX.wave();
-  const rel=n-(G.act-1)*20;
-  let nm=NOMI[G.act][(rel-1)%20];
-  if(rel>20)nm+=' · '+ROMAN(Math.floor((rel-1)/20)+1);
+  let nm=NOMI[G.act][(n-1)%20];
+  if(n>20)nm+=' · '+ROMAN(Math.floor((n-1)/20)+1);
   if(groups.some(g=>g.t==='big'))nm=BIGCRY[G.act];
-  banner('ONDATA '+ROMAN(rel),nm);
+  banner('ONDATA '+ROMAN(n),nm);
   syncUI();
 }
 function banner(a,b){
@@ -1334,8 +3344,9 @@ function update(dt){
     if(G.t>=G.queue[i].at){const q=G.queue[i];G.queue.splice(i,1);spawn(q.t,q.wave);}
   }
 
-  // reset rallentamento
-  for(const e of G.enemies)e.slowAmt=0;
+  // rallentamento e corazza scrostata si rifanno da zero a ogni giro: valgono
+  // finché la creatura resta nell'aura, non un istante di più
+  for(const e of G.enemies){e.slowAmt=0;e.armorCut=0;}
 
   // torri
   for(const t of G.towers)towerUpdate(t,dt);
@@ -1393,6 +3404,13 @@ function update(dt){
     s.life-=dt;if(s.life<=0){impact(s);G.shots.splice(i,1);}
   }
   function impact(s){
+    if(s.pozR){
+      // la pece non scoppia: si posa, e resta a bruciare dov'è caduta
+      SFX.fire();
+      G.pozze.push({x:s.x,y:s.y,r:s.pozR,t:s.pozT,max:s.pozT,dps:s.dmg,ap:s.ap});
+      burst(s.x,s.y,8,'#3a2418',40,.5,60);
+      return;
+    }
     if(s.splash){
       SFX.fire();
       G.rings.push({x:s.x,y:s.y,r:2,max:s.splash,t:.32,col:C.ember});
@@ -1409,7 +3427,24 @@ function update(dt){
     }else if(s.target&&s.target.alive){
       damage(s.target,s.dmg,s.ap);SFX.hit();
       burst(s.x,s.y,3,'#c9b08a',34,.22,60);
+      // l'arpione arretra chi è ancora vivo dopo il colpo
+      if(s.pull&&s.target.alive)arretra(s.target,s.pull);
     }
+  }
+
+  // pece: brucia chi ci sta dentro finché dura
+  for(let i=G.pozze.length-1;i>=0;i--){
+    const p=G.pozze[i];p.t-=dt;
+    if(p.t<=0){G.pozze.splice(i,1);continue;}
+    const r2=p.r*p.r;
+    for(let j=0;j<G.enemies.length;j++){
+      const e=G.enemies[j];if(!e.alive)continue;
+      const dx=e.x-p.x,dy=e.y-4-p.y;
+      if(dx*dx+dy*dy<r2)damage(e,p.dps*dt,p.ap);
+    }
+    if(Math.random()<dt*14)
+      part(p.x+(Math.random()*2-1)*p.r*.8,p.y+(Math.random()*2-1)*p.r*.4,
+        0,-12-Math.random()*10,.5,Math.random()<.4?C.ember:'#5a3a22',-8);
   }
 
   // raggi & anelli & particelle
@@ -1424,12 +3459,10 @@ function update(dt){
   // fine ondata
   if(G.waveOn&&G.state==='play'&&G.queue.length===0&&G.enemies.length===0){
     G.waveOn=false;
-    G.lacrime+=25+G.wave*6;
-    if(!G.endless&&G.wave>=G.act*20){
-      if(G.act===1)victory();
-      else if(G.act===2)victoryFinal();
-      else victoryTrue();
-    }
+    G.lacrime+=25+wAbs(G.wave)*6;
+    // venti ondate chiudono lo scenario: da lì si sceglie
+    if(!G.endless&&G.wave>=20)compiuto();
+    else salvaPartita();   // fra un'ondata e l'altra il punto è fermo: si segna
     syncUI();
   }
 }
@@ -1444,31 +3477,93 @@ function moveEnemy(e,dt){
     else{dist-=rem;e.seg++;e.segD=0;
       if(e.seg>=SEGLEN.length){e.escaped=true;return;}}
   }
+  posizionaNemico(e);
+}
+/* dove cade una creatura, dato il tratto e quanto ne ha percorso */
+function posizionaNemico(e){
   const a=PATHPX[e.seg],b=PATHPX[e.seg+1],t=e.segD/SEGLEN[e.seg];
   e.x=a.x+(b.x-a.x)*t;e.y=a.y+(b.y-a.y)*t;
   if(b.x!==a.x)e.dir=b.x>a.x?1:-1;
   e.prog=e.seg+t;
 }
+/* L'arpione ributta indietro lungo la via, non in linea d'aria: si scende di
+   tratto in tratto, e all'imbocco ci si ferma. Ciò che è grosso si smuove
+   poco, il Signore quasi per niente — se no lo si terrebbe fermo a metà
+   percorso finché non muore, e non sarebbe più un boss. */
+function arretra(e,px){
+  const p=e.def.final?.15:((e.def.big||e.def.boss)?.4:1);
+  let d=px*p;
+  if(d<=0)return;
+  while(d>0){
+    if(e.segD>=d){e.segD-=d;break;}
+    d-=e.segD;e.seg--;
+    if(e.seg<0){e.seg=0;e.segD=0;break;}
+    e.segD=SEGLEN[e.seg];
+  }
+  posizionaNemico(e);
+  for(let i=0;i<4;i++)part(e.x,e.y-4,(Math.random()*30-15),-10-Math.random()*20,.35,'#8fa5b0',40);
+}
 
+/* Le salmodie non colpiscono: cambiano gli altri. Le statistiche di un
+   edificio quindi non dipendono più solo da lui, e vanno rifatte ogni volta
+   che il campo cambia — si erige, si potenzia, si demolisce, si ripristina.
+   Non ogni fotogramma: sono gli stessi punti in cui si riordinano le torri. */
+const SBUFF_MAX={dmg:.9,rate:.5};   // per quanti cori si accalchino, oltre non va
+function ricalcolaTorri(){
+  for(const t of G.towers)t.st=tstats(t);
+  const cori=G.towers.filter(t=>TOWERS[t.type].sostegno);
+  for(const t of G.towers){
+    t.buff=0;
+    if(TOWERS[t.type].sostegno)continue;   // una salmodia non sostiene un'altra salmodia
+    let d=0,r=0;
+    for(const c of cori){
+      const dx=c.x-t.x,dy=c.y-t.y;
+      if(dx*dx+dy*dy<=c.st.range*c.st.range){d+=c.st.sdmg;r+=c.st.srate;}
+    }
+    d=Math.min(d,SBUFF_MAX.dmg);r=Math.min(r,SBUFF_MAX.rate);
+    if(d||r){
+      t.st.dmg=Math.round(t.st.dmg*(1+d));
+      t.st.burn=t.st.burn*(1+d);
+      t.st.rate=t.st.rate/(1+r);
+      t.buff=d;
+    }
+  }
+}
 function towerUpdate(t,dt){
   const st=t.st,cfg=TOWERS[t.type];
+  if(cfg.sostegno)return;   // il suo effetto sta tutto in ricalcolaTorri
   t.cd-=dt;t.rec=Math.max(0,t.rec-dt*4);
   const r2=st.range*st.range;
+  // lo scongiuro è un'aura che non colpisce: scrosta e basta
+  if(cfg.cut){
+    for(let i=0;i<G.enemies.length;i++){
+      const e=G.enemies[i];if(!e.alive)continue;
+      const dx=e.x-t.x,dy=e.y-t.y;
+      if(dx*dx+dy*dy<r2)e.armorCut=Math.max(e.armorCut||0,st.cut);
+    }
+    return;
+  }
   if(cfg.aura){
+    // la campana rallenta e percuote, l'ossario rode soltanto: stesso giro,
+    // due voci diverse
+    const muta=!cfg.slow;
     let any=false;
     for(let i=0;i<G.enemies.length;i++){
       const e=G.enemies[i];if(!e.alive)continue;
       const dx=e.x-t.x,dy=e.y-t.y;
       if(dx*dx+dy*dy<r2){
-        const res=e.def.slowResist||0;
-        e.slowAmt=Math.max(e.slowAmt,st.slow*(1-res));any=true;}
+        if(st.slow>0){const res=e.def.slowResist||0;
+          e.slowAmt=Math.max(e.slowAmt,st.slow*(1-res));}
+        any=true;}
     }
     if(t.cd<=0&&any){
-      t.cd=st.rate;t.rec=1;SFX.bell();
-      G.rings.push({x:t.x,y:t.y,r:4,max:st.range,t:.5,col:'#9fb8c8'});
+      t.cd=st.rate;t.rec=1;
+      if(muta)SFX.hit();else SFX.bell();
+      G.rings.push({x:t.x,y:t.y,r:4,max:st.range,t:muta?.28:.5,
+        col:muta?'rgba(207,196,168,.75)':'#9fb8c8'});
       for(let i=0;i<G.enemies.length;i++){const e=G.enemies[i];
         const dx=e.x-t.x,dy=e.y-t.y;
-        if(e.alive&&dx*dx+dy*dy<r2)damage(e,st.dmg,1);}
+        if(e.alive&&dx*dx+dy*dy<r2)damage(e,st.dmg,cfg.ap);}
     }
     return;
   }
@@ -1479,7 +3574,8 @@ function towerUpdate(t,dt){
   t.aim=Math.atan2(target.y-4-t.y,target.x-t.x);
   if(cfg.beam){
     SFX.beam();
-    G.beams.push({x1:t.x,y1:t.y-6,x2:target.x,y2:target.y-4,t:.16});
+    G.beams.push({x1:t.x,y1:t.y-6,x2:target.x,y2:target.y-4,t:.16,
+      col:t.type==='rotaia'?'#20d8ff':'#f5ecd0',halo:t.type==='rotaia'?'#ff3bd4':C.gold});
     damage(target,st.dmg,1);
     burst(target.x,target.y-4,7,'#f0e6d0',60,.35,20);
     G.shake=1.6;
@@ -1487,10 +3583,21 @@ function towerUpdate(t,dt){
     SFX.fire();
     G.shots.push({x:t.x,y:t.y-6,target,lx:target.x,ly:target.y-4,speed:78,dmg:st.dmg,
       ap:st.ap,splash:st.splash,burn:st.burn,col:C.ember,life:3,type:'fire',trail:true,a:0});
+  }else if(cfg.pozza){
+    SFX.fire();
+    G.shots.push({x:t.x,y:t.y-6,target,lx:target.x,ly:target.y-4,speed:64,dmg:st.dmg,
+      ap:st.ap,pozR:st.pozR,pozT:st.pozT,col:'#3a2418',life:3,type:'fire',trail:true,a:0});
+  }else if(cfg.pull){
+    SFX.shoot();
+    G.shots.push({x:t.x,y:t.y-8,target,lx:target.x,ly:target.y-4,speed:150,dmg:st.dmg,
+      ap:st.ap,pull:st.pull,col:'#8fa5b0',life:2.5,type:'bolt',trail:true,a:0});
   }else{
     SFX.shoot();
-    G.shots.push({x:t.x,y:t.y-8,target,lx:target.x,ly:target.y-4,speed:165,dmg:st.dmg,
-      ap:st.ap,col:'#cbbb98',life:2.5,type:'bolt',a:0});
+    // il mangano è lento e pesante: si vede partire
+    const grosso=st.rate>=2;
+    G.shots.push({x:t.x,y:t.y-8,target,lx:target.x,ly:target.y-4,speed:grosso?120:165,
+      dmg:st.dmg,ap:st.ap,col:grosso?'#9c8f78':'#cbbb98',life:2.5,type:'bolt',a:0});
+    if(grosso){G.shake=Math.max(G.shake,1.2);}
   }
 }
 function findTarget(t,r2){
@@ -1517,6 +3624,22 @@ function render(){
     x.globalAlpha=.10+Math.sin(G.t*5)*.05;
     x.fillStyle=C.gold;
     for(let i=0;i<freeCells.length;i+=2)x.fillRect(freeCells[i],freeCells[i+1],TILE-2,TILE-2);
+    x.globalAlpha=1;
+  }
+
+  // pece: sta a terra, sotto tutto quello che ci cammina sopra
+  for(let i=0;i<G.pozze.length;i++){
+    const p=G.pozze[i],f=Math.min(1,p.t/Math.max(.001,p.max));
+    x.globalAlpha=.30+.30*f;
+    x.fillStyle='#2a1a10';
+    x.beginPath();x.ellipse(p.x,p.y,p.r,p.r*.55,0,0,6.2832);x.fill();
+    // le bolle che scoppiano: quello che si vede bruciare
+    x.globalAlpha=.5*f;
+    for(let b=0;b<5;b++){
+      const a=b*1.7+G.t*1.3+p.x,rr=p.r*(.25+.55*((b+1)/5));
+      x.fillStyle=b%2?C.ember:'#7a3a18';
+      x.fillRect(Math.round(p.x+Math.cos(a)*rr),Math.round(p.y+Math.sin(a)*rr*.55),1,1);
+    }
     x.globalAlpha=1;
   }
 
@@ -1565,9 +3688,9 @@ function render(){
   // raggi
   for(const b of G.beams){
     const a=b.t/.16;
-    x.globalAlpha=a;x.strokeStyle='#f5ecd0';x.lineWidth=1;
+    x.globalAlpha=a;x.strokeStyle=b.col||'#f5ecd0';x.lineWidth=1;
     x.beginPath();x.moveTo(b.x1,b.y1);x.lineTo(b.x2,b.y2);x.stroke();
-    x.globalAlpha=a*.35;x.strokeStyle=C.gold;x.lineWidth=3;
+    x.globalAlpha=a*.35;x.strokeStyle=b.halo||C.gold;x.lineWidth=3;
     x.beginPath();x.moveTo(b.x1,b.y1);x.lineTo(b.x2,b.y2);x.stroke();
     x.globalAlpha=1;
   }
@@ -1584,11 +3707,13 @@ function render(){
   for(let i=0;i<LIGHTS.length;i++){
     const L=LIGHTS[i],fl=.55+Math.sin(G.t*7+L.x)*.12+Math.random()*.08;
     x.globalAlpha=.20*fl;
-    if(APO)x.drawImage(GLOW_SACRO,L.x-30,L.y-30);
+    if(CYBER)x.drawImage(CYFASE===1?GLOW_NEON_ACIDO:GLOW_NEON,L.x-28,L.y-28);
+    else if(APO)x.drawImage(GLOW_SACRO,L.x-30,L.y-30);
     else if(INF)x.drawImage(GLOW_INFERNO,L.x-22,L.y-22);
     else x.drawImage(GLOW_CANDELA,L.x-20,L.y-20);
     x.globalAlpha=.5*fl;
-    x.fillStyle='#f2c14e';x.fillRect(L.x,L.y-1-((Math.random()*2)|0),1,1);
+    x.fillStyle=CYBER?(CYFASE===1?'#b7ff45':'#20d8ff'):'#f2c14e';
+    x.fillRect(L.x,L.y-1-((Math.random()*2)|0),1,1);
   }
   {const pl=.72+Math.sin(atime*1.5)*.12,sx=5*TILE+8,sy=H+30;
    x.globalAlpha=.42*pl;x.drawImage(GLOW_SACRO,sx-30,sy-30);}
@@ -1616,13 +3741,9 @@ function render(){
     x.fillStyle='rgba(201,162,39,.6)';x.fillRect(bx0+((bw*b.def.breakAt)|0),by0-2,1,8);
   }
   drawCenere();
-  x.drawImage(APO?VIG_APO:(INF?VIG_INF:VIG),-OX,-OY);
+  x.drawImage(CYBER?VIG_CYBER:(APO?VIG_APO:(INF?VIG_INF:VIG)),-OX,-OY);
 
-  // pausa
-  if(G.paused&&G.state==='play'){
-    x.fillStyle='rgba(6,4,9,.72)';x.fillRect(-OX,-OY,CW,CH);
-    x.fillStyle=C.gold;x.fillRect(W/2-9,H/2-8,5,16);x.fillRect(W/2+4,H/2-8,5,16);
-  }
+  // il velo della pausa non si disegna qui: lo mette l'overlay #pausa
   x.restore();
 }
 const ZLIST=[];
@@ -1634,23 +3755,83 @@ const zcmp=(a,b)=>zy(a)-zy(b);
 function drawTorre(t){
   const sp=t.sp;
   const py=t.y+TILE/2-sp.h+(t.rec>0?1:0);
-  const max=t.lv===MAXLV;
+  const max=t.lv===MAXLV,cyber=CY_TOWER_SET.has(t.type);
+  // basamento ottico: ancora l'edificio al terreno anche sulle pietre chiare
+  x.fillStyle='rgba(4,3,7,.42)';x.beginPath();
+  x.ellipse(t.x,t.y+TILE/2-1,Math.min(9,sp.w*.42),2.25,0,0,6.2832);x.fill();
   if(max){
     // aureola: segna il grado massimo senza aggiungere mole
     const pu=.55+Math.sin(G.t*2.2+t.x)*.16;
     x.globalAlpha=pu*.5;
-    x.strokeStyle='#f7e08a';x.lineWidth=1;
+    x.strokeStyle=cyber?'#73f4ff':'#f7e08a';x.lineWidth=1;
     x.beginPath();x.arc(t.x,py+4,7,0,6.2832);x.stroke();
     x.globalAlpha=pu*.22;
     x.beginPath();x.arc(t.x,py+4,9,0,6.2832);x.stroke();
     x.globalAlpha=1;
-    if(Math.random()<.16)part(t.x+(Math.random()*10-5),py+2,0,-9,.6,'#f7e08a',-16);
+    if(Math.random()<.16)part(t.x+(Math.random()*10-5),py+2,0,-9,.6,cyber?'#20d8ff':'#f7e08a',-16);
   }
   blit(x,sp,t.x-sp.w/2,py);
+  /* Ogni edificio ha un dettaglio vivo, minuscolo ma riconoscibile: non è un
+     effetto sopra lo sprite a caso, segue la sua funzione e ne rafforza la
+     lettura anche quando il campo è affollato. */
+  const puls=.45+.35*Math.sin(G.t*2.6+t.x*.17),cy=py+Math.round(sp.h*.34);
+  if(t.type==='spine'){
+    x.globalAlpha=.55+puls*.35;x.fillStyle='#e8703a';x.fillRect(t.x-1,cy,2,1);
+  }else if(t.type==='campana'){
+    x.globalAlpha=.35+puls*.5;x.fillStyle='#f7e08a';x.fillRect(t.x,cy-1,1,2);
+  }else if(t.type==='ossario'){
+    x.globalAlpha=.35+puls*.35;x.fillStyle='#f3ead8';x.fillRect(t.x-3,py+4,1,1);
+    x.fillRect(t.x+2,py+6,1,1);
+  }else if(t.type==='caldaia'){
+    x.globalAlpha=.45+puls*.4;x.fillStyle=max?'#9fd8e8':'#d79a38';
+    x.fillRect(t.x-2,py+3-(Math.floor(G.t*2+t.x)&1),1,1);
+    x.fillRect(t.x+2,py+5-(Math.floor(G.t*1.4)&1),1,1);
+  }else if(t.type==='mangano'||t.type==='arpione'){
+    x.globalAlpha=.25+puls*.45;x.fillStyle=max?'#ffffff':'#cbbb98';
+    x.fillRect(t.x+Math.round(Math.cos(G.t*.7+t.x)*2),py+3,1,1);
+  }else if(t.type==='scongiuro'){
+    x.globalAlpha=.55+puls*.4;x.fillStyle=max?'#9fd8e8':'#e8703a';
+    x.fillRect(t.x-1,cy,3,1);x.fillStyle=max?'#ffffff':'#f7e08a';x.fillRect(t.x,cy,1,1);
+  }else if(t.type==='impulso'){
+    x.globalAlpha=.55+puls*.4;x.fillStyle=max?'#ffffff':'#20d8ff';
+    x.fillRect(t.x-4,py+4,2,1);x.fillRect(t.x+3,py+4,2,1);
+  }else if(t.type==='plasma'){
+    x.globalAlpha=.5+puls*.45;x.fillStyle=max?'#ffffff':'#ff3bd4';
+    x.fillRect(t.x-2,cy-1,4,3);x.fillStyle='#20d8ff';x.fillRect(t.x-1,cy,2,1);
+  }else if(t.type==='stasi'){
+    const a=G.t*1.8+t.x,rr=4;
+    x.globalAlpha=.4+puls*.45;x.fillStyle=max?'#ffffff':'#20d8ff';
+    x.fillRect(Math.round(t.x+Math.cos(a)*rr),Math.round(cy+Math.sin(a)*2),1,1);
+    x.fillRect(Math.round(t.x-Math.cos(a)*rr),Math.round(cy-Math.sin(a)*2),1,1);
+  }else if(t.type==='rotaia'){
+    x.globalAlpha=.45+puls*.5;x.fillStyle=max?'#ffffff':'#73f4ff';
+    x.fillRect(t.x,py+2,1,Math.max(2,Math.round(sp.h*.38)));
+  }else if(t.type==='sciame'){
+    const a=G.t*2.5+t.x;
+    x.globalAlpha=.55+puls*.35;x.fillStyle=max?'#ffffff':'#ff3bd4';
+    x.fillRect(Math.round(t.x+Math.cos(a)*6),Math.round(cy+Math.sin(a)*3),2,1);
+    x.fillRect(Math.round(t.x-Math.cos(a)*6)-1,Math.round(cy-Math.sin(a)*3),2,1);
+  }else if(t.type==='disturbo'){
+    x.globalAlpha=.35+puls*.5;x.fillStyle=max?'#ffffff':'#ff3bd4';
+    const sy=py+2+(Math.floor(G.t*7+t.x)%Math.max(2,sp.h-5));x.fillRect(t.x-5,sy,10,1);
+  }
+  x.globalAlpha=1;
   if(t.type==='braciere'){const set=TFLAME[t.lv-1];
     for(let i=0;i<set.length;i++)drawFlame(t.x+set[i][0],py+set[i][1],set[i][2],max);}
   if(t.type==='reliquiario'&&t.rec>0){
     x.fillStyle='#f5ecd0';x.fillRect(t.x-1,py+TTIP.reliquiario[t.lv-1],2,2);
+  }
+  // la salmodia respira: un alone lento, che è tutto quello che si vede di lei
+  if(TOWERS[t.type].sostegno){
+    x.globalAlpha=.10+Math.sin(G.t*1.6+t.x*.3)*.05;
+    x.fillStyle='#e0d8c0';x.beginPath();
+    x.arc(t.x,t.y+4,t.st.range,0,6.2832);x.fill();x.globalAlpha=1;
+  }
+  // chi la ode porta un segno, se no il sostegno è invisibile e non si capisce
+  if(t.buff>0){
+    x.globalAlpha=.5+Math.sin(G.t*3+t.x)*.2;
+    x.fillStyle='#e0d8c0';x.fillRect(t.x-1,py-3,2,1);x.fillRect(t.x-2,py-2,4,1);
+    x.globalAlpha=1;
   }
   if(max){ // sigillo pieno al posto delle tacche
     x.fillStyle='#f7e08a';x.fillRect(t.x-5,t.y+TILE/2-2,10,2);
@@ -1664,10 +3845,11 @@ function drawNemico(e){
   const off=e.def.float?Math.sin(e.bob*.6)*1.5:(Math.floor(e.bob)%2?0:-1);
   const px=e.x-sp.w/2,py=e.y-sp.h+4+off;
   e.py=py;
-  if(e.def.big){
-    x.fillStyle='rgba(0,0,0,.4)';
-    x.beginPath();x.ellipse(e.x,e.y+2,sp.w*.42,e.def.final?4:3,0,0,6.2832);x.fill();
-  }
+  // ogni creatura tocca davvero il terreno; gli spettri hanno invece un'ombra
+  // più tenue e larga, come se galleggiassero sopra la via
+  x.fillStyle=e.def.float?'rgba(8,12,18,.22)':'rgba(0,0,0,.38)';
+  x.beginPath();x.ellipse(e.x,e.y+2,Math.max(3,sp.w*(e.def.big?.42:.34)),
+    e.def.final?4:(e.def.big?3:1.6),0,0,6.2832);x.fill();
   blit(x,sp,px,py,e.dir<0,e.def.alpha);
   if(e.slowAmt>0){x.fillStyle='rgba(140,200,220,.18)';x.fillRect(px,py,sp.w,sp.h);}
   if(e.broken&&Math.random()<.25)
@@ -1708,6 +3890,10 @@ function frame(now){
     syncSoft();
   }
   render();
+  // a schermata aperta il fondale in parallasse la copre: il campo continua
+  // a disegnare dietro, ma non si vede
+  if(G.state!=='play'){drawMenuBg(dt);
+    if(smode==='mappa')drawTappe();else if(smode==='mondi')drawMondi();}
   requestAnimationFrame(frame);
 }
 
@@ -1718,6 +3904,8 @@ function fit(){
   let s=Math.min(aw/CW,ah/CH);
   s=Math.max(.75,Math.floor(s*4)/4);
   cv.style.width=(CW*s)+'px';cv.style.height=(CH*s)+'px';
+  // ruotando il telefono cambia la larghezza: gli strati vanno rigenerati
+  if(G.state!=='play')menuBgSync();
 }
 window.addEventListener('resize',fit);
 window.addEventListener('orientationchange',()=>setTimeout(fit,180));
@@ -1752,9 +3940,10 @@ function deny(c,r){
 function place(type,c,r){
   const cost=TOWERS[type].cost;
   G.lacrime-=cost;
-  const t={type,c,r,x:c*TILE+TILE/2,y:r*TILE+TILE/2,lv:1,cd:0,rec:1,spent:cost,aim:0};
+  const t={type,c,r,x:c*TILE+TILE/2,y:r*TILE+TILE/2,lv:1,cd:0,rec:1,spent:cost,aim:0,buff:0};
   t.st=tstats(t);t.sp=S[type+'1'];
   G.towers.push(t);G.towers.sort((a,b)=>a.y-b.y);grid[r][c]=3;rebuildFree();
+  ricalcolaTorri();
   SFX.build();
   burst(t.x,t.y+6,10,'#6b6252',45,.4,80);
   G.rings.push({x:t.x,y:t.y,r:4,max:t.st.range,t:.4,col:'rgba(201,162,39,.9)'});
@@ -1763,7 +3952,8 @@ function place(type,c,r){
 function upgrade(){
   const t=G.sel;if(!t||t.lv>=MAXLV)return;
   const c=upCost(t);if(G.lacrime<c){SFX.err();return;}
-  G.lacrime-=c;t.spent+=c;t.lv++;t.st=tstats(t);t.sp=S[t.type+t.lv];
+  G.lacrime-=c;t.spent+=c;t.lv++;t.sp=S[t.type+t.lv];
+  ricalcolaTorri();   // se è una salmodia, cambia anche per i vicini
   SFX.up();
   G.rings.push({x:t.x,y:t.y,r:4,max:t.st.range,t:.45,col:C.gold});
   burst(t.x,t.y,10,C.gold,50,.5,40);
@@ -1773,7 +3963,7 @@ function sell(){
   const t=G.sel;if(!t)return;
   G.lacrime+=sellVal(t);
   grid[t.r][t.c]=0;
-  G.towers.splice(G.towers.indexOf(t),1);rebuildFree();
+  G.towers.splice(G.towers.indexOf(t),1);rebuildFree();ricalcolaTorri();
   burst(t.x,t.y,12,'#6b6252',50,.45,90);coins(t.x,t.y,3);
   SFX.build();
   G.sel=null;closePanel();syncUI();
@@ -1782,24 +3972,29 @@ function sell(){
 /* ─────────── UI ─────────── */
 const el=id=>document.getElementById(id);
 const bar=el('bar');
-TORDER.forEach(k=>{
-  const cfg=TOWERS[k];
-  const d=document.createElement('button');
-  d.className='tcard';d.dataset.k=k;
-  const ic=document.createElement('canvas');ic.width=14;ic.height=18;
-  const ix=ic.getContext('2d');ix.imageSmoothingEnabled=false;
-  ix.drawImage(S[k+'1'].cv,-1,-1);
-  d.appendChild(ic);
-  const n=document.createElement('div');n.className='tn';n.textContent=cfg.short;d.appendChild(n);
-  const c=document.createElement('div');c.className='tc';c.textContent='◈'+cfg.cost;d.appendChild(c);
-  d.addEventListener('click',()=>{
-    audio();
-    if(G.state!=='play')return;
-    G.build=(G.build===k)?null:k;
-    G.sel=null;closePanel();syncUI();
-  });
-  bar.appendChild(d);
-});
+/* La barra non è più fissa: mostra la quaterna scelta per questa veglia, e si
+   rifà quando la quaterna cambia — cioè una volta sola, prima di scendere. */
+function buildBar(){
+  bar.innerHTML='';
+  for(const k of G.loadout){
+    const cfg=TOWERS[k];if(!cfg)continue;
+    const d=document.createElement('button');
+    d.className='tcard';d.dataset.k=k;
+    const ic=document.createElement('canvas');ic.width=14;ic.height=18;
+    const ix=ic.getContext('2d');ix.imageSmoothingEnabled=false;
+    ix.drawImage(S[k+'1'].cv,-1,-1);
+    d.appendChild(ic);
+    const n=document.createElement('div');n.className='tn';n.textContent=cfg.short;d.appendChild(n);
+    const c=document.createElement('div');c.className='tc';c.textContent='◈'+cfg.cost;d.appendChild(c);
+    d.addEventListener('click',()=>{
+      audio();
+      if(G.state!=='play')return;
+      G.build=(G.build===k)?null:k;
+      G.sel=null;closePanel();syncUI();
+    });
+    bar.appendChild(d);
+  }
+}
 
 function openPanel(){
   const t=G.sel;if(!t)return;
@@ -1808,19 +4003,36 @@ function openPanel(){
   el('pName').textContent=cfg.name;
   el('pLev').textContent='LIV '+t.lv+(t.lv>=MAXLV?' · MASSIMO':'');
   let s='';
-  if(cfg.aura){
-    s+='RALLENTAMENTO <span>'+Math.round(st.slow*100)+'%</span> · RINTOCCO <span>'+st.dmg+'</span><br>';
+  if(cfg.sostegno){
+    s+='DANNO AI VICINI <span>+'+Math.round(st.sdmg*100)+'%</span> · CADENZA <span>+'+
+       Math.round(st.srate*100)+'%</span><br>';
+    s+='VOCE <span>'+Math.round(st.range)+'</span> · ODONO <span>'+
+       G.towers.filter(o=>o!==t&&o.buff>0).length+'</span> edifici<br>';
+  }else if(cfg.cut){
+    s+='CORAZZA SCROSTATA <span>'+Math.round(st.cut*100)+'%</span><br>';
+    s+='AURA <span>'+Math.round(st.range)+'</span> · <span>non colpisce nessuno</span><br>';
+  }else if(cfg.pozza){
+    s+='PECE <span>'+st.dmg+'/s</span> per <span>'+st.pozT.toFixed(1)+'s</span><br>';
+    s+='GITTATA <span>'+Math.round(st.range)+'</span> · POZZA <span>'+Math.round(st.pozR)+
+       '</span> · OGNI <span>'+st.rate.toFixed(1)+'s</span><br>';
+  }else if(cfg.aura){
+    if(st.slow>0)
+      s+='RALLENTAMENTO <span>'+Math.round(st.slow*100)+'%</span> · RINTOCCO <span>'+st.dmg+'</span><br>';
+    else s+='MORSO <span>'+st.dmg+'</span> · DPS <span>'+(st.dmg/st.rate).toFixed(1)+'</span><br>';
     s+='AURA <span>'+Math.round(st.range)+'</span> · OGNI <span>'+st.rate.toFixed(1)+'s</span><br>';
   }else{
     s+='DANNO <span>'+st.dmg+'</span> · CADENZA <span>'+st.rate.toFixed(2)+'s</span><br>';
     s+='GITTATA <span>'+Math.round(st.range)+'</span> · DPS <span>'+(st.dmg/st.rate).toFixed(1)+'</span><br>';
   }
   if(st.splash)s+='AREA <span>'+Math.round(st.splash)+'</span> · USTIONE <span>'+st.burn.toFixed(0)+'/s</span><br>';
+  if(st.pull)s+='ARRETRA <span>'+Math.round(st.pull)+'</span> px<br>';
   if(st.ap===1)s+='<span>TRAPASSA OGNI CORAZZA</span><br>';
-  else if(st.ap>0)s+='<span>IGNORA METÀ CORAZZA</span><br>';
+  else if(st.ap>=.5)s+='<span>IGNORA METÀ CORAZZA</span><br>';
+  else if(st.ap>0)s+='<span>INTACCA LA CORAZZA</span><br>';
+  if(t.buff>0)s+='<span>SOSTENUTO DALLA SALMODIA · +'+Math.round(t.buff*100)+'%</span><br>';
   el('pStats').innerHTML=s;
   const up=el('pUp');
-  if(t.lv>=MAXLV){up.disabled=true;up.textContent='RITO COMPIUTO';}
+  if(t.lv>=MAXLV){up.disabled=true;up.textContent=lex('ritoFatto');}
   else{up.disabled=G.lacrime<upCost(t);up.textContent='POTENZIA ◈'+upCost(t);}
   el('pSell').textContent='DEMOLISCI +◈'+sellVal(t);
 }
@@ -1849,16 +4061,15 @@ function syncSoft(){
   }
   if(UIC.waveOn!==G.waveOn||UIC.wave!==G.wave||UIC.act!==G.act){
     UIC.waveOn=G.waveOn;UIC.wave=G.wave;UIC.act=G.act;
-    if(G.waveOn){elBW.className='big ghost';elBW.textContent='ANTICIPA · +◈'+(10+G.wave*2);}
+    if(G.waveOn){elBW.className='big ghost';elBW.textContent='ANTICIPA · +◈'+(10+wAbs(G.wave)*2);}
     else{elBW.className='big';
-    elBW.textContent=ATTO[G.act].btn+ROMAN(G.wave+1-(G.act-1)*20);}
+    elBW.textContent=ATTO[G.act].btn+ROMAN(G.wave+1);}
   }
 }
 function uiDirty(){UIC.lac=-1;UIC.sig=-1;UIC.wave=-2;UIC.up=null;}
 function syncUI(){
   uiDirty();syncSoft();
-  const rel=G.wave-(G.act-1)*20;
-  el('hWave').textContent=ATTO[G.act].hud+ROMAN(Math.max(1,rel))+(G.endless?'':' / XX');
+  el('hWave').textContent=ATTO[G.act].hud+ROMAN(Math.max(1,G.wave))+(G.endless?'':' / XX');
 }
 
 el('bWave').addEventListener('click',()=>{audio();if(G.state==='play')startWave();});
@@ -1872,21 +4083,73 @@ el('bSound').addEventListener('click',()=>{
   el('bSound').textContent=G.sound?'♪':'✕';
   el('bSound').classList.toggle('on',G.sound);
 });
+/* ─────────── PAUSA ─────────── */
+/* Non è una schermata: il campo resta lì sotto, fermo, che si vede. Due stati
+   nello stesso blocco — il menu e la conferma dell'abbandono — perché una
+   veglia lunga non la si deve poter buttare via con un tocco storto. */
+let paConferma=false;
+function pausaAggiorna(){
+  el('paTitle').innerHTML=paConferma?'ABBANDONARE<br>LA VEGLIA?':'VEGLIA<br>SOSPESA';
+  el('paStato').textContent=paConferma?'NON SI TORNA INDIETRO':
+    ATTO[G.act].nome+' · ONDATA '+ROMAN(Math.max(1,G.wave));
+  el('paLore').innerHTML=paConferma
+    ? 'Quello che hai eretto resta qui, e la partita sospesa viene cancellata. '+
+      'Quanto hai retto finisce comunque nell\'<b>albo d\'oro</b>.'
+    : 'Sigilli <b>'+G.sigilli+'</b> · lacrime <b>'+G.lacrime+'</b> · torri <b>'+
+      G.towers.length+'</b><br><br>Puoi riprendere adesso, oppure sospenderla e '+
+      'ritrovarla dov\'era quando vorrai.';
+  el('paMain').textContent=paConferma?'NO, RIPRENDI':'RIPRENDI';
+  el('paSalva').textContent=paConferma?'SÌ, ABBANDONA':'SALVA ED ESCI';
+  el('paSalva').className=paConferma?'big lascia':'big ghost';
+  el('paLascia').classList.toggle('hidden',paConferma);
+}
+function apriPausa(){
+  if(G.state!=='play')return;
+  G.paused=true;paConferma=false;
+  el('bPause').classList.add('on');
+  el('pausa').classList.remove('off');
+  pausaAggiorna();
+}
+function chiudiPausa(){
+  paConferma=false;
+  el('pausa').classList.add('off');
+}
+function riprendiPausa(){
+  chiudiPausa();
+  if(G.state!=='play')return;
+  G.paused=false;el('bPause').classList.remove('on');
+}
 el('bPause').addEventListener('click',()=>{
   if(G.state!=='play')return;
-  G.paused=!G.paused;
-  el('bPause').classList.toggle('on',G.paused);
+  if(G.paused)riprendiPausa();else{apriPausa();salvaPartita();}
 });
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&G.state==='play'){G.paused=true;el('bPause').classList.add('on');}});
+el('paMain').addEventListener('click',()=>{audio();riprendiPausa();});
+el('paSalva').addEventListener('click',()=>{
+  audio();
+  if(!paConferma){salvaPartita();chiudiPausa();G.state='menu';mappa();return;}
+  // abbandono: il risultato entra nell'albo, la partita sospesa no
+  segna();scartaSalvataggio(G.act);
+  chiudiPausa();G.state='menu';mappa();
+});
+el('paLascia').addEventListener('click',()=>{audio();paConferma=true;pausaAggiorna();});
+/* finire in secondo piano è un modo come un altro di sospendere: si mette in
+   pausa e si salva, ma senza aprire la conferma addosso a nessuno */
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden&&G.state==='play'){apriPausa();salvaPartita();}
+});
 
 /* ─────────── SCHERMATE ─────────── */
 const LORE_INTRO=
  'Il Sagrato è l\'ultima soglia consacrata. Dal valico a nord scende la <b>processione</b>: '+
  'penitenti che non ricordano più a chi si votarono.<br><br>'+
  'Tu sei il campanaro. Il portale parte <b>senza sigilli</b>: ogni ondata suonata te ne concede '+
- '<b>uno</b>, e ogni penitente che varca la soglia te ne toglie. Le prime veglie non perdonano '+
+ '<b>uno</b>, e ogni penitente che varca la soglia te ne toglie. Le prime ondate non perdonano '+
  'nulla; più a lungo reggi, più margine ti resta.<br><br>'+
- 'Erigi il tuo rito lungo la via con le <b>lacrime</b> raccolte dai caduti.';
+ 'Venti ondate chiudono una veglia. Poi si può restare, oppure scendere più a fondo — ma '+
+ 'quello che hai eretto <b>resta qui</b>.<br><br>'+
+ 'Erigi il tuo rito lungo la via con le <b>lacrime</b> raccolte dai caduti.<br><br>'+
+ '<b>Il rito</b> — come si gioca e chi scende — è dentro ogni mondo, insieme alle sue veglie: '+
+ 'le schiere non sono le stesse dappertutto.';
 const LORE_HELP=
  '<b>1 ·</b> Tocca una torre nella barra, poi tocca una lastra libera del sagrato per consacrarla.<br>'+
  '<b>2 ·</b> Tocca una torre già eretta per vederne la gittata, potenziarla o demolirla (rimborso 60%). '+
@@ -1899,7 +4162,7 @@ const LORE_HELP=
  '<b>6 ·</b> Suonare la campana durante un\'ondata anticipa la successiva e frutta lacrime in più.<br>'+
  '<b>7 ·</b> Venti veglie ti separano dall\'alba. Ma i penitenti non scendevano: fuggivano.';
 
-let smode='menu',HELPHTML=null;
+let smode='menu';
 /* le figure del compendio sono le stesse sprite che vedi in campo */
 function spr(k,z){
   const c=S[k].cv;
@@ -1920,190 +4183,764 @@ const LEGG=[
  ['boss','Chiude ogni decina. Mentre avanza genera fanteria dal proprio corpo.'],
  ['final','Chiude l\'atto. Più grande di ogni altra cosa in campo e con una riserva di vita che '+
   'nessuno avvicina. <u>Se varca la soglia hai perso, anche con tutti i sigilli intatti.</u>']];
+/* Il compendio parla delle creature, e le creature sono roba di un mondo: le
+   colonne sono le veglie di MONDO[msel], non tutti gli scenari che esistono.
+   Gli edifici stanno in armeria, che è della campagna e non di un mondo.
+   Per questo l'HTML si rifà a ogni apertura invece di restare in cache. */
 function buildHelp(){
-  if(HELPHTML)return HELPHTML;
-  let h='<div class="cmpT cmpI">Tocca una torre nella barra, poi una lastra libera del sagrato '+
-    'per consacrarla. Tocca una torre già eretta per vederne la gittata, potenziarla o demolirla '+
-    '(rimborso 60%). Suonare la campana durante un\'ondata anticipa la successiva e frutta '+
-    'lacrime in più.<br><br><b>I sigilli.</b> Parti da zero: ogni ondata te ne dà uno, ogni fuga '+
-    'te ne toglie. All\'inizio non puoi sbagliare niente; alla lunga accumuli margine.<br><br>'+
-    '<b>Tre atti</b> da venti ondate: la veglia sul sagrato, la discesa nel fuoco, il giudizio '+
-    'che scende dal cielo aperto.</div>';
-  h+='<div class="cmpH">LE CONSACRAZIONI · primo, quarto e quinto grado</div>';
-  for(const k of TORDER)
-    h+=cmpR(spr(k+'1',2)+spr(k+'4',2)+spr(k+'5',2),
-      TOWERS[k].name+' · ◈'+TOWERS[k].cost,TOWERS[k].desc+
-      ' <i>Al quinto rito la pietra diventa marmo e il fuoco si fa freddo.</i>');
-  h+='<div class="cmpH">LE SCHIERE · veglia · discesa · giudizio</div>';
+  const scen=MONDO[msel].scen.length?MONDO[msel].scen:[1];
+  const nomi=scen.map(a=>ATTO[a].nome.replace(/^(LA|IL) /,'').toLowerCase());
+  let h='<div class="cmpT cmpI">Tocca un edificio nella barra, poi una lastra libera del sagrato '+
+    'per consacrarlo. Tocca un edificio già eretto per vederne la gittata, potenziarlo o '+
+    'demolirlo (rimborso 60%). Suonare la campana durante un\'ondata anticipa la successiva e '+
+    'frutta lacrime in più.<br><br><b>I sigilli.</b> Ogni ondata te ne dà uno, ogni fuga te ne '+
+    'toglie. Alla Veglia parti da zero e non puoi sbagliare niente; le veglie più profonde te ne '+
+    'concedono qualcuno in mano, perché aprono già dure.<br><br>'+
+    '<b>La campagna</b> è fatta di mondi, e ogni mondo di veglie da venti ondate l\'una. Ognuna è '+
+    'a sé — compiute le venti puoi restare a vegliare senza fine oppure scendere alla successiva, '+
+    'ma <b>le torri non ti seguono</b>: di là si ricomincia da pietra nuda, con più lacrime in '+
+    'mano e creature già più dure. Una veglia aperta resta aperta: la si rigioca dalla mappa '+
+    'quando si vuole, e la si può <b>sospendere</b> dalla pausa per riprenderla dopo.<br><br>'+
+    '<b>La via</b> non è la stessa dappertutto: nel sagrato serpeggia e ti concede tempo, più a '+
+    'fondo si distende. Meno curve vuol dire meno tiri prima della soglia.<br><br>'+
+    'Quel che puoi erigere sta nell\'<b>armeria</b>: '+conta(TORDER.length)+' edifici, '+
+    conta(NSLOT)+' per veglia.</div>';
+  h+='<div class="cmpH">LE SCHIERE · '+nomi.join(' · ')+'</div>';
   for(const r of RUOLI){
-    const t=[1,2,3].map(a=>ROSTER[a][r[0]]);
+    const t=scen.map(a=>ROSTER[a][r[0]]);
     h+=cmpR(t.map(k=>spr(k,3)).join(''),
-      ENEMIES[t[0]].name+' · <i>'+ENEMIES[t[1]].name+'</i> · <i>'+ENEMIES[t[2]].name+'</i>',r[1]);
+      t.map((k,i)=>i?'<i>'+ENEMIES[k].name+'</i>':ENEMIES[k].name).join(' · '),r[1]);
   }
   h+='<div class="cmpH">I LEGGENDARI</div>';
   for(const r of LEGG){
-    const t=[1,2,3].map(a=>ROSTER[a][r[0]]);
+    const t=scen.map(a=>ROSTER[a][r[0]]);
     h+=cmpR(t.map(k=>spr(k,2)).join(''),
-      ENEMIES[t[0]].name+' · <i>'+ENEMIES[t[1]].name+'</i> · <i>'+ENEMIES[t[2]].name+'</i>',r[1]);
+      t.map((k,i)=>i?'<i>'+ENEMIES[k].name+'</i>':ENEMIES[k].name).join(' · '),r[1]);
   }
-  HELPHTML=h;return h;
+  return h;
 }
-function showScreen(title,sub,lore,main,alt,score){
-  const s=el('screen');s.classList.remove('off');s.classList.remove('wide');
+/* unico punto da cui passano menu, compendio, fine atto, vittoria e sconfitta:
+   basta agganciare qui il fondale perché lo abbiano tutte */
+function hideScreen(){
+  el('screen').classList.add('off');
+  el('menubg').classList.add('off');
+}
+function showScreen(title,sub,lore,main,alt,score,alt2,alt3){
+  const s=el('screen');s.className='';
+  el('menubg').classList.remove('off');
+  menuBgSync();
   el('scTitle').innerHTML=title;
   el('scSub').textContent=sub;
   el('scLore').innerHTML=lore;
   el('scMain').textContent=main;
+  el('scMain').disabled=false;   // solo i mondi sigillati lo spengono
+  el('scMain').classList.remove('hidden');   // solo l'armeria che si sfoglia lo nasconde
   const a=el('scAlt');
   if(alt){a.classList.remove('hidden');a.textContent=alt;}else a.classList.add('hidden');
+  const b=el('scAlt2');
+  if(alt2){b.classList.remove('hidden');b.textContent=alt2;}else b.classList.add('hidden');
+  const c=el('scAlt3');
+  if(alt3){c.classList.remove('hidden');c.textContent=alt3;}else c.classList.add('hidden');
   const sc=el('scScore');
   if(score){sc.classList.remove('hidden');sc.innerHTML=score;}else sc.classList.add('hidden');
 }
 function menu(){
   G.state='menu';smode='menu';
-  showScreen("L'ULTIMA<br>VEGLIA",'TRE ATTI · 60 ONDATE · v3',LORE_INTRO,
-    'INIZIA LA VEGLIA','IL RITO — COME SI GIOCA',
-    G.best?'SPINTO FINO A: <b>'+ATTO[Math.min(3,Math.ceil(G.best/20))].hud+
-      ROMAN(G.best-(Math.min(3,Math.ceil(G.best/20))-1)*20)+'</b>':null);
+  const sosp=scenariSospesi();
+  // IL RITO non sta qui: parla delle schiere, e le schiere sono di un mondo.
+  // Si trova dentro la mappa del mondo, insieme alle sue veglie.
+  showScreen("L'ULTIMA<br>VEGLIA",NMONDI+' MONDI · VENTI ONDATE A VEGLIA · v6',LORE_INTRO,
+    'ENTRA NELLA CAMPAGNA',null,
+    COLLAUDO?'<b>ACCOUNT COLLAUDO</b> · TUTTO SBLOCCATO':
+      (PROG.unl>1?'VEGLIE APERTE: <b>'+ROMAN(PROG.unl)+' / '+ROMAN(NSCEN)+'</b>':null),
+    sosp.length?'RIPRENDI · '+ATTO[sosp[sosp.length-1]].nome:null,
+    COLLAUDO?'TORNA AL PROFILO NORMALE':'ACCOUNT COLLAUDO · TUTTO SBLOCCATO');
 }
 function help(){
   smode='help';
-  showScreen('IL RITO','COMPENDIO DEL SAGRATO',buildHelp(),'TORNA INDIETRO',null,null);
+  // «LE SCHIERE DI IL CAMPANARO» no: i nomi dei mondi hanno già l'articolo
+  showScreen(lex('compendio',msel),lex('schiere',msel)+' · '+MONDO[msel].nome,buildHelp(),
+    'TORNA INDIETRO',null,null,null,null);
   el('screen').classList.add('wide');
 }
+/* ═══ I MONDI ═══
+   Il piano più alto della campagna. Un mondo si apre quando si è arrivati alla
+   sua prima veglia; quello che non c'è ancora lo dice e basta. */
+function elencoMondi(){
+  let h='';
+  for(let m=1;m<=NMONDI;m++){
+    const M=MONDO[m],aperto=mondoAperto(m),fatto=mondoCompiuto(m);
+    const k=M.scen.filter(a=>PROG.fin[a]).length;
+    // ROMAN(0) è la stringa vuota: a zero veglie si scrive, non si numera
+    const s=fatto?'COMPIUTO · '+ROMAN(k)+' VEGLIE'
+      :(k?'VEGLIE COMPIUTE: '+ROMAN(k)+' / '+ROMAN(M.scen.length)
+         :'NESSUNA VEGLIA COMPIUTA · '+ROMAN(M.scen.length)+' DA TENERE');
+    h+='<div class="mdR'+(aperto?'':' mut')+(m===msel?' on':'')+'">'+
+       '<span class="t">'+M.nome+'</span>'+
+       '<span class="s">'+(aperto?s:M.sotto)+'</span>'+
+       (m===msel?'<div class="d">'+M.lore+'</div>':'')+'</div>';
+  }
+  return h;
+}
+function mondiAggiorna(){
+  buildMondi();
+  el('scLore').innerHTML=elencoMondi();
+  const M=MONDO[msel],aperto=mondoAperto(msel);
+  el('scScore').classList.remove('hidden');
+  el('scScore').innerHTML=aperto?M.sotto:'ANCORA SIGILLATO';
+  el('scMain').textContent=aperto?'ENTRA · '+M.nome:'PROSSIMAMENTE';
+  el('scMain').disabled=!aperto;
+}
+function mondi(){
+  G.state='menu';smode='mondi';
+  if(!mondoAperto(msel))msel=mondoDi(PROG.unl);
+  showScreen('I<br>MONDI','TOCCA UN MONDO · OGNUNO HA LE SUE VEGLIE','',
+    'ENTRA','TORNA INDIETRO',null,"L'ARMERIA","L'ALBO D'ORO");
+  el('screen').classList.add('mondi');
+  tappeFit();
+  mondiAggiorna();
+}
+/* ═══ LA MAPPA ═══
+   Le tappe sbloccate del mondo scelto, a tocco sul canvas; sotto, la
+   classifica delle serie più lunghe, una riga per veglia. */
+function classifica(){
+  const righe=scenDelMondo().map(a=>({a,r:albo(a)[0]||null}));
+  righe.sort((x,y)=>(y.r?y.r.w:-1)-(x.r?x.r.w:-1)||x.a-y.a);
+  let h='<div class="clsH">LE PIÙ LUNGHE</div>';
+  for(const{a,r}of righe){
+    const chiusa=a>PROG.unl;
+    let v;
+    if(r)v='ONDATA <b>'+ROMAN(r.w)+'</b> · '+r.k+' caduti';
+    else v=chiusa?'— sigillata —':'— mai tentata —';
+    h+='<div class="clsR'+(chiusa||!r?' mut':'')+(a===tsel?' on':'')+'">'+
+       '<span class="n">'+ROMAN(a)+'</span>'+
+       '<span class="t">'+ATTO[a].nome+'</span>'+
+       '<span class="v">'+v+'</span></div>';
+  }
+  return h;
+}
+function mappaAggiorna(){
+  buildTappe();
+  el('scLore').innerHTML=classifica();
+  const r=albo(tsel)[0],sosp=haSalvataggio(tsel);
+  const parti=[sosp?'VEGLIA SOSPESA':ATTO[tsel].sotto];
+  if(r)parti.push('MIGLIORE: <b>'+ROMAN(r.w)+'</b>');
+  el('scScore').classList.remove('hidden');
+  el('scScore').innerHTML=parti.join(' · ');
+  el('scMain').textContent=(sosp?'RIPRENDI · ':'PREPARATI · ')+ATTO[tsel].nome;
+  const b=el('scAlt2');
+  if(sosp){b.classList.remove('hidden');b.textContent='RICOMINCIA DA CAPO';}
+  else b.classList.add('hidden');
+}
+function mappa(){
+  G.state='menu';smode='mappa';
+  const s=scenDelMondo();
+  if(s.indexOf(tsel)<0||tsel>PROG.unl)tsel=s.filter(a=>a<=PROG.unl).pop()||s[0];
+  showScreen(MONDO[msel].nome.replace(/^IL /,'IL<br>'),
+    'TOCCA UNA TAPPA · OGNI VEGLIA È A SÉ','',
+    'SCENDI','TORNA AI MONDI',null,null,lex('compendioBtn',msel));
+  el('screen').classList.add('mappa');
+  tappeFit();
+  mappaAggiorna();
+}
+/* ═══ L'ALBO D'ORO ═══
+   Le cinque serie più lunghe di ogni veglia. Non si distingue fra chi si è
+   fermato alle venti e chi ha tirato avanti nell'infinito: conta l'ondata. */
+function albo(a){const r=PROG.rec[a];return Array.isArray(r)?r:[];}
+function buildAlbo(){
+  let h='';
+  for(let a=1;a<=NSCEN;a++){
+    h+='<div class="cmpH">'+ATTO[a].nome+' · '+ATTO[a].sotto+'</div>';
+    const l=albo(a);
+    if(!l.length){
+      h+='<div class="clsR mut"><span class="t">'+
+         (a>PROG.unl?'— sigillata —':'— mai tentata —')+'</span></div>';
+      continue;
+    }
+    l.forEach((r,i)=>{
+      h+='<div class="clsR'+(i?'':' on')+'">'+
+         '<span class="n">'+ROMAN(i+1)+'</span>'+
+         '<span class="t">ONDATA <b>'+ROMAN(r.w)+'</b></span>'+
+         '<span class="v">'+r.k+' caduti</span></div>';
+    });
+  }
+  return h;
+}
+function alboScreen(){
+  smode='albo';
+  showScreen("L'ALBO<br>D'ORO",'LE CINQUE SERIE PIÙ LUNGHE DI OGNI VEGLIA',
+    buildAlbo(),'TORNA INDIETRO',null,null,null,null);
+  el('screen').classList.add('wide');
+}
+/* ═══ L'ARMERIA ═══
+   La legenda degli edifici — che è roba della campagna, non di un mondo: le
+   pietre sono le stesse dappertutto, sono le creature a cambiare — e il posto
+   in cui si compone la quaterna da portare in veglia.
+   Due modi, stessa schermata: si sfoglia (dai mondi) oppure si sceglie
+   (dalla mappa, prima di scendere). */
+let armSel=[],armScegli=false,armAvviso='',armSlot=0,armInfo=null;
+const armPiene=()=>armSel.filter(k=>TOWERS[k]).length;
+const armPronta=()=>armPiene()===NSLOT&&new Set(armSel).size===NSLOT;
+function armSlotHtml(){
+  let h='<div class="armSlotsW"><div class="armSlotsH">'+(armScegli?
+    'LA QUATERNA · TOCCA LO SLOT DA CAMBIARE':'LA QUATERNA DI RIFERIMENTO')+'</div><div class="armSlots">';
+  for(let i=0;i<NSLOT;i++){
+    const k=armSel[i],cfg=TOWERS[k];
+    h+='<button type="button" class="armSlot'+(i===armSlot&&armScegli?' pick':'')+
+      (cfg?'':' vuoto')+'" data-arm-slot="'+i+'">'+
+      '<span class="asN">'+ROMAN(i+1)+'</span><span class="asI">'+(cfg?spr(k+'1',1):'')+'</span>'+ 
+      '<span class="asT">'+(cfg?cfg.short:'VUOTO')+'</span></button>';
+  }
+  return h+'</div></div>';
+}
+function armRiga(k){
+  const cfg=TOWERS[k],slot=armSel.indexOf(k),dentro=slot>=0;
+  const st=tstats({type:k,lv:1});
+  let numeri;
+  if(cfg.sostegno)numeri='sostegno · voce '+Math.round(st.range);
+  else if(cfg.cut)numeri='scrosta '+Math.round(st.cut*100)+'% · aura '+Math.round(st.range);
+  else if(cfg.pozza)numeri='gittata '+Math.round(st.range)+' · pece '+st.dmg+'/s per '+
+    st.pozT.toFixed(1)+'s';
+  else if(cfg.aura)numeri=(st.slow>0?'rallenta '+Math.round(st.slow*100)+'% · ':'')+
+    'aura '+Math.round(st.range)+' · '+(st.dmg/st.rate).toFixed(1)+' dps';
+  else numeri='gittata '+Math.round(st.range)+' · '+(st.dmg/st.rate).toFixed(1)+' dps';
+  let scegli='';
+  if(armScegli){
+    const et=slot===armSlot?'SCELTA':(dentro?'SPOSTA QUI':'SCEGLI');
+    scegli='<button type="button" class="armPick'+(slot===armSlot?' on':'')+
+      '" data-arm-choose="'+k+'">'+et+'</button>';
+  }
+  return '<div class="armR'+(dentro?' on':'')+'" data-t="'+k+'">'+
+    '<span class="ap">'+spr(k+'1',2)+'</span>'+ 
+    '<span class="at"><span class="an">'+cfg.short+
+      '<span class="ar">'+(cfg.ruolo||'')+'</span></span>'+ 
+      '<span class="ad">'+cfg.desc+'<br><i>'+numeri+'</i></span></span>'+ 
+    '<span class="armActions">'+scegli+
+      '<button type="button" class="armMore" data-arm-info="'+k+'">INFO</button></span></div>';
+}
+function armCosto(k,lv){
+  const cfg=TOWERS[k];
+  if(lv===1)return {passo:cfg.cost,tot:cfg.cost};
+  let tot=cfg.cost;for(let g=1;g<lv;g++)tot+=Math.round(cfg.cost*UPMUL[g-1]);
+  return {passo:Math.round(cfg.cost*UPMUL[lv-2]),tot};
+}
+function armStatistiche(k,lv){
+  const cfg=TOWERS[k],st=tstats({type:k,lv}),v=[];
+  if(cfg.sostegno){
+    v.push('VOCE <b>'+Math.round(st.range)+'</b>');
+    v.push('DANNO AI VICINI <b>+'+Math.round(st.sdmg*100)+'%</b>');
+    v.push('CADENZA AI VICINI <b>+'+Math.round(st.srate*100)+'%</b>');
+  }else if(cfg.cut){
+    v.push('AURA <b>'+Math.round(st.range)+'</b>');
+    v.push('CORAZZA SCROSTATA <b>'+Math.round(st.cut*100)+'%</b>');
+    v.push('<i>Non infligge danno diretto</i>');
+  }else if(cfg.pozza){
+    v.push('PECE <b>'+st.dmg+'/s</b> PER <b>'+st.pozT.toFixed(1)+'s</b>');
+    v.push('POZZA <b>'+Math.round(st.pozR)+'</b> · GITTATA <b>'+Math.round(st.range)+'</b>');
+    v.push('VERSA OGNI <b>'+st.rate.toFixed(2)+'s</b>');
+  }else if(cfg.aura){
+    v.push((st.slow>0?'RINTOCCO':'MORSO')+' <b>'+st.dmg+'</b> · DPS <b>'+
+      (st.dmg/st.rate).toFixed(1)+'</b>');
+    v.push('AURA <b>'+Math.round(st.range)+'</b> · OGNI <b>'+st.rate.toFixed(2)+'s</b>');
+    if(st.slow>0)v.push('RALLENTA <b>'+Math.round(st.slow*100)+'%</b>');
+  }else{
+    v.push('DANNO <b>'+st.dmg+'</b> · DPS <b>'+(st.dmg/st.rate).toFixed(1)+'</b>');
+    v.push('GITTATA <b>'+Math.round(st.range)+'</b> · CADENZA <b>'+st.rate.toFixed(2)+'s</b>');
+  }
+  if(st.splash)v.push('AREA <b>'+Math.round(st.splash)+'</b> · USTIONE <b>'+st.burn.toFixed(0)+'/s</b>');
+  if(st.pull)v.push('ARRETRA <b>'+Math.round(st.pull)+' px</b>');
+  if(st.ap===1)v.push('<i>Trapassa ogni corazza</i>');
+  else if(st.ap>0)v.push('<i>Ignora il '+Math.round(st.ap*100)+'% della corazza</i>');
+  return v.join('<br>');
+}
+function armDettaglio(k){
+  const cfg=TOWERS[k];
+  let h=armSlotHtml()+'<button type="button" class="armBack" data-arm-back="1">← TUTTI GLI EDIFICI</button>'+ 
+    '<div class="armInfoHead"><div class="nome">'+cfg.name+'</div><div class="ruolo">'+cfg.ruolo+'</div>'+ 
+    '<div class="desc">'+cfg.desc+'</div></div>';
+  if(armScegli)h+='<button type="button" class="armInfoPick" data-arm-choose="'+k+'">ASSEGNA ALLO SLOT '+
+    ROMAN(armSlot+1)+'</button>';
+  h+='<div class="cmpH">I CINQUE GRADI</div>';
+  for(let lv=1;lv<=MAXLV;lv++){
+    const c=armCosto(k,lv),prezzo=lv===1?'ERIGI <b>◈'+c.passo+'</b>':
+      lex('rito',msel)+' <b>◈'+c.passo+'</b> · INVESTITO <b>◈'+c.tot+'</b>';
+    h+='<div class="armLv'+(lv===MAXLV?' max':'')+'"><div class="lvPic">'+spr(k+lv,2)+
+      '<span class="lvN">GRADO '+ROMAN(lv)+'</span></div><div class="lvStat">'+prezzo+'<br>'+ 
+      armStatistiche(k,lv)+(lv===MAXLV?'<br><i>MARMO · ORO · RITO COMPIUTO</i>':'')+'</div></div>';
+  }
+  return h;
+}
+/* i numeri a lettere: si ricavano dal catalogo, se no invecchiano al primo
+   edificio aggiunto — è già successo */
+const LETT=['nessuno','uno','due','tre','quattro','cinque','sei','sette','otto',
+  'nove','dieci','undici','dodici'];
+const conta=n=>LETT[n]||String(n);
+function buildArmeria(){
+  if(armInfo&&TOWERS[armInfo])return armDettaglio(armInfo);
+  let h=armSlotHtml()+'<div class="cmpT cmpI">'+conta(TORDER.length).replace(/^./,c=>c.toUpperCase())+
+    ' edifici, <b>'+conta(NSLOT)+'</b> in campo. La quaterna si sceglie prima di scendere e non '+
+    'si cambia più: sceglila guardando la veglia che ti aspetta, non l\'ultima che hai vinto.'+
+    '<br><br>Ogni edificio ha <b>cinque gradi</b>: i primi quattro crescono di sagoma, il quinto '+
+    'cambia materia — marmo e oro, fiamma fredda — e non si ingrandisce più.</div>';
+  h+='<div class="cmpH">LE CONSACRAZIONI</div>';
+  for(const k of TORDER)h+=armRiga(k);
+  return h;
+}
+function armeriaAggiorna(){
+  el('scLore').innerHTML=buildArmeria();
+  const sc=el('scScore');
+  sc.classList.remove('hidden');
+  if(armScegli){
+    const n=armPiene();
+    sc.innerHTML=armAvviso||('SLOT <b>'+ROMAN(armSlot+1)+'</b> ATTIVO · '+
+      (n<NSLOT?'DA RIEMPIRE: <b>'+(NSLOT-n)+'</b>':'QUATERNA PRONTA'));
+    el('scMain').textContent='SCENDI · '+ATTO[tsel].nome;
+    el('scMain').disabled=!armPronta();
+  }else{
+    sc.innerHTML=conta(TORDER.length).toUpperCase()+' EDIFICI · '+conta(NSLOT).toUpperCase()+' IN CAMPO';
+  }
+}
+function armeria(scegli){
+  smode='armeria';armScegli=!!scegli;armAvviso='';armSlot=0;armInfo=null;
+  const q=quaterneValida(PROG.arm[tsel]||QUATERNA_BASE);
+  armSel=Array.from({length:NSLOT},(_,i)=>q[i]||null);
+  showScreen("L'ARMERIA",scegli?'SCEGLI CON CHE COSA SCENDERE':'LE PIETRE CHE PUOI CONSACRARE',
+    '','SCENDI','TORNA INDIETRO',null,null,null);
+  el('screen').classList.add('wide');
+  if(!scegli)el('scMain').classList.add('hidden');
+  else el('scMain').classList.remove('hidden');
+  armeriaAggiorna();
+}
+el('scLore').addEventListener('click',ev=>{
+  if(smode!=='armeria')return;
+  const hit=s=>ev.target.closest?ev.target.closest(s):null;
+  const slot=hit('[data-arm-slot]');
+  if(slot&&armScegli){
+    audio();armSlot=Math.max(0,Math.min(NSLOT-1,Number(slot.dataset.armSlot)||0));
+    armAvviso='SLOT <b>'+ROMAN(armSlot+1)+'</b> · scegli un edificio dal catalogo';
+    armeriaAggiorna();return;
+  }
+  const info=hit('[data-arm-info]');
+  if(info){audio();armInfo=info.dataset.armInfo;armAvviso='';armeriaAggiorna();
+    el('scLore').scrollTop=0;return;}
+  if(hit('[data-arm-back]')){audio();armInfo=null;armeriaAggiorna();el('scLore').scrollTop=0;return;}
+  const scegli=hit('[data-arm-choose]');
+  if(!scegli||!armScegli)return;
+  audio();
+  const k=scegli.dataset.armChoose,altro=armSel.indexOf(k),vecchio=armSel[armSlot];
+  if(altro!==armSlot){
+    armSel[armSlot]=k;
+    if(altro>=0)armSel[altro]=vecchio||null;
+  }
+  armAvviso='<b>'+TOWERS[k].short+'</b> assegnata allo slot '+ROMAN(armSlot+1);
+  if(!vecchio){const vuota=armSel.findIndex(x=>!x);if(vuota>=0)armSlot=vuota;}
+  const uscivaInfo=!!armInfo;if(armInfo)armInfo=null;
+  armeriaAggiorna();
+  if(uscivaInfo)el('scLore').scrollTop=0;
+});
 el('scMain').addEventListener('click',()=>{
   audio();
-  if(smode==='help')menu();
-  else if(smode==='won')startAct2();
-  else if(smode==='atto3')startAct3();
-  else if(smode==='fine')endless();
-  else startGame();
+  if(smode==='help')mappa();          // il compendio è roba del mondo
+  else if(smode==='albo')mondi();
+  else if(smode==='armeria'){if(armScegli)startScen(tsel,armSel);else mondi();}
+  else if(smode==='mondi')mappa();
+  // dalla mappa si passa sempre dall'armeria, salvo riprendere un sospeso
+  else if(smode==='mappa'){if(haSalvataggio(tsel))riprendi(tsel);else armeria(true);}
+  else if(smode==='avanti'){scartaSalvataggio(G.act);tsel=G.act+1;armeria(true);}
+  else if(smode==='fine')restaAVegliare();
+  else if(smode==='over')armeria(true);
+  else mondi();
 });
 el('scAlt').addEventListener('click',()=>{
   audio();
-  if(smode==='menu')help();
-  else if(smode==='won'||smode==='atto3'||smode==='fine')startGame();
-  else menu();
+  if(smode==='avanti')restaAVegliare();
+  else if(smode==='mondi')menu();
+  else if(smode==='armeria')armScegli?mappa():mondi();
+  else if(smode==='mappa'||smode==='fine')mondi();
+  else mappa();   // la sconfitta torna alla mappa del proprio mondo
+});
+el('scAlt2').addEventListener('click',()=>{
+  audio();
+  if(smode==='menu'){const s=scenariSospesi();if(s.length)riprendi(s[s.length-1]);}
+  else if(smode==='mondi')armeria(false);
+  else if(smode==='mappa')armeria(true);   // ricomincia da capo: si riparte dalla scelta
+});
+el('scAlt3').addEventListener('click',()=>{
+  audio();
+  if(smode==='menu')cambiaProfilo();
+  else if(smode==='mondi')alboScreen();
+  else if(smode==='mappa')help();
 });
 function endless(){
   G.endless=true;G.state='play';smode='play';
-  el('screen').classList.add('off');
-  uiDirty();syncUI();banner('IL FUOCO','Non ha più numero');
+  hideScreen();
+  uiDirty();syncUI();banner('OLTRE IL NUMERO','Nessuno verrà a darti il cambio');
 }
 
-function startGame(){
-  G.state='play';smode='play';G.wave=0;G.lacrime=130;G.sigilli=0;G.paused=false;G.endless=false;
-  if(G.act!==1)applyAct(1);else G.act=1;
+/* Il campo sgombro dell'atto `a`: nessuna torre, niente in volo, ondata a
+   zero. La usano sia chi comincia una veglia sia chi ne riprende una
+   sospesa — quest'ultimo ci rimette sopra l'istantanea. */
+function azzeraCampo(a){
+  if(G.act!==a)applyAct(a);else G.act=a;
+  G.state='play';smode='play';G.wave=0;G.lacrime=0;G.sigilli=0;
+  G.paused=false;G.endless=false;
   G.bossRef=null;G.bossIn=false;G.bossHp=0;
   G.enemies.length=0;G.towers.length=0;G.shots.length=0;G.beams.length=0;
-  G.parts.length=0;G.rings.length=0;G.queue.length=0;
+  G.parts.length=0;G.rings.length=0;G.queue.length=0;G.pozze.length=0;
   G.sel=null;G.build=null;G.waveOn=false;G.t=0;G.killed=0;G.shake=0;
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(grid[r][c]===3)grid[r][c]=0;
   rebuildFree();
-  el('screen').classList.add('off');
+  hideScreen();chiudiPausa();
   el('bPause').classList.remove('on');
-  closePanel();syncUI();fit();
-  banner('IL SAGRATO','Erigi il tuo rito');
+  closePanel();
 }
+/* Ogni scenario comincia nudo: nessuna torre, nessun sigillo, l'ondata a
+   zero. L'unica cosa che si porta dietro dalla campagna sono le lacrime
+   concesse in partenza, ed è lì che sta il compenso per la difficoltà. */
+function startScen(a,quaterna){
+  a=Math.max(1,Math.min(NSCEN,a|0));
+  scartaSalvataggio(a);   // ricominciare da capo scarta la veglia sospesa
+  G.loadout=quaterneValida(quaterna||PROG.arm[a]||QUATERNA_BASE);
+  PROG.arm[a]=G.loadout.slice();progSalva();   // la prossima volta la ritrova
+  azzeraCampo(a);
+  G.lacrime=ATTO[a].lac;G.sigilli=ATTO[a].sig||0;
+  buildBar();syncUI();fit();
+  if(a===2){G.shake=7;SFX.over();
+    for(let i=0;i<40;i++)part(Math.random()*W,H*Math.random(),Math.random()*30-15,
+      -20-Math.random()*40,1.2,Math.random()<.5?C.ember:C.blood,-14);}
+  else if(a===3){G.shake=8;SFX.roar();
+    for(let i=0;i<50;i++)part(Math.random()*W,H,Math.random()*30-15,
+      -30-Math.random()*50,1.4,Math.random()<.5?'#f7e08a':'#ffffff',22);}
+  else if(a>=4){G.shake=5+CYFASE;SFX.beam();
+    const ca=CYFASE===1?'#b7ff45':'#20d8ff',cb=CYFASE===2?'#ffffff':'#ff3bd4';
+    for(let i=0;i<64;i++)part(Math.random()*W,-8-Math.random()*H*.25,
+      5+Math.random()*18,35+Math.random()*75,.8,Math.random()<.7?ca:cb,14);}
+  banner(ROMAN(a)+' · '+ATTO[a].nome,
+    a===MONDO[mondoDi(a)].scen[0]?lex('erigi',mondoDi(a)):lex('daCapo',mondoDi(a)));
+}
+const startGame=()=>startScen(1);   // usato dal banco di prova
 function gameOver(){
   if(G.state!=='play')return;
   G.state='over';smode='over';SFX.over();
-  saveBest(G.wave);
-  const rel=G.wave-(G.act-1)*20;
+  chiudiPausa();segna();
+  scartaSalvataggio(G.act);   // una veglia perduta non si riprende
+  msel=mondoDi(G.act);tsel=G.act;   // chi torna indietro trova dov'era
+  const rel=G.wave,signore=ENEMIES[ROSTER[G.act].final].name.toUpperCase();
   if(G.bossIn)
-    showScreen(G.act===3?"L'AGNELLO<br>È PASSATO":(G.act===2?'IL SIGNORE<br>È PASSATO':'IL SANTO<br>È PASSATO'),
+    showScreen(signore.replace(/ /g,'<br>')+'<br>È PASSATO',
       'NESSUN SIGILLO POTEVA BASTARE',
       'Non serviva che i tuoi sigilli cadessero: è bastato che <b>lui</b> arrivasse alla soglia. '+
       'Si è chinato per entrare, e la porta era comunque troppo bassa.<br><br>'+
       'Contro una cosa simile non si resiste: la si ferma prima, oppure non la si ferma.',
-      'RIPROVA',null,
+      'RIPROVA','TORNA ALLA MAPPA',
       'FERMATO AL <b>'+Math.round((1-(G.bossHp||0))*100)+'%</b> · CADUTI: <b>'+G.killed+'</b>');
+  else if(G.act>=4)
+    showScreen('CONNESSIONE<br>INTERROTTA','LA CITTÀ HA VINTO',
+      'I sigilli di rete sono esauriti. Il protocollo ostile ha attraversato la soglia e '+
+      'la città ha riscritto il tuo nome come un errore.<br><br>Il canale può essere riaperto. '+
+      'La pioggia, intanto, non ha mai smesso.',
+      'RIAVVIA LO SCENARIO','TORNA ALLA MAPPA',
+      'PROTOCOLLO <b>'+ROMAN(Math.max(1,rel))+'</b> · UNITÀ DISATTIVATE: <b>'+G.killed+'</b>');
   else if(G.act===3)
     showScreen('IL LIBRO<br>SI CHIUDE','IL GIUDIZIO HA VINTO',
       'I sigilli sono finiti. Ciò che scendeva dal cielo aperto è entrato in ordine, '+
       'in fila, senza fretta, come chi non ha mai avuto dubbi.<br><br>'+
       'Il tuo nome era in quel libro. Adesso non c\'è più.',
-      'RICOMINCIA DALLA VEGLIA',null,
-      'ATTO III · GIUDIZIO <b>'+ROMAN(Math.max(1,rel))+'</b> · CADUTI: <b>'+G.killed+'</b>');
+      'RIPROVA IL GIUDIZIO','TORNA ALLA MAPPA',
+      'GIUDIZIO <b>'+ROMAN(Math.max(1,rel))+'</b> · CADUTI: <b>'+G.killed+'</b>');
   else if(G.act===2)
     showScreen('IL FUOCO<br>È DENTRO','LA CREPA HA VINTO',
       'I sigilli sono cenere. Ciò che saliva dal fondo adesso siede dove sedeva il santo, '+
       'e la pietra sopra di te comincia a colare.<br><br>'+
       'Il sagrato tornerà a essere consacrato. Qualcuno dovrà rifare tutto daccapo.',
-      'RICOMINCIA DALLA VEGLIA',null,
-      'ATTO II · DISCESA <b>'+ROMAN(Math.max(1,rel))+'</b> · CADUTI: <b>'+G.killed+'</b>');
+      'RIPROVA LA DISCESA','TORNA ALLA MAPPA',
+      'DISCESA <b>'+ROMAN(Math.max(1,rel))+'</b> · CADUTI: <b>'+G.killed+'</b>');
   else
     showScreen('LE CAMPANE<br>TACCIONO','IL CORTEO HA VARCATO LA SOGLIA',
       'I sigilli sono infranti. Ciò che scendeva dal valico ora è dentro la navata, '+
       'e canta con la tua voce.<br><br>Un\'altra veglia ti attende, campanaro.',
-      'VEGLIA DI NUOVO',null,
+      'VEGLIA DI NUOVO','TORNA ALLA MAPPA',
       'ONDATE RESISTITE: <b>'+ROMAN(Math.max(1,rel))+'</b> · CADUTI: <b>'+G.killed+'</b>');
 }
-function victory(){
-  G.state='won';smode='won';saveBest(G.wave);
-  showScreen("CALA<br>L'INFERNO","VENTI VEGLIE COMPIUTE",
-    'L\'ultimo Vescovo si disfa sulle lastre. Per un istante il valico è muto — '+
-    'poi la pietra si apre e il sagrato comincia a scaldarsi sotto i piedi.<br><br>'+
-    'Non erano loro a scendere: erano loro a <b>fuggire</b>. Ciò che li spingeva sale adesso, '+
-    'e ha ossa che bruciano.<br><br>Le tue torri restano in piedi. Ti sono concesse '+
-    '<b>200 lacrime</b>: non ti sarà dato altro.',
-    'SCENDI NEL FUOCO','RICOMINCIA DACCAPO',
-    'CADUTI: <b>'+G.killed+'</b> · LACRIME: <b>'+G.lacrime+'</b>');
-}
-function startAct2(){
-  applyAct(2);
-  G.state='play';smode='play';
-  G.lacrime+=200;
-  el('screen').classList.add('off');
-  G.shake=7;SFX.over();
-  for(let i=0;i<40;i++)part(Math.random()*W,H*Math.random(),Math.random()*30-15,
-    -20-Math.random()*40,1.2,Math.random()<.5?C.ember:C.blood,-14);
-  uiDirty();syncUI();
-  banner('ATTO II · LA DISCESA','Il fondo sale al sagrato');
-}
-function victoryFinal(){
-  G.state='won';smode='atto3';saveBest(G.wave);
-  showScreen("SI APRE<br>IL CIELO",'QUARANTA ONDATE COMPIUTE',
-    'Il Signore del Fondo si spegne sulle lastre calde e per un istante non sale più nulla.<br><br>'+
-    'Poi il cielo si apre — non come si apre una nuvola: come si apre un <b>libro</b>. '+
-    'Quello che scende adesso non brucia e non marcisce. È bianco, è in ordine, e ha sette occhi.<br><br>'+
-    'Non era l\'inferno a volerti il sagrato. Era il <b>giudizio</b>, e arrivava ultimo.',
-    'ALZA GLI OCCHI','RICOMINCIA DACCAPO',
-    'CADUTI: <b>'+G.killed+'</b> · LACRIME: <b>'+G.lacrime+'</b>');
-}
-function startAct3(){
-  applyAct(3);
-  G.state='play';smode='play';
-  G.lacrime+=400;
-  el('screen').classList.add('off');
-  G.shake=8;SFX.roar();
-  for(let i=0;i<50;i++)part(Math.random()*W,H,Math.random()*30-15,
-    -30-Math.random()*50,1.4,Math.random()<.5?'#f7e08a':'#ffffff',22);
-  uiDirty();syncUI();
-  banner('ATTO III · IL GIUDIZIO','Il cielo è un libro aperto');
-}
-function victoryTrue(){
-  G.state='won';smode='fine';saveBest(G.wave);
-  showScreen('NESSUNO<br>SCENDE PIÙ','SESSANTA ONDATE COMPIUTE',
-    'L\'Agnello si è disfatto sulle lastre come tutti gli altri, e con lui il libro si è chiuso.<br><br>'+
-    'Non c\'è alba, non c\'è fondo, non c\'è giudizio: c\'è un sagrato vuoto e una campana che nessuno '+
-    'suona. Hai tenuto la soglia contro tre mondi.<br><br>Puoi restare a vegliare finché reggerai.',
-    'RESTA A VEGLIARE','RICOMINCIA DACCAPO',
-    'CADUTI: <b>'+G.killed+'</b> · LACRIME: <b>'+G.lacrime+'</b>');
-}
-function saveBest(w){
-  if(w>G.best){G.best=w;
-    try{if(window.storage&&window.storage.set)window.storage.set('veglia:best',String(w));}catch(e){}}
-}
-(async()=>{try{
-  if(window.storage&&window.storage.get){
-    const r=await window.storage.get('veglia:best');
-    if(r&&r.value)G.best=parseInt(r.value,10)||0;
-    if(G.state==='menu')menu();
+/* Venti ondate compiute: da qui si sceglie. Proseguire all'infinito lascia
+   in piedi tutto quello che si è costruito; scendere alla veglia dopo no —
+   le torri restano qui, e di là si ricomincia con le sole lacrime concesse. */
+const CHIUSURA={
+  1:{tit:"CALA<br>L'INFERNO",sub:'LA VEGLIA È COMPIUTA',
+     testo:'L\'ultimo Vescovo si disfa sulle lastre. Per un istante il valico è muto — '+
+       'poi la pietra si apre e il sagrato comincia a scaldarsi sotto i piedi.<br><br>'+
+       'Non erano loro a scendere: erano loro a <b>fuggire</b>. Ciò che li spingeva sale '+
+       'adesso, e ha ossa che bruciano.'},
+  2:{tit:'SI APRE<br>IL CIELO',sub:'LA DISCESA È COMPIUTA',
+     testo:'Il Signore del Fondo si spegne sulle lastre calde e per un istante non sale '+
+       'più nulla.<br><br>Poi il cielo si apre — non come si apre una nuvola: come si apre '+
+       'un <b>libro</b>. Quello che scende adesso non brucia e non marcisce. È bianco, è in '+
+       'ordine, e ha sette occhi.'},
+  3:{tit:'NESSUNO<br>SCENDE PIÙ',sub:'IL MONDO DEL CAMPANARO È COMPIUTO',
+     testo:'L\'Agnello si è disfatto sulle lastre come tutti gli altri, e con lui il libro '+
+       'si è chiuso.<br><br>Non c\'è alba, non c\'è fondo, non c\'è giudizio: c\'è un sagrato '+
+       'vuoto e una campana che nessuno suona. Hai tenuto la soglia contro tre mondi.'},
+  4:{tit:'SALE<br>IL VAPORE',sub:'IL LIVELLO ZERO È LIBERO',
+     testo:'Il Nucleo si spegne e per la prima volta i vicoli tornano bui. Sotto le grate, '+
+       'però, qualcosa continua a pompare.<br><br>L\'ascensore industriale si apre sul '+
+       '<b>Distretto Acido</b>: fabbriche senza operai, turni senza fine.'},
+  5:{tit:'RESTANO<br>SOLO I DATI',sub:'LE FABBRICHE SONO FERME',
+     testo:'La Bestia Reattore collassa in una pioggia verde. Le catene di montaggio si '+
+       'arrestano una dopo l\'altra.<br><br>Dietro l\'ultima paratia non c\'è una strada: '+
+       'c\'è la <b>Griglia Nera</b>, il luogo dove la città decide chi esiste.'},
+  6:{tit:'SPUNTA<br>UN\'ALBA FALSA',sub:'LA CITTÀ SENZA ALBA È COMPIUTA',
+     testo:'La Matrice Nera perde l\'ultimo processo e le insegne si spengono, isolato dopo '+
+       'isolato.<br><br>All\'orizzonte compare una luce che imita il mattino. Non è il sole, '+
+       'ma per questa notte basta: hai restituito alla città il diritto di scegliere.'}
+};
+/* Venti ondate compiute. Se la veglia non era l'ultima del mondo si sceglie
+   fra restare e scendere; se lo era, il mondo è chiuso e quello dopo — quando
+   ci sarà — è ancora sotto ceralacca. In tutti i casi restare a vegliare
+   significa che la partita continua: è l'unico ramo che non scarta il sospeso. */
+function compiuto(){
+  const a=G.act,fineMondo=ultimoDelMondo(a),ultimo=a>=NSCEN;
+  G.state='won';PROG.fin[a]=true;segna();
+  chiudiPausa();msel=mondoDi(a);tsel=a;
+  if(!ultimo)sblocca(a+1);
+  progSalva();
+  const c=CHIUSURA[a]||CHIUSURA[NSCEN];
+  let coda;
+  if(fineMondo){
+    const m=mondoDi(a)+1,pross=MONDO[m];
+    coda='<br><br>Le veglie di questo mondo sono compiute. '+
+      (pross&&pross.scen.length?'La soglia successiva è aperta: <b>'+pross.nome+'</b>.'
+        :(pross?'Oltre c\'è dell\'altro, ma la ceralacca è ancora intera: <b>prossimamente</b>.'
+              :'Oltre non c\'è ancora nulla.'))+
+      '<br><br>Puoi restare qui a vegliare finché reggerai: da qui in poi le ondate non hanno '+
+      'più numero, e la serie finisce solo quando finisci tu — o quando la sospendi.';
+  }else{
+    coda='<br><br>'+lex('tuoRito',mondoDi(a))+' però resta quassù: <b>le torri non ti '+
+      'seguono</b>. Di là si ricomincia '+lex('pietraNuda',mondoDi(a+1))+', con <b>'+
+      ATTO[a+1].lac+' lacrime</b> e nient\'altro. Oppure resti, e vegli finché reggi.';
   }
+  smode=fineMondo?'fine':'avanti';
+  showScreen(c.tit,c.sub,c.testo+coda,
+    fineMondo?'RESTA A VEGLIARE':'SCENDI · '+ATTO[a+1].nome,
+    fineMondo?'TORNA AI MONDI':'RESTA A VEGLIARE',
+    'ONDATE: <b>'+ROMAN(G.wave)+'</b> · CADUTI: <b>'+G.killed+'</b> · TORRI: <b>'+G.towers.length+'</b>',
+    null);
+}
+/* restare a vegliare: la partita prosegue, quindi il sospeso si riscrive */
+function restaAVegliare(){endless();salvaPartita();}
+
+/* ═══ MEMORIA ═══
+   Niente localStorage (vincolo del progetto): tutto passa da window.storage,
+   e se non c'è la campagna vive quanto la sessione. Due chiavi distinte:
+   `veglia:prog` sono i progressi — piccoli, preziosi, scritti spesso — e
+   `veglia:save` le partite sospese, che sono grosse. Tenerle separate vuol
+   dire che un salvataggio malandato non si porta dietro l'albo d'oro. */
+function progSalva(){
+  try{if(window.storage&&window.storage.set)
+    window.storage.set(COLLAUDO?'veglia:prog:test':'veglia:prog',JSON.stringify(PROG));}catch(e){}
+}
+function sblocca(a){
+  if(a>PROG.unl&&a<=NSCEN){PROG.unl=a;progSalva();}
+}
+/* L'albo: si infila la serie, si riordina per ondata (a parità, per caduti)
+   e si tiene solo la cima. Ci passa ogni fine partita, anche l'abbandono. */
+function segna(){
+  if(G.wave<1)return;
+  const l=albo(G.act).slice();
+  l.push({w:G.wave,k:G.killed});
+  l.sort((x,y)=>y.w-x.w||y.k-x.k);
+  PROG.rec[G.act]=l.slice(0,NALBO);
+  progSalva();
+}
+
+/* ═══ PARTITE SOSPESE ═══
+   Uno slot per veglia. Dell'istantanea fa parte tutto quel che non si può
+   ricavare da capo: le sagome (`sp`), le statistiche (`st`) e la scheda della
+   creatura (`def`) si rimettono a mano al ritorno, e gli effetti che durano
+   meno di un secondo — proiettili, raggi, anelli, faville — non si salvano
+   affatto: nessuno si accorgerà che sono spariti. */
+const SAVE={};
+const copiaMemoria=o=>JSON.parse(JSON.stringify(o));
+function sostituisciMemoria(dst,src){
+  for(const k in dst)delete dst[k];
+  if(src&&typeof src==='object')for(const k in src)dst[k]=src[k];
+}
+async function leggiMemoria(k){
+  try{
+    if(!(window.storage&&window.storage.get))return null;
+    const r=await window.storage.get(k);
+    return r&&r.value?JSON.parse(r.value):null;
+  }catch(e){return null;}
+}
+/* Il collaudo è un profilo vero e separato: record, armerie e sospesi non
+   finiscono mai nella campagna normale. Aprirlo porta direttamente al Mondo II
+   e rende selezionabili tutte le sei veglie già realizzate. */
+async function cambiaProfilo(){
+  if(CAMBIO_PROFILO)return;CAMBIO_PROFILO=true;
+  try{
+    if(!COLLAUDO){
+      PROFILO_NORMALE={prog:copiaMemoria(PROG),save:copiaMemoria(SAVE)};
+      COLLAUDO=true;
+      const p=await leggiMemoria('veglia:prog:test'),s=await leggiMemoria('veglia:save:test');
+      sostituisciMemoria(PROG,p||{unl:NSCEN,fin:{},rec:{},arm:{}});
+      PROG.fin=PROG.fin&&typeof PROG.fin==='object'?PROG.fin:{};
+      PROG.rec=PROG.rec&&typeof PROG.rec==='object'?PROG.rec:{};
+      PROG.arm=PROG.arm&&typeof PROG.arm==='object'?PROG.arm:{};
+      PROG.unl=NSCEN;sostituisciMemoria(SAVE,s||{});migraProg();progSalva();
+      tsel=MONDO[2].scen[0];msel=2;applyAct(tsel);
+    }else{
+      progSalva();saveSalva();COLLAUDO=false;
+      if(PROFILO_NORMALE){
+        sostituisciMemoria(PROG,PROFILO_NORMALE.prog);
+        sostituisciMemoria(SAVE,PROFILO_NORMALE.save);
+      }
+      PROG.unl=Math.min(NSCEN,Math.max(1,PROG.unl|0)||1);
+      tsel=PROG.unl;msel=mondoDi(tsel);applyAct(tsel);
+    }
+    menu();
+  }finally{CAMBIO_PROFILO=false;}
+}
+const CAMPI_NEMICO=['type','hp','max','speed','armor','bounty','seg','segD','x','y',
+  'dir','prog','slowAmt','burn','burnT','flash','bob','spawnT','stepT','broken'];
+/* Un proiettile insegue un oggetto, e un oggetto non si scrive su disco: il
+   bersaglio si salva come posto nella lista delle creature, e al ritorno si
+   riaggancia. Sono pochi e vivono un attimo, ma bastano a far divergere due
+   partite altrimenti identiche — una caldaia ne ha quasi sempre uno per aria. */
+const CAMPI_COLPO=['x','y','lx','ly','speed','dmg','ap','splash','burn','pull',
+  'pozR','pozT','col','life','type','trail','a'];
+function istantanea(){
+  const e2=[],indice=new Map();
+  for(const e of G.enemies){
+    if(!e.alive)continue;
+    indice.set(e,e2.length);
+    const o={};for(const k of CAMPI_NEMICO)o[k]=e[k];
+    e2.push(o);
+  }
+  const s2=G.shots.map(s=>{
+    const o={};for(const k of CAMPI_COLPO)if(s[k]!==undefined)o[k]=s[k];
+    o.ti=indice.has(s.target)?indice.get(s.target):-1;
+    return o;
+  });
+  return {v:1,act:G.act,wave:G.wave,lacrime:G.lacrime,sigilli:G.sigilli,
+    killed:G.killed,endless:!!G.endless,waveOn:!!G.waveOn,t:G.t,speed:G.speed,
+    loadout:G.loadout.slice(),   // una veglia ripresa ritrova i suoi edifici
+    towers:G.towers.map(t=>({type:t.type,c:t.c,r:t.r,lv:t.lv,cd:t.cd,rec:t.rec,
+      spent:t.spent,aim:t.aim})),
+    enemies:e2,shots:s2,
+    queue:G.queue.map(q=>({t:q.t,at:q.at,wave:q.wave})),
+    // la pece dura qualche secondo: troppo per buttarla via come una favilla
+    pozze:G.pozze.map(p=>({x:p.x,y:p.y,r:p.r,t:p.t,max:p.max,dps:p.dps,ap:p.ap}))};
+}
+function ripristina(s){
+  if(!s||!s.act)return false;
+  azzeraCampo(Math.max(1,Math.min(NSCEN,s.act|0)));   // rifà percorso e griglia
+  G.loadout=quaterneValida(s.loadout);buildBar();
+  G.wave=s.wave|0;G.lacrime=s.lacrime|0;G.sigilli=s.sigilli|0;
+  G.killed=s.killed|0;G.endless=!!s.endless;G.waveOn=!!s.waveOn;
+  G.t=+s.t||0;G.speed=s.speed>=1&&s.speed<=3?s.speed:1;
+  for(const d of s.towers||[]){
+    if(!TOWERS[d.type])continue;
+    const t={type:d.type,c:d.c,r:d.r,x:d.c*TILE+TILE/2,y:d.r*TILE+TILE/2,
+      lv:Math.max(1,Math.min(MAXLV,d.lv|0)),cd:+d.cd||0,rec:+d.rec||0,
+      spent:d.spent|0,aim:+d.aim||0};
+    t.st=tstats(t);t.sp=S[t.type+t.lv];
+    G.towers.push(t);grid[t.r][t.c]=3;
+  }
+  G.towers.sort((a,b)=>a.y-b.y);rebuildFree();ricalcolaTorri();
+  for(const d of s.enemies||[]){
+    const def=ENEMIES[d.type];if(!def)continue;
+    const e={def,alive:true,escaped:false};
+    for(const k of CAMPI_NEMICO)e[k]=d[k];
+    G.enemies.push(e);
+    if(def.final){G.bossRef=e;G.bossHp=Math.max(0,e.hp/e.max);}
+  }
+  for(const d of s.shots||[]){
+    const o={};for(const k of CAMPI_COLPO)if(d[k]!==undefined)o[k]=d[k];
+    o.target=(d.ti>=0&&d.ti<G.enemies.length)?G.enemies[d.ti]:null;
+    G.shots.push(o);
+  }
+  for(const q of s.queue||[])if(ENEMIES[q.t])G.queue.push({t:q.t,at:+q.at||0,wave:q.wave|0});
+  for(const p of s.pozze||[])G.pozze.push({x:+p.x||0,y:+p.y||0,r:+p.r||0,t:+p.t||0,
+    max:+p.max||1,dps:+p.dps||0,ap:+p.ap||0});
+  el('bSpeed').textContent='×'+G.speed;
+  el('bSpeed').classList.toggle('on',G.speed>1);
+  uiDirty();syncUI();fit();
+  return true;
+}
+const haSalvataggio=a=>!!SAVE[a];
+const scenariSospesi=()=>{const l=[];for(let a=1;a<=NSCEN;a++)if(SAVE[a])l.push(a);return l;};
+function saveSalva(){
+  try{if(window.storage&&window.storage.set)
+    window.storage.set(COLLAUDO?'veglia:save:test':'veglia:save',JSON.stringify(SAVE));}catch(e){}
+}
+function salvaPartita(){
+  if(G.state!=='play')return false;
+  SAVE[G.act]=istantanea();saveSalva();return true;
+}
+function scartaSalvataggio(a){
+  if(!SAVE[a])return;
+  delete SAVE[a];saveSalva();
+}
+function riprendi(a){
+  if(!SAVE[a])return false;
+  const ok=ripristina(SAVE[a]);
+  // si può riprendere anche dal menu principale, saltando la mappa: chi poi
+  // esce dev'essere riportato al proprio mondo, non a quello di prima
+  if(ok){msel=mondoDi(a);tsel=a;
+    banner(ROMAN(a)+' · '+ATTO[a].nome,'La veglia riprende dove l\'avevi lasciata');}
+  return ok;
+}
+/* dalla mappa: se c'è un sospeso lo si riprende, se no si comincia */
+function riprendiOScendi(a){if(!riprendi(a))startScen(a);}
+
+(async()=>{try{
+  if(!(window.storage&&window.storage.get))return;
+  const r=await window.storage.get('veglia:prog');
+  if(r&&r.value){
+    const p=JSON.parse(r.value);
+    if(p&&typeof p==='object'){
+      PROG.unl=Math.min(NSCEN,Math.max(1,p.unl|0)||1);
+      if(p.fin&&typeof p.fin==='object')PROG.fin=p.fin;
+      if(p.rec&&typeof p.rec==='object')PROG.rec=p.rec;
+      if(p.arm&&typeof p.arm==='object')PROG.arm=p.arm;
+    }
+  }else{
+    // dalla vecchia campagna unica da sessanta ondate al conto per veglia
+    const v=await window.storage.get('veglia:best');
+    const b=v&&v.value?parseInt(v.value,10)||0:0;
+    if(b>0){
+      PROG.unl=Math.min(NSCEN,Math.floor((b-1)/20)+1);
+      for(let a=1;a<=PROG.unl;a++){
+        const w=Math.min(20,b-(a-1)*20);
+        if(w>0)PROG.rec[a]=[{w,k:0}];
+      }
+    }
+  }
+  migraProg();
+  const sv=await window.storage.get('veglia:save');
+  if(sv&&sv.value){
+    const p=JSON.parse(sv.value);
+    if(p&&typeof p==='object')
+      for(let a=1;a<=NSCEN;a++)if(p[a]&&p[a].act)SAVE[a]=p[a];
+  }
+  tsel=PROG.unl;msel=mondoDi(PROG.unl);
+  if(G.state==='menu'&&smode==='menu')menu();
 }catch(e){}})();
+/* Le memorie vecchie hanno un record solo per veglia, e non sanno di `fin`:
+   un record da venti ondate è una veglia compiuta, e lo è anche ogni veglia
+   che ne ha una più profonda aperta dopo di sé. */
+function migraProg(){
+  let tocco=false;
+  for(let a=1;a<=NSCEN;a++){
+    const r=PROG.rec[a];
+    if(r&&!Array.isArray(r)){PROG.rec[a]=[{w:r.w|0,k:r.k|0}];tocco=true;}
+    const l=albo(a);
+    if(!PROG.fin[a]&&(a<PROG.unl||(l[0]&&l[0].w>=20))){PROG.fin[a]=true;tocco=true;}
+  }
+  if(tocco)progSalva();
+}
 
 /* ─────────── AVVIO ─────────── */
+buildBar();
 menu();
 fit();
 setTimeout(fit,120);
