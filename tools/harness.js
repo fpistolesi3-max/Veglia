@@ -91,6 +91,8 @@ function carica(opzioni = {}) {
         'TORDER,NSLOT,QUATERNA_BASE,quaterneValida,ricalcolaTorri,arretra,buildBar,' +
         'edificioAperto,gradoMax,mancaEdificio,mancaGrado,uccMondo,uccTorre,' +
         'ricalcolaSoglie,GRADI_LIEVI,GRADI_ALTRI,contaCaduto,' +
+        'DANNI,TDANNO,RES,resDi,mordeDi,nomeDanno,corazzaDice,appicca,' +
+        'pergamenaHtml,libro,buildPergamena,tempreHtml,' +
         'armeria,buildArmeria,help,buildHelp,damage,tstats,makeSprite,ART,PAL_TOW,' +
         'cambiaProfilo,MUSICA,musicaAggiorna,musicaToggle,hideScreen,lex};' +
         '\nglobalThis.__T.getProfilo=()=>({collaudo:COLLAUDO,unl:PROG.unl,msel,tsel,smode});' +

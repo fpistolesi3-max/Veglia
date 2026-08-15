@@ -130,6 +130,12 @@ function veglia(a, maxOndate) {
   return { a, esito: 'retta', w: G.wave };
 }
 
+/* Il bot e il suo piano servono anche a chi tara (margine.js): richiesto come
+   modulo, sim.js non gioca da solo — espone il giocatore-tipo e basta. Così il
+   metro è uno solo, e nessuno se ne riscrive una copia che diverge. */
+module.exports = { T, G, veglia, piano };
+if (require.main !== module) return;
+
 const solo = Number(process.argv[2]) || 0;
 const ondate = Number(process.argv[3]) || 20;
 const esiti = [];

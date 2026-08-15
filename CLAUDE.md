@@ -19,6 +19,7 @@ bundler, non aggiungere librerie esterne.**
 | `index.html` | copia di `ultima-veglia.html` + meta PWA + icona in base64 |
 | `sw.js` | service worker (rete-prima per l'HTML, cache per il resto) |
 | `manifest.webmanifest`, `icona*.png` | icona e configurazione dell'app |
+| `SISTEMA-DANNI.md` | il sistema di combattimento per intero: nature, tempre, taratura |
 | `tools/` | banco di prova headless (vedi sotto) |
 
 Dopo ogni modifica al gioco **rigenera `index.html`** (vedi "Rilascio").
@@ -35,6 +36,9 @@ npm run check                 # estrae lo script e ne controlla la sintassi
 node tools/sim.js             # tutti gli scenari, uno per uno, ondata per ondata
 node tools/sim.js 2           # solo la Discesa
 node tools/quaterne.js tutte  # confronto fra quaterne, uno scambio per volta
+node tools/margine.js tutte   # quanto si può stringere prima che ceda
+node tools/danni.js nature    # quanto vale ogni natura di danno, veglia per veglia
+node tools/danni.js 3         # la matrice edificio × schiera del Giudizio
 node tools/salva.js 2         # sospendere e riprendere: andata e ritorno
 node tools/shot.js 3 46 x.png # screenshot reale (atto 3, ondata 46)
 node tools/vie.js vie.png 2   # i tre percorsi affiancati, campo nudo
@@ -64,7 +68,11 @@ Due appigli del banco che valgono per tutti i tool:
 
 **Regole di lavoro:**
 - Dopo ogni modifica: `npm run check`. Sempre.
-- Se tocchi il bilanciamento: `node tools/sim.js` e confronta l'esito.
+- Se tocchi il bilanciamento: `node tools/sim.js` e confronta l'esito, poi
+  `node tools/margine.js tutte` — l'esito a ×1 non dice niente da solo, quel che
+  conta è dove si rompe (deve stare fra ×1.10 e ×1.30).
+- Se tocchi danni, corazze o tempre: `node tools/danni.js nature`. Nessuna
+  natura dev'essere la migliore dappertutto, nessuna veglia dev'essere piatta.
 - Se tocchi lo stato della partita: `node tools/salva.js 1 2 3`. La prova non
   confronta i campi, fa proseguire la partita per mezzo minuto da entrambe le
   parti: è così che si scopre il campo dimenticato.
@@ -224,6 +232,61 @@ Sei edifici hanno meccaniche proprie, non solo numeri diversi:
 - **scongiuro** non colpisce: mette `e.armorCut`, che `damage()` toglie alla
   corazza. Si azzera a ogni giro come `slowAmt`: vale finché si sta nell'aura.
 
+## Il sistema dei danni
+
+Il documento per intero è `SISTEMA-DANNI.md`: nature, tempre, criterio di
+taratura, come aggiungerne. Qui sta solo quel che serve per non romperlo.
+
+**Un colpo è un numero e una natura.** Sei nature (`DANNI`): fisico, fuoco,
+arcano, gelo, folgore, veleno. Il conto sta tutto in `damage()`:
+
+```
+max( 1 ,  danno × (1 − tempra)  −  corazza × morde )
+```
+
+Prima la tempra, poi la corazza — l'ordine inverso renderebbe la corazza forte
+proprio contro le nature che devono scavalcarla. Il fondo di 1 c'è sempre: un
+corazzato dev'essere duro, non immortale.
+
+**`morde`** è quanta corazza conta contro quella natura, e un edificio la
+eredita dalla sua `nat`. Può derogare con `ap`, ma **solo se la sua descrizione
+lo promette a parole** — mangano, arpione, rotaia. È l'unica eccezione ammessa,
+e serve a far nascere coerente ogni edificio nuovo.
+
+**Le tempre** (`RES` per atto, `res` per creatura) sono di un mondo prima che di
+una creatura: è la sua storia a deciderle. Due regole:
+- **ogni veglia ne regge una e ne scopre un'altra.** Un muro senza porta chiede
+  di cambiare quaterna, non di mescolare — e la quaterna si cambia fuori dalla
+  partita, quindi non è una scelta di gioco;
+- **la prima veglia non ha tempre**: si impara a giocare prima del sistema.
+
+La tempra si compone una volta per specie (`resDi`, con cache) e finisce su
+`e.res` allo spawn: nel conto del danno dev'essere una lettura, non un calcolo.
+Al ritorno da un salvataggio si rimette a mano, come la scheda.
+
+**I danni persistenti** — `burn` (ustione, fuoco) e `tox` (marciume, veleno) —
+ignorano la corazza per definizione, non la tempra: `appicca()` la conta **una
+volta sola** quando si appiccano, così al tic non resta che una sottrazione.
+A 180 aggiornamenti al secondo la differenza si sente.
+
+**Le tempre hanno spostato il bilanciamento**, perché la quaterna di riferimento
+è due quarti arcano: `ATTO[a].hp` è stato ritarato a 2.5 (Discesa), 3.4
+(Giudizio) e 5.9 (Distretto Acido). L'ossario, diventato veleno, è sceso da
+`dmg 8` a 5: i suoi numeri erano tarati per un danno che la corazza smussava.
+Tutto in `SISTEMA-DANNI.md`, con il perché.
+
+**Il Libro della Veglia** (`libro()`, `pergamenaHtml`): la pergamena in pixel
+art che si apre dalla home. Carta e rulli sono due texture disegnate all'avvio
+(`buildPergamena`) con un seme fisso — una pergamena che cambia venatura a ogni
+apertura sarebbe un'altra pergamena — e ripetute dal CSS, quindi costano quanto
+un colore pieno. **Le nature, le tempre e il conto d'esempio si ricavano dalle
+tabelle**, non sono ricopiati: una pergamena che invecchia mentre il gioco
+cambia è peggio di nessuna pergamena. Le regole stanno lì e **non** nel
+compendio: `IL RITO` tiene le creature, che sono roba di un mondo.
+
+I colori delle nature sono nati per il fondo nero del campo: sulla carta chiara
+diventano sigilli scuri (`.pgNn`), se no spariscono.
+
 ## Quel che si guadagna
 
 Niente è concesso in partenza tranne i quattro storici al primo grado. Il resto
@@ -311,8 +374,8 @@ loro il muro vero, non la truppa: se un bilanciamento «regge fino alla 19»,
 
 **Curve di difficoltà.** Dentro uno scenario `hpCurva` fa 1.16 per ondata fino
 alla 20ª, poi 1.115 nell'infinito. A cambiare fra scenari sono il **gradino di
-partenza** `ATTO[a].hp` (1 / 2.8 / 4.6), compensato dalle lacrime iniziali, e
-la forma del percorso. I tre valori vengono da sweep su `sim.js`: ognuno è il
+partenza** `ATTO[a].hp` (1 / 2.5 / 3.4 / 5.8 / 5.9 / 5.2), compensato dalle
+lacrime iniziali, la forma del percorso e — da quando ci sono — le tempre. I tre valori vengono da sweep su `sim.js`: ognuno è il
 più alto per cui il giocatore-tipo arriva in fondo, e si rompe attorno a
 ×1.15-1.3 — lo stesso agio che ha sempre avuto la Veglia. Sono più bassi di
 quanto sembri perché la parte restante del gradino sta nel tracciato, che dopo

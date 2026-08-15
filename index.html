@@ -143,6 +143,50 @@ canvas#menubg.off{display:none}
 .cmpT i{color:#8fa5b0;font-style:normal}
 .cmpT u{color:#c14a4a;text-decoration:none}
 .cmpI{padding:2px 0 4px}
+/* ── IL LIBRO DELLA VEGLIA ──
+   Una pergamena vera: la carta scorre e i due rulli restano appesi ai bordi.
+   Le regole sono parecchie e su fondo nero non le legge nessuno; su carta sì.
+   Carta e legno sono texture a pixel disegnate all'avvio (buildPergamena) e
+   ripetute dal CSS: costano quanto un colore pieno. */
+#screen.perg{background:linear-gradient(180deg,rgba(5,4,8,.93) 0%,rgba(6,5,9,.96) 100%)}
+#screen.perg .lore{max-width:352px;padding:0 6px;overflow-x:hidden}
+.pgRullo{position:sticky;height:45px;z-index:3;margin:0 -2px;
+  image-rendering:pixelated;image-rendering:crisp-edges;
+  background-repeat:repeat-x;background-size:24px 45px;
+  box-shadow:0 3px 12px rgba(0,0,0,.85)}
+.pgRullo.alto{top:0}
+.pgRullo.basso{bottom:0;box-shadow:0 -3px 12px rgba(0,0,0,.85)}
+/* i pomoli: due blocchi di legno più scuro che sporgono ai capi del rullo */
+.pgRullo::before,.pgRullo::after{content:'';position:absolute;top:-5px;width:9px;height:55px;
+  background:#4a3018;border-left:1px solid #2a1b0e;border-right:1px solid #2a1b0e}
+.pgRullo::before{left:1px}
+.pgRullo::after{right:1px}
+.pgCarta{image-rendering:pixelated;background-repeat:repeat;background-size:96px 96px;
+  padding:18px 15px 22px;text-align:left;color:#3b2a17;
+  font-size:9.5px;line-height:1.95;letter-spacing:.01em;
+  box-shadow:inset 0 0 26px rgba(110,80,38,.55),inset 0 0 3px rgba(70,50,20,.6)}
+#screen.perg .lore .pgCarta b{color:#241708;font-weight:600}
+#screen.perg .lore .pgCarta i{color:#6a4a16;font-style:italic}
+#screen.perg .lore .pgQ b{color:#8a2b1e}
+.pgH{margin:20px 0 7px;font-size:9px;letter-spacing:.26em;color:#8a2b1e;
+  border-bottom:1px solid #b39a6d;padding-bottom:4px}
+.pgH:first-child{margin-top:0}
+.pgOc{float:left;font-size:22px;line-height:.95;color:#8a2b1e;margin:1px 6px 0 0}
+.pgN{display:flex;gap:8px;align-items:baseline;padding:6px 0;
+  border-bottom:1px solid rgba(120,95,50,.35)}
+/* i colori delle nature sono nati per il fondo nero del campo: su carta chiara
+   sparirebbero. Diventano sigilli scuri — il colore resta, il contrasto torna */
+.pgNn{flex:0 0 66px;font-size:7.5px;letter-spacing:.12em;font-weight:600;text-align:center;
+  background:#2b1e12;border:1px solid #17100a;border-radius:2px;padding:3px 2px}
+.pgNd{flex:1 1 auto;font-size:9px;line-height:1.75}
+.pgNc{display:block;font-size:7.5px;letter-spacing:.12em;color:#7a5a2a;margin-top:2px}
+.pgQ{margin:9px 0;padding:7px 9px;border-left:2px solid #8a2b1e;
+  background:rgba(150,120,70,.18);font-size:9px;line-height:1.8}
+.pgQ b{color:#8a2b1e}
+.pgT{width:100%;border-collapse:collapse;margin:6px 0;font-size:8.5px}
+.pgT td,.pgT th{border-bottom:1px solid rgba(120,95,50,.35);padding:3px 4px;text-align:left}
+.pgT th{font-size:7.5px;letter-spacing:.14em;color:#7a5a2a;font-weight:600}
+.pgT td.n{text-align:right;font-variant-numeric:tabular-nums}
 /* mappa della campagna */
 #tappe{display:none;image-rendering:pixelated;image-rendering:crisp-edges;
   margin:16px 0 6px;border:1px solid #2b2434;background:#0a0810;max-width:100%}
@@ -197,6 +241,20 @@ canvas#menubg.off{display:none}
 .armR .ar{font-size:7.5px;letter-spacing:.18em;color:#7d6a4a;margin-left:6px}
 .armR .ad{display:block;font-size:8.5px;line-height:1.6;color:#7a6f60;margin-top:3px}
 .armR .ad i{color:#8fa5b0;font-style:normal}
+/* la pastiglia della natura del danno: colore e parola, prima dei numeri */
+.natP{display:inline-block;border:1px solid #3a3344;border-radius:2px;padding:1px 4px;
+  margin-right:5px;font-size:7px;letter-spacing:.18em;vertical-align:1px}
+.natP.sost{color:#7d6a4a}
+/* le tempre nel compendio: che cosa regge una schiera e dove è scoperta */
+.tmpB{border:1px solid #241f2b;border-radius:3px;padding:6px 7px;margin-bottom:5px;
+  background:rgba(14,11,19,.5)}
+.tmpN{font-size:9px;letter-spacing:.16em;color:#c9a227;margin-bottom:4px}
+.tmpR{font-size:8px;letter-spacing:.1em;color:#7a6f60;line-height:2}
+.tmpR b{display:inline-block;width:62px;color:#8b7f6c;font-weight:600;letter-spacing:.16em}
+.tmpR.sc b{color:#b4636b}
+.tmp{display:inline-block;border:1px solid #3a3344;border-radius:2px;padding:1px 4px;
+  margin-right:4px;font-size:7.5px;letter-spacing:.12em}
+.cmpN{font-size:8px;letter-spacing:.18em;color:#8fa5b0}
 .armActions{flex:0 0 63px;display:flex;flex-direction:column;gap:5px}
 .armActions button,.armBack,.armInfoPick{min-height:24px;padding:4px 3px;border-radius:2px;
   font:600 7.5px/1.2 ui-monospace,monospace;letter-spacing:.08em}
@@ -1757,6 +1815,68 @@ function buildPercorso(a){
 }
 buildPercorso(1);
 
+/* ═══════════ I SEI MODI DI FAR MALE ═══════════
+   Un colpo non è più solo un numero: è un numero e una **natura**. La natura
+   decide due cose, e sono le sole due che contano nel conto del danno:
+
+     `corazza`  quanta della corazza avversaria morde quel danno. 1 = la
+                corazza lo ferma tutto, 0 = non lo vede nemmeno passare.
+     `res`      quanto quella creatura lo sopporta (sta dall'altra parte,
+                nelle schiere: vedi RES).
+
+   Un edificio può derogare alla sua natura dichiarando `ap` — quanto trapassa
+   — ma solo se il suo carattere lo dice a parole: il mangano *sfonda*, la
+   rotaia va *oltre ogni corazza*. Senza `ap` eredita la corazza del suo tipo, e
+   così un edificio nuovo nasce già coerente col resto.
+
+   `dot` è quel che il colpo lascia addosso: un danno che continua da solo dopo
+   che chi l'ha inferto guarda altrove. Ustione e veleno sono i due che ci sono;
+   ignorano la corazza per definizione — bruciano e marciscono *dentro* — ma non
+   le resistenze, che si applicano quando si appiccano.
+
+   Il conto, in ordine:  (danno × resistenza) − corazza×morde,  minimo 1.
+   La resistenza prima, la corazza dopo: la creatura assorbe la sua parte, poi
+   la piastra ferma quel che resta. Un fondo di 1 c'è sempre, se no un bersaglio
+   molto corazzato diventerebbe immortale invece che duro. */
+const DANNI={
+  fisico:{nome:'FISICO',col:'#cbbb98',corazza:1,
+    breve:'la corazza lo ferma tutto',
+    desc:'Ferro, pietra, quadrelli. È il danno che non chiede niente e non '+
+      'perdona niente: <i>contro un corazzato non passa</i>. Fa strage di '+
+      'fanteria e si spunta sulle piastre.'},
+  fuoco:{nome:'FUOCO',col:'#e8a03a',corazza:.5,dot:'ustione',
+    breve:'passa metà corazza e resta addosso',
+    desc:'Passa metà della corazza e non finisce col colpo: <i>lascia '+
+      'l\'ustione</i>, che continua a mangiare vita da sola. Sotto ai gruppi '+
+      'fitti vale il doppio di quel che dice.'},
+  arcano:{nome:'ARCANO',col:'#f0e6d0',corazza:0,nomeM:{2:'QUANTISTICO'},
+    breve:'la corazza non lo vede',
+    desc:'Non tocca la materia, quindi <i>la corazza non lo vede</i>. È la '+
+      'risposta a tutto ciò che è piastrato — ed è per questo che chi ha '+
+      'imparato a difendersene lo sopporta meglio di ogni altra cosa.'},
+  gelo:{nome:'GELO',col:'#9fd8e8',corazza:.6,
+    breve:'morde poco, ma trattiene',
+    desc:'Fa male poco e <i>trattiene</i>: il suo mestiere è il tempo che ti '+
+      'regala, non la vita che toglie. La corazza lo morde ancora parecchio.'},
+  folgore:{nome:'FOLGORE',col:'#7ee0ff',corazza:.35,
+    breve:'scavalca quasi tutta la corazza',
+    desc:'Scavalca quasi tutta la corazza: passa dove il ferro tocca il ferro. '+
+      'Ma tutto ciò che è fatto di protocolli l\'ha già visto arrivare.'},
+  veleno:{nome:'VELENO',col:'#8fd46a',corazza:0,dot:'tossico',
+    breve:'ignora la corazza, uccide dopo',
+    desc:'Non fa quasi niente sul colpo: <i>marcisce</i>. Ignora la corazza — '+
+      'entra da sotto — ma su ciò che è già morto, o che non è mai stato vivo, '+
+      'trova poco da guastare.'}
+};
+const TDANNO=['fisico','fuoco','arcano','gelo','folgore','veleno'];
+/* «SACRO» sul sagrato, «QUANTISTICO» sotto il neon: è la stessa natura, e la
+   sola parola che cambia da un mondo all'altro sta in `nomeM`. */
+function nomeDanno(k,m){
+  const D=DANNI[k];if(!D)return '';
+  return (D.nomeM&&D.nomeM[m===undefined?mondoDi(G.act):m])||D.nome;
+}
+const colDanno=k=>(DANNI[k]||DANNI.fisico).col;
+
 /* ─────────── TORRI ─────────── */
 /* Sedici edifici, quattro in campo: la quaterna si sceglie prima di scendere e
    non si cambia più fino alla fine della veglia. Ognuno ha un mestiere che gli
@@ -1768,43 +1888,43 @@ buildPercorso(1);
    mano fin dal principio — sono i quattro storici e nessun altro. Chi aggiunge
    un edificio a un mondo nuovo scrive due numeri qui e non tocca altro. */
 const TOWERS={
-  spine:{name:'TORRE DELLE SPINE',short:'SPINE',ruolo:'TIRO RAPIDO',cost:45,dmg:9,rate:.55,range:48,ap:0,
+  spine:{name:'TORRE DELLE SPINE',short:'SPINE',ruolo:'TIRO RAPIDO',cost:45,dmg:9,rate:.55,range:48,nat:'fisico',
     mondo:1,ucc:0,desc:'Quadrelli rapidi su un solo bersaglio.'},
-  braciere:{name:'BRACIERE VOTIVO',short:'BRACIERE',ruolo:'AREA',cost:80,dmg:11,rate:1.25,range:42,ap:.5,
+  braciere:{name:'BRACIERE VOTIVO',short:'BRACIERE',ruolo:'AREA',cost:80,dmg:11,rate:1.25,range:42,nat:'fuoco',
     mondo:1,ucc:0,splash:15,burn:5,desc:'Fuoco ad area, incendia e ignora metà corazza.'},
-  campana:{name:'CAMPANA DEL SILENZIO',short:'CAMPANA',ruolo:'RALLENTA',cost:65,dmg:7,rate:1.9,range:40,ap:1,
+  campana:{name:'CAMPANA DEL SILENZIO',short:'CAMPANA',ruolo:'RALLENTA',cost:65,dmg:7,rate:1.9,range:40,nat:'arcano',
     mondo:1,ucc:0,aura:true,slow:.45,desc:'Rallenta del 45% e percuote tutti nell\'aura.'},
-  reliquiario:{name:'RELIQUIARIO',short:'RELIQUIARIO',ruolo:'GITTATA',cost:140,dmg:52,rate:2.2,range:82,ap:1,
+  reliquiario:{name:'RELIQUIARIO',short:'RELIQUIARIO',ruolo:'GITTATA',cost:140,dmg:52,rate:2.2,range:82,nat:'arcano',
     mondo:1,ucc:0,beam:true,desc:'Raggio istantaneo, lunga gittata, trapassa ogni corazza.'},
-  ossario:{name:'OSSARIO',short:'OSSARIO',ruolo:'MACINA',cost:45,dmg:8,rate:.45,range:31,ap:.25,
-    mondo:1,ucc:250,aura:true,slow:0,desc:'Non mira: rode chiunque gli passi accanto. Gittata cortissima, '+
-    'va dove la via si stringe.'},
-  salmodia:{name:'SALMODIA',short:'SALMODIA',ruolo:'SOSTEGNO',cost:95,dmg:0,rate:0,range:44,ap:0,
+  ossario:{name:'OSSARIO',short:'OSSARIO',ruolo:'MACINA',cost:45,dmg:5,rate:.45,range:31,nat:'veleno',
+    mondo:1,ucc:250,aura:true,slow:0,tox:2,desc:'Non mira: <i>rode</i> chiunque gli passi accanto, e il '+
+    'marciume resta a lavorare. Gittata cortissima, va dove la via si stringe.'},
+  salmodia:{name:'SALMODIA',short:'SALMODIA',ruolo:'SOSTEGNO',cost:95,dmg:0,rate:0,range:44,
     mondo:1,ucc:2800,sostegno:{dmg:.22,rate:.11},desc:'Non colpisce: gli edifici che la odono battono '+
     '<i>più forte e più spesso</i>.'},
-  mangano:{name:'MANGANO',short:'MANGANO',ruolo:'COLPO GROSSO',cost:112,dmg:84,rate:2.8,range:54,ap:.8,
+  mangano:{name:'MANGANO',short:'MANGANO',ruolo:'COLPO GROSSO',cost:112,dmg:84,rate:2.8,range:54,nat:'fisico',ap:.8,
     mondo:1,ucc:2100,desc:'Un colpo solo, lento ed enorme, che sfonda quasi ogni corazza. Sulla truppa fitta '+
     'è uno spreco.'},
-  arpione:{name:'ARPIONE',short:'ARPIONE',ruolo:'ARRETRA',cost:80,dmg:7,rate:1.8,range:50,ap:.5,
+  arpione:{name:'ARPIONE',short:'ARPIONE',ruolo:'ARRETRA',cost:80,dmg:7,rate:1.8,range:50,nat:'fisico',ap:.5,
     mondo:1,ucc:1000,pull:13,desc:'Fa poco male: <i>ributta indietro</i> lungo la via. Le cose grosse le smuove '+
     'poco, il Signore quasi niente.'},
-  caldaia:{name:'CALDAIA DI PECE',short:'CALDAIA',ruolo:'PECE',cost:95,dmg:13,rate:2.2,range:44,ap:.5,
+  caldaia:{name:'CALDAIA DI PECE',short:'CALDAIA',ruolo:'PECE',cost:95,dmg:13,rate:2.2,range:44,nat:'fuoco',
     mondo:1,ucc:1500,pozza:{r:19,dur:4.5},desc:'Versa pece che <i>resta a bruciare</i>: non un colpo, un tratto '+
     'di strada che fa male finché dura.'},
-  scongiuro:{name:'SCONGIURO',short:'SCONGIURO',ruolo:'SCORTICA',cost:78,dmg:0,rate:0,range:42,ap:0,
+  scongiuro:{name:'SCONGIURO',short:'SCONGIURO',ruolo:'SCORTICA',cost:78,dmg:0,rate:0,range:42,
     mondo:1,ucc:600,cut:.55,desc:'Non fa male: <i>scrosta la corazza</i> di chi passa, e i colpi degli altri '+
     'mordono. Il rovescio della salmodia.'},
-  impulso:{name:'RIPETITORE A IMPULSI',short:'IMPULSO',ruolo:'RAFFICA',cost:58,dmg:8,rate:.34,range:52,ap:.12,
+  impulso:{name:'RIPETITORE A IMPULSI',short:'IMPULSO',ruolo:'RAFFICA',cost:58,dmg:8,rate:.34,range:52,nat:'folgore',
     mondo:2,ucc:250,desc:'Una raffica di fotoni: poco per colpo, quasi nessuna pausa.'},
-  plasma:{name:'FORGIA AL PLASMA',short:'PLASMA',ruolo:'AREA',cost:105,dmg:16,rate:1.35,range:46,ap:.55,
+  plasma:{name:'FORGIA AL PLASMA',short:'PLASMA',ruolo:'AREA',cost:105,dmg:16,rate:1.35,range:46,nat:'fuoco',
     mondo:2,ucc:1500,splash:18,burn:7,desc:'Fonde gruppi e corazze in una pozza di luce.'},
-  stasi:{name:'FARO DI STASI',short:'STASI',ruolo:'RALLENTA',cost:88,dmg:6,rate:1.55,range:46,ap:1,
+  stasi:{name:'FARO DI STASI',short:'STASI',ruolo:'RALLENTA',cost:88,dmg:6,rate:1.55,range:46,nat:'gelo',
     mondo:2,ucc:600,aura:true,slow:.52,desc:'Piega il tempo locale e consuma ogni intruso nell’aura.'},
-  rotaia:{name:'OBELISCO A ROTAIA',short:'ROTAIA',ruolo:'PRECISIONE',cost:155,dmg:66,rate:2.35,range:90,ap:1,
+  rotaia:{name:'OBELISCO A ROTAIA',short:'ROTAIA',ruolo:'PRECISIONE',cost:155,dmg:66,rate:2.35,range:90,nat:'folgore',ap:1,
     mondo:2,ucc:2100,beam:true,desc:'Un colpo lineare, istantaneo, oltre ogni corazza.'},
-  sciame:{name:'NIDO DI DRONI',short:'SCIAME',ruolo:'SOSTEGNO',cost:118,dmg:0,rate:0,range:50,ap:0,
+  sciame:{name:'NIDO DI DRONI',short:'SCIAME',ruolo:'SOSTEGNO',cost:118,dmg:0,rate:0,range:50,
     mondo:2,ucc:2800,sostegno:{dmg:.25,rate:.14},desc:'I droni riallineano le armi vicine: più danno, meno attesa.'},
-  disturbo:{name:'JAMMER DEL VUOTO',short:'JAMMER',ruolo:'DISARMA',cost:96,dmg:0,rate:0,range:48,ap:0,
+  disturbo:{name:'JAMMER DEL VUOTO',short:'JAMMER',ruolo:'DISARMA',cost:96,dmg:0,rate:0,range:48,
     mondo:2,ucc:1000,cut:.62,desc:'Spegne i protocolli difensivi e apre le corazze al fuoco alleato.'}
 };
 /* l'ordine in cui l'armeria li mostra: prima i quattro di sempre */
@@ -1823,10 +1943,23 @@ const NSLOT=4;   // quanti se ne portano in campo
    loro. Sedici edifici stanno in sedici bit, e accenderne uno costa un OR:
    si può fare nei cicli caldi senza pensarci. */
 const TBIT={};TORDER.forEach((k,i)=>{TBIT[k]=1<<i;});
+/* `morde` è quanta corazza avversaria conta contro questo edificio: la eredita
+   dalla sua natura, salvo che dichiari `ap` per conto suo. Si calcola qui una
+   volta per grado, non a ogni colpo. */
+const mordeDi=b=>b.ap!==undefined?1-b.ap:(DANNI[b.nat]||DANNI.fisico).corazza;
+/* quanto la corazza avversaria conta, detto a parole: è il numero che il
+   giocatore deve leggere prima di scegliere contro chi mandarlo */
+function corazzaDice(m){
+  if(m<=0)return 'la corazza non lo ferma';
+  if(m<=.4)return 'quasi tutta la corazza scavalcata';
+  if(m<.9)return 'passa il '+Math.round((1-m)*100)+'% della corazza';
+  return 'la corazza lo ferma tutto';
+}
 function tstats(t){
   const b=TOWERS[t.type],l=t.lv-1,m=Math.pow(1.62,l);
   return {dmg:Math.round(b.dmg*m),rate:b.rate*Math.pow(.9,l),range:b.range*Math.pow(1.12,l),
-    ap:b.ap,splash:b.splash?b.splash+l*3:0,burn:b.burn?b.burn*m:0,
+    nat:b.nat,morde:mordeDi(b),
+    splash:b.splash?b.splash+l*3:0,burn:b.burn?b.burn*m:0,tox:b.tox?b.tox*m:0,
     slow:b.slow?Math.min(.72,b.slow+l*.08):0,
     pull:b.pull?b.pull*Math.pow(1.22,l):0,
     cut:b.cut?Math.min(.92,b.cut+l*.09):0,
@@ -1861,7 +1994,8 @@ const ENEMIES={
   penitente:{name:'Penitente',hp:36,speed:29,armor:0,bounty:5,dmg:1},
   flagellante:{name:'Flagellante',hp:28,speed:56,armor:0,bounty:6,dmg:1},
   portatore:{name:'Portatore di Ceneri',hp:130,speed:19,armor:5,bounty:12,dmg:2},
-  ombra:{name:'Ombra',hp:54,speed:46,armor:2,bounty:9,dmg:1,slowResist:.6,alpha:.78,float:true},
+  ombra:{name:'Ombra',hp:54,speed:46,armor:2,bounty:9,dmg:1,slowResist:.6,alpha:.78,float:true,
+    res:{fisico:.5,arcano:-.25}},
   colosso:{name:'Colosso del Giogo',hp:380,speed:12,armor:9,bounty:45,dmg:3,
     big:true,slowResist:.45,breakAt:.5},
   vescovo:{name:'Vescovo Marcio',hp:900,speed:16,armor:8,bounty:90,dmg:6,boss:true,spawner:4},
@@ -1870,51 +2004,91 @@ const ENEMIES={
   imp:{name:'Imp',hp:33,speed:58,armor:0,bounty:7,dmg:1},
   golem:{name:'Golem di Scorie',hp:160,speed:19,armor:7,bounty:14,dmg:2},
   dannata:{name:'Anima Dannata',hp:64,speed:47,armor:3,bounty:10,dmg:1,
-    slowResist:.6,alpha:.8,float:true},
+    slowResist:.6,alpha:.8,float:true,res:{fisico:.5,arcano:-.25,fuoco:.5}},
   titano:{name:'Titano di Magma',hp:460,speed:12,armor:11,bounty:55,dmg:3,
     big:true,slowResist:.45,breakAt:.5},
   arcidemone:{name:'Arcidemone',hp:1150,speed:16,armor:10,bounty:110,dmg:6,boss:true,spawner:4},
   // I SIGNORI: se varcano la soglia, la veglia finisce comunque
   santo:{name:'Il Santo Sepolto',hp:1250,speed:9,armor:14,bounty:400,dmg:99,
-    final:true,big:true,slowResist:.7,breakAt:.45,spawner:5},
+    final:true,big:true,slowResist:.7,breakAt:.45,spawner:5,res:{arcano:.25,fisico:-.25}},
   signore:{name:'Il Signore del Fondo',hp:650,speed:9,armor:16,bounty:500,dmg:99,
-    final:true,big:true,slowResist:.7,breakAt:.45,spawner:4},
+    final:true,big:true,slowResist:.7,breakAt:.45,spawner:4,res:{fuoco:.5,gelo:-.35}},
   // ATTO III
   cherubino:{name:'Cherubino Cieco',hp:52,speed:31,armor:2,bounty:7,dmg:1},
   serafino:{name:'Serafino',hp:38,speed:60,armor:1,bounty:8,dmg:1},
   trono:{name:'Trono',hp:190,speed:19,armor:9,bounty:16,dmg:2},
   voce:{name:'Voce dall\'Alto',hp:74,speed:48,armor:4,bounty:11,dmg:1,
-    slowResist:.65,alpha:.82,float:true},
+    slowResist:.65,alpha:.82,float:true,res:{fisico:.5,arcano:.3}},
   mietitore:{name:'Mietitore',hp:540,speed:12,armor:13,bounty:65,dmg:3,
     big:true,slowResist:.45,breakAt:.5},
   tromba:{name:'La Tromba',hp:1350,speed:16,armor:12,bounty:130,dmg:6,boss:true,spawner:4},
   agnello:{name:'L\'Agnello',hp:290,speed:9,armor:18,bounty:600,dmg:99,
-    final:true,big:true,slowResist:.7,breakAt:.45,spawner:4},
+    final:true,big:true,slowResist:.7,breakAt:.45,spawner:4,res:{arcano:.35,veleno:-.35}},
   // MONDO II · I BASSIFONDI NEON
   pacchetto:{name:'Pacchetto Randagio',hp:42,speed:34,armor:2,bounty:8,dmg:1},
   corridore:{name:'Corridore Cromato',hp:31,speed:67,armor:1,bounty:9,dmg:1},
   sbirro:{name:'Sbirro Antisommossa',hp:175,speed:20,armor:10,bounty:18,dmg:2},
-  eco:{name:'Eco Olografica',hp:70,speed:54,armor:4,bounty:13,dmg:1,slowResist:.68,alpha:.76,float:true},
+  eco:{name:'Eco Olografica',hp:70,speed:54,armor:4,bounty:13,dmg:1,slowResist:.68,alpha:.76,float:true,
+    res:{fisico:.6,veleno:.6,folgore:-.35}},
   scaricatore:{name:'Scaricatore Industriale',hp:510,speed:13,armor:15,bounty:72,dmg:3,big:true,slowResist:.5,breakAt:.5},
   oracolo:{name:'Oracolo di Quartiere',hp:1450,speed:17,armor:14,bounty:145,dmg:6,boss:true,spawner:4},
-  nucleo:{name:'Nucleo di Sorveglianza',hp:310,speed:9,armor:20,bounty:700,dmg:99,final:true,big:true,slowResist:.75,breakAt:.45,spawner:5},
+  nucleo:{name:'Nucleo di Sorveglianza',hp:310,speed:9,armor:20,bounty:700,dmg:99,final:true,big:true,slowResist:.75,breakAt:.45,spawner:5,
+    res:{arcano:.3,veleno:.6,folgore:-.25}},
   // MONDO II · IL DISTRETTO ACIDO
   acaro:{name:'Acaro Sintetico',hp:48,speed:35,armor:3,bounty:9,dmg:1},
   lama:{name:'Lama Corriere',hp:35,speed:69,armor:2,bounty:10,dmg:1},
   hazmat:{name:'Hazmat Corazzato',hp:205,speed:20,armor:12,bounty:20,dmg:2},
-  fantasma_dati:{name:'Fantasma di Dati',hp:78,speed:55,armor:5,bounty:14,dmg:1,slowResist:.7,alpha:.78,float:true},
+  fantasma_dati:{name:'Fantasma di Dati',hp:78,speed:55,armor:5,bounty:14,dmg:1,slowResist:.7,alpha:.78,float:true,
+    res:{fisico:.6,veleno:.7,folgore:-.3}},
   mutante:{name:'Mutante da Carico',hp:590,speed:13,armor:17,bounty:82,dmg:3,big:true,slowResist:.52,breakAt:.5},
   direttore:{name:'Direttore Esecutivo',hp:1650,speed:17,armor:16,bounty:165,dmg:6,boss:true,spawner:4},
-  reattore:{name:'Bestia Reattore',hp:340,speed:9,armor:22,bounty:800,dmg:99,final:true,big:true,slowResist:.78,breakAt:.45,spawner:5},
+  reattore:{name:'Bestia Reattore',hp:340,speed:9,armor:22,bounty:800,dmg:99,final:true,big:true,slowResist:.78,breakAt:.45,spawner:5,
+    res:{fuoco:.45,veleno:.6,gelo:-.35}},
   // MONDO II · LA GRIGLIA NERA
   frammento:{name:'Frammento di Sicurezza',hp:55,speed:36,armor:4,bounty:10,dmg:1},
   ciclista:{name:'Ciclista di Luce',hp:39,speed:72,armor:3,bounty:11,dmg:1},
   sentinella:{name:'Sentinella Bianca',hp:235,speed:21,armor:14,bounty:22,dmg:2},
-  nulla:{name:'Spettro Null',hp:86,speed:57,armor:6,bounty:15,dmg:1,slowResist:.72,alpha:.8,float:true},
+  nulla:{name:'Spettro Null',hp:86,speed:57,armor:6,bounty:15,dmg:1,slowResist:.72,alpha:.8,float:true,
+    res:{fisico:.6,veleno:.7,arcano:-.3}},
   assedio:{name:'Costrutto d’Assedio',hp:675,speed:13,armor:19,bounty:94,dmg:3,big:true,slowResist:.55,breakAt:.5},
   arconte:{name:'Arconte di Sistema',hp:1880,speed:17,armor:18,bounty:188,dmg:6,boss:true,spawner:4},
-  matrice:{name:'La Matrice Nera',hp:380,speed:9,armor:24,bounty:900,dmg:99,final:true,big:true,slowResist:.8,breakAt:.45,spawner:5}
+  matrice:{name:'La Matrice Nera',hp:380,speed:9,armor:24,bounty:900,dmg:99,final:true,big:true,slowResist:.8,breakAt:.45,spawner:5,
+    res:{folgore:.5,fisico:.3,arcano:-.3}}
 };
+/* ═══════════ COME SI DIFENDONO LE SCHIERE ═══════════
+   Alla corazza — che è una sottrazione, e vale solo contro chi la corazza la
+   sente — si affianca la **tempra**: quanto una creatura sopporta una natura di
+   danno. Positivo resiste, negativo scopre il fianco: `.5` vuol dire che ne
+   prende metà, `-.3` che ne prende un terzo in più.
+
+   La tempra è di un mondo prima che di una creatura, perché è la sua storia a
+   deciderla: chi vive nel fuoco non lo teme, chi è stato giudicato ha già visto
+   il sacro, chi è fatto di protocolli sa cosa aspettarsi da un impulso. Sta
+   quindi per atto in `RES`, e una singola creatura la corregge con `res` solo
+   quando è lei a essere diversa dalle sue — i fantasmi, che il ferro passa
+   attraverso, e i Signori, che ognuno ha la sua.
+
+   Ogni riga ha una resistenza **e** una scopertura: una veglia non deve poter
+   essere vinta con una natura sola, ma nemmeno chiuderne una senza aprirne
+   un'altra — se no la risposta è «cambia quaterna» e non «mescola». */
+const RES={
+  1:{},                                            // carne e cilicio: nessuna virtù
+  2:{fuoco:.35, veleno:.3, gelo:-.3,  arcano:-.2}, // il fondo brucia già di suo, e non marcisce
+  3:{arcano:.25,veleno:-.3,fisico:-.25},           // le schiere del giudizio conoscono il sacro
+  4:{arcano:.2, folgore:-.3},                      // i santi non parlano la lingua della città
+  5:{veleno:.5, fuoco:.25, folgore:-.3, gelo:-.2}, // in fabbrica il veleno è l'aria di casa
+  6:{folgore:.4,fisico:.25,arcano:-.3}             // la Griglia l'impulso l'ha già visto arrivare
+};
+/* la tempra di una creatura in un atto: quella del mondo, corretta da lei.
+   Si compone una volta per specie e si tiene da parte — nel conto del danno
+   dev'essere una lettura, non un calcolo. */
+const RESCACHE={};
+function resDi(a,tipo){
+  const k=a+':'+tipo,c=RESCACHE[k];
+  if(c)return c;
+  const o=Object.assign({},RES[a]||{},(ENEMIES[tipo]||{}).res||{});
+  RESCACHE[k]=o;return o;
+}
 /* i due atti condividono la struttura delle ondate, non le creature */
 const ROSTER={
   1:{base:'penitente',fast:'flagellante',tank:'portatore',ghost:'ombra',big:'colosso',
@@ -1948,13 +2122,13 @@ const ATTO={
   1:{hud:'VEGLIA ',  btn:'SUONA LA CAMPANA · ', nome:"LA VEGLIA",
      sotto:'IL SAGRATO DI CENERE', hp:1,   lac:130,  sig:0},
   2:{hud:'DISCESA ', btn:'APRI LA CREPA · ',    nome:"LA DISCESA",
-     sotto:'IL FONDO CHE SALE',    hp:2.8, lac:850,  sig:2},
+     sotto:'IL FONDO CHE SALE',    hp:2.5, lac:850,  sig:2},
   3:{hud:'GIUDIZIO ',btn:'ROMPI IL SIGILLO · ', nome:"IL GIUDIZIO",
-     sotto:'IL CIELO APERTO',      hp:4.6, lac:1350, sig:4},
+     sotto:'IL CIELO APERTO',      hp:3.4, lac:1350, sig:4},
   4:{hud:'NEON ',btn:'APRI IL CANALE · ',nome:'I BASSIFONDI',
      sotto:'PIOGGIA SUL LIVELLO ZERO',hp:5.8,lac:2100,sig:6},
   5:{hud:'ACIDO ',btn:'SOVRACCARICA · ',nome:'IL DISTRETTO ACIDO',
-     sotto:'LE FABBRICHE NON DORMONO',hp:7.2,lac:3200,sig:8},
+     sotto:'LE FABBRICHE NON DORMONO',hp:5.9,lac:3200,sig:8},
   6:{hud:'GRIGLIA ',btn:'ESEGUI IL PROTOCOLLO · ',nome:'LA GRIGLIA NERA',
      sotto:'OLTRE IL CODICE',hp:5.2,lac:4700,sig:10}
 };
@@ -3472,26 +3646,44 @@ function spawn(type,wave,seg,segD){
     armor:d.armor+Math.floor(wDur(wave)/7),
     bounty:Math.round(d.bounty*(1+.055*(wa-1))),
     seg:seg||0,segD:segD||0,x:PATHPX[0].x,y:PATHPX[0].y,dir:1,prog:0,
-    slowAmt:0,burn:0,burnT:0,flash:0,bob:Math.random()*6,alive:true,spawnT:0,
-    stepT:.3,broken:false,mani:0};
+    slowAmt:0,burn:0,burnT:0,tox:0,toxT:0,flash:0,bob:Math.random()*6,alive:true,spawnT:0,
+    stepT:.3,broken:false,mani:0,res:resDi(G.act,type)};
   if(d.final){G.bossRef=e;G.shake=8;SFX.roar();
     banner(d.name.toUpperCase(),'SE VARCA LA SOGLIA È FINITA');}
   G.enemies.push(e);
   return e;
 }
-/* `mani` sono gli edifici da cui viene il colpo: quello che ha sparato e i
-   cori che lo sostenevano. Va portato fin qui da tutte le strade — proiettile,
-   pece, aura, raggio — se no un edificio lavora e un altro incassa i gradi.
-   L'ustione non ha bisogno di niente: il bit è già entrato quando la fiamma è
-   stata appiccata, e la creatura se lo porta dietro fino a che cade. */
-function damage(e,amt,ap,mani){
+/* Il conto del danno, e sta tutto qui.
+   `nat`  la natura del colpo: decide quanto la tempra della creatura lo
+          sopporta e, se l'edificio non deroga, quanta corazza morde
+   `morde` quanta della corazza conta contro questo colpo (0 = la scavalca)
+   `mani` gli edifici da cui viene: quello che ha sparato e i cori che lo
+          sostenevano. Va portato fin qui da tutte le strade — proiettile,
+          pece, aura, raggio — se no un edificio lavora e un altro incassa
+          i gradi. L'ustione non ha bisogno di niente: il bit è già entrato
+          quando la fiamma è stata appiccata.
+
+   Prima la tempra, poi la corazza: la creatura assorbe la sua parte e la
+   piastra ferma quel che resta. Il fondo di 1 c'è sempre — un bersaglio molto
+   corazzato dev'essere duro, non immortale. */
+function damage(e,amt,nat,morde,mani){
+  const r=nat&&e.res?(e.res[nat]||0):0;
   // lo scongiuro scrosta: la corazza che conta è quella che gli resta addosso
-  const arm=e.armor*(1-(e.armorCut||0));
-  const eff=Math.max(1,amt-arm*(1-(ap||0)));
+  const arm=e.armor*(1-(e.armorCut||0))*(morde===undefined?1:morde);
+  const eff=Math.max(1,amt*(1-r)-arm);
   e.hp-=eff;e.flash=.09;
   if(mani)e.mani=(e.mani|0)|mani;
   checkBreak(e);
   if(e.hp<=0&&e.alive)kill(e);
+}
+/* I due danni che restano addosso. Ignorano la corazza per definizione —
+   bruciano e marciscono dentro — ma non la tempra, che si applica una volta
+   sola quando si appiccano: al tic non deve restare che una sottrazione. */
+function appicca(e,dps,dur,nat){
+  const v=dps*(1-((e.res&&e.res[nat])||0));
+  if(v<=0)return;
+  if(nat==='veleno'){e.tox=Math.max(e.tox||0,v);e.toxT=dur;}
+  else{e.burn=Math.max(e.burn,v);e.burnT=dur;}
 }
 function checkBreak(e){
   if(e.def.breakAt&&!e.broken&&e.hp>0&&e.hp<=e.max*e.def.breakAt)breakArmor(e);
@@ -3629,8 +3821,13 @@ function update(dt){
     const e=G.enemies[i];
     if(!e.alive){G.enemies.splice(i,1);continue;}
     e.flash=Math.max(0,e.flash-dt);e.bob+=dt*6;
+    // quel che resta addosso: brucia e marcisce anche quando nessuno spara.
+    // La tempra è già stata contata quando si è appiccato, qui è una sottrazione
     if(e.burnT>0){e.burnT-=dt;e.hp-=e.burn*dt;checkBreak(e);
       if(Math.random()<dt*9)part(e.x+(Math.random()*6-3),e.y-4,0,-14,.4,C.ember,-10);
+      if(e.hp<=0){kill(e);continue;}}
+    if(e.toxT>0){e.toxT-=dt;e.hp-=e.tox*dt;checkBreak(e);
+      if(Math.random()<dt*7)part(e.x+(Math.random()*6-3),e.y-3,0,-9,.5,DANNI.veleno.col,-6);
       if(e.hp<=0){kill(e);continue;}}
     // passi del colosso
     if(e.def.big){
@@ -3680,7 +3877,8 @@ function update(dt){
     if(s.pozR){
       // la pece non scoppia: si posa, e resta a bruciare dov'è caduta
       SFX.fire();
-      G.pozze.push({x:s.x,y:s.y,r:s.pozR,t:s.pozT,max:s.pozT,dps:s.dmg,ap:s.ap,mani:s.mani});
+      G.pozze.push({x:s.x,y:s.y,r:s.pozR,t:s.pozT,max:s.pozT,dps:s.dmg,
+        nat:s.nat,morde:s.morde,mani:s.mani});
       burst(s.x,s.y,8,'#3a2418',40,.5,60);
       return;
     }
@@ -3693,14 +3891,14 @@ function update(dt){
         const e=G.enemies[i];if(!e.alive)continue;
         const dx=e.x-s.x,dy=e.y-s.y-4;
         if(dx*dx+dy*dy<sr2){
-          damage(e,s.dmg,s.ap,s.mani);
+          damage(e,s.dmg,s.nat,s.morde,s.mani);
           // l'ustione uccide dopo, quando chi l'ha appiccata guarda altrove:
           // il caduto resta suo
-          if(s.burn){e.burn=Math.max(e.burn,s.burn);e.burnT=3;}
+          if(s.burn)appicca(e,s.burn,3,'fuoco');
         }
       }
     }else if(s.target&&s.target.alive){
-      damage(s.target,s.dmg,s.ap,s.mani);SFX.hit();
+      damage(s.target,s.dmg,s.nat,s.morde,s.mani);SFX.hit();
       burst(s.x,s.y,3,'#c9b08a',34,.22,60);
       // l'arpione arretra chi è ancora vivo dopo il colpo
       if(s.pull&&s.target.alive)arretra(s.target,s.pull);
@@ -3715,7 +3913,7 @@ function update(dt){
     for(let j=0;j<G.enemies.length;j++){
       const e=G.enemies[j];if(!e.alive)continue;
       const dx=e.x-p.x,dy=e.y-4-p.y;
-      if(dx*dx+dy*dy<r2)damage(e,p.dps*dt,p.ap,p.mani);
+      if(dx*dx+dy*dy<r2)damage(e,p.dps*dt,p.nat,p.morde,p.mani);
     }
     if(Math.random()<dt*14)
       part(p.x+(Math.random()*2-1)*p.r*.8,p.y+(Math.random()*2-1)*p.r*.4,
@@ -3847,7 +4045,11 @@ function towerUpdate(t,dt){
         col:muta?'rgba(207,196,168,.75)':'#9fb8c8'});
       for(let i=0;i<G.enemies.length;i++){const e=G.enemies[i];
         const dx=e.x-t.x,dy=e.y-t.y;
-        if(e.alive&&dx*dx+dy*dy<r2)damage(e,st.dmg,cfg.ap,t.mani);}
+        if(e.alive&&dx*dx+dy*dy<r2){
+          damage(e,st.dmg,st.nat,st.morde,t.mani);
+          // l'ossario non morde e basta: lascia il marciume a lavorare
+          if(st.tox&&e.alive)appicca(e,st.tox,4,'veleno');
+        }}
     }
     return;
   }
@@ -3860,27 +4062,31 @@ function towerUpdate(t,dt){
     SFX.beam();
     G.beams.push({x1:t.x,y1:t.y-6,x2:target.x,y2:target.y-4,t:.16,
       col:t.type==='rotaia'?'#20d8ff':'#f5ecd0',halo:t.type==='rotaia'?'#ff3bd4':C.gold});
-    damage(target,st.dmg,1,t.mani);
+    damage(target,st.dmg,st.nat,st.morde,t.mani);
     burst(target.x,target.y-4,7,'#f0e6d0',60,.35,20);
     G.shake=1.6;
   }else if(cfg.splash){
     SFX.fire();
     G.shots.push({x:t.x,y:t.y-6,target,lx:target.x,ly:target.y-4,speed:78,dmg:st.dmg,
-      ap:st.ap,splash:st.splash,burn:st.burn,mani:t.mani,col:C.ember,life:3,type:'fire',trail:true,a:0});
+      nat:st.nat,morde:st.morde,splash:st.splash,burn:st.burn,mani:t.mani,
+      col:colDanno(st.nat),life:3,type:'fire',trail:true,a:0});
   }else if(cfg.pozza){
     SFX.fire();
     G.shots.push({x:t.x,y:t.y-6,target,lx:target.x,ly:target.y-4,speed:64,dmg:st.dmg,
-      ap:st.ap,pozR:st.pozR,pozT:st.pozT,mani:t.mani,col:'#3a2418',life:3,type:'fire',trail:true,a:0});
+      nat:st.nat,morde:st.morde,pozR:st.pozR,pozT:st.pozT,mani:t.mani,
+      col:'#3a2418',life:3,type:'fire',trail:true,a:0});
   }else if(cfg.pull){
     SFX.shoot();
     G.shots.push({x:t.x,y:t.y-8,target,lx:target.x,ly:target.y-4,speed:150,dmg:st.dmg,
-      ap:st.ap,pull:st.pull,mani:t.mani,col:'#8fa5b0',life:2.5,type:'bolt',trail:true,a:0});
+      nat:st.nat,morde:st.morde,pull:st.pull,mani:t.mani,
+      col:'#8fa5b0',life:2.5,type:'bolt',trail:true,a:0});
   }else{
     SFX.shoot();
     // il mangano è lento e pesante: si vede partire
     const grosso=st.rate>=2;
     G.shots.push({x:t.x,y:t.y-8,target,lx:target.x,ly:target.y-4,speed:grosso?120:165,
-      dmg:st.dmg,ap:st.ap,mani:t.mani,col:grosso?'#9c8f78':'#cbbb98',life:2.5,type:'bolt',a:0});
+      dmg:st.dmg,nat:st.nat,morde:st.morde,mani:t.mani,
+      col:grosso?'#9c8f78':colDanno(st.nat),life:2.5,type:'bolt',a:0});
     if(grosso){G.shake=Math.max(G.shake,1.2);}
   }
 }
@@ -4312,10 +4518,10 @@ function openPanel(){
     s+='GITTATA <span>'+Math.round(st.range)+'</span> · DPS <span>'+(st.dmg/st.rate).toFixed(1)+'</span><br>';
   }
   if(st.splash)s+='AREA <span>'+Math.round(st.splash)+'</span> · USTIONE <span>'+st.burn.toFixed(0)+'/s</span><br>';
+  if(st.tox)s+='MARCIUME <span>'+st.tox.toFixed(0)+'/s</span> per <span>4s</span><br>';
   if(st.pull)s+='ARRETRA <span>'+Math.round(st.pull)+'</span> px<br>';
-  if(st.ap===1)s+='<span>TRAPASSA OGNI CORAZZA</span><br>';
-  else if(st.ap>=.5)s+='<span>IGNORA METÀ CORAZZA</span><br>';
-  else if(st.ap>0)s+='<span>INTACCA LA CORAZZA</span><br>';
+  if(st.nat)s+='NATURA <span style="color:'+colDanno(st.nat)+'">'+nomeDanno(st.nat)+
+    '</span> · '+corazzaDice(st.morde)+'<br>';
   if(t.buff>0)s+='<span>SOSTENUTO DALLA SALMODIA · +'+Math.round(t.buff*100)+'%</span><br>';
   if(t.lv<MAXLV&&mancaGrado(t.type,t.lv+1)>0)
     s+='GRADO '+ROMAN(t.lv+1)+': ancora <span>'+mancaGrado(t.type,t.lv+1)+
@@ -4446,19 +4652,46 @@ const LORE_INTRO=
  'Erigi il tuo rito lungo la via con le <b>lacrime</b> raccolte dai caduti.<br><br>'+
  '<b>Il rito</b> — come si gioca e chi scende — è dentro ogni mondo, insieme alle sue veglie: '+
  'le schiere non sono le stesse dappertutto.';
-const LORE_HELP=
- '<b>1 ·</b> Tocca una torre nella barra, poi tocca una lastra libera del sagrato per consacrarla.<br>'+
- '<b>2 ·</b> Tocca una torre già eretta per vederne la gittata, potenziarla o demolirla (rimborso 60%). '+
- 'Ogni torre ha <b>quattro gradi</b>: a ogni rito cambia forma, si alza e colpisce più forte.<br>'+
- '<b>3 ·</b> <b>SPINE</b> colpisce rapido. <b>BRACIERE</b> incendia gruppi. <b>CAMPANA</b> rallenta chi la ode. '+
- '<b>RELIQUIARIO</b> trapassa le corazze da lontano.<br>'+
- '<b>4 ·</b> I <b>Portatori</b> hanno corazza: braciere e reliquiario la superano. Le <b>Ombre</b> resistono al rallentamento.<br>'+
- '<b>5 ·</b> Il <b>Colosso del Giogo</b> scende dall\'ondata VI e poi ogni cinque: la sua corazza respinge '+
- 'quasi tutto finché non gli spezzi le piastre a metà vita. Poi diventa vulnerabile — ma più rapido.<br>'+
- '<b>6 ·</b> Suonare la campana durante un\'ondata anticipa la successiva e frutta lacrime in più.<br>'+
- '<b>7 ·</b> Venti veglie ti separano dall\'alba. Ma i penitenti non scendevano: fuggivano.';
-
 let smode='menu';
+/* ═══════════ LA PERGAMENA ═══════════
+   Il libro della veglia è una pergamena vera: carta invecchiata disegnata a
+   pixel e due rulli di legno, uno in cima e uno in fondo, che restano appesi
+   ai bordi mentre la carta scorre. Non è cosmesi: le regole di questo gioco
+   sono parecchie, e un muro di testo sul fondo nero delle schermate non lo
+   legge nessuno. Su carta sì.
+
+   Le texture si disegnano una volta sola all'avvio e diventano due data URL:
+   ripetute dal CSS costano quanto un colore pieno. Il rumore è pseudocasuale
+   ma **con un seme fisso** — una pergamena che cambia venatura a ogni apertura
+   sarebbe un'altra pergamena. */
+function semeCaso(s){return()=>{s=(s*1664525+1013904223)&0x7fffffff;return s/0x7fffffff;};}
+const PERG={};
+function buildPergamena(){
+  // la carta: fondo caldo, fibre orizzontali, qualche macchia d'umido
+  const c=document.createElement('canvas');c.width=48;c.height=48;
+  const x=c.getContext('2d');x.imageSmoothingEnabled=false;
+  const r=semeCaso(20260815);
+  rect(x,'#dbc9a4',0,0,48,48);
+  // fibre: contrasto basso, se no la carta sembra sporca invece che vecchia
+  for(let i=0;i<90;i++)rect(x,r()<.5?'#e0d0ac':'#d4c199',r()*48,r()*48,1+((r()*3)|0),1);
+  for(let i=0;i<7;i++){                        // macchie d'umido, appena accennate
+    const mx=r()*48,my=r()*48,w=2+r()*4;
+    rect(x,'#cdb992',mx,my,w,1);
+    rect(x,'#d3c09b',mx-1,my+1,w+2,1);
+  }
+  for(let i=0;i<10;i++)rect(x,'#c7b184',r()*48,r()*48,1,1);   // punture di tarlo
+  PERG.carta=c.toDataURL();
+  // il rullo: legno con venatura, luce da sopra e ombra sotto
+  const b=document.createElement('canvas');b.width=8;b.height=15;
+  const y=b.getContext('2d');y.imageSmoothingEnabled=false;
+  const r2=semeCaso(77);
+  rect(y,'#2a1b0e',0,0,8,15);
+  rect(y,'#6b4a26',0,2,8,11);
+  rect(y,'#8a6434',0,3,8,3);
+  rect(y,'#4a3018',0,10,8,3);
+  for(let i=0;i<10;i++)rect(y,r2()<.5?'#7a5730':'#57381a',r2()*8,3+r2()*9,1+((r2()*2)|0),1);
+  PERG.rullo=b.toDataURL();
+}
 /* le figure del compendio sono le stesse sprite che vedi in campo */
 function spr(k,z){
   const c=S[k].cv;
@@ -4483,35 +4716,199 @@ const LEGG=[
    colonne sono le veglie di MONDO[msel], non tutti gli scenari che esistono.
    Gli edifici stanno in armeria, che è della campagna e non di un mondo.
    Per questo l'HTML si rifà a ogni apertura invece di restare in cache. */
+/* Le tempre dette in due righe: che cosa regge e dove è scoperta. Si legge la
+   tabella, non si indovina — è la sola informazione con cui si sceglie la
+   quaterna prima di scendere. */
+function tempreHtml(res,vuoto){
+  const su=[],giu=[];
+  for(const k of TDANNO){
+    const v=res[k];if(!v)continue;
+    const chip='<span class="tmp" style="color:'+colDanno(k)+';border-color:'+colDanno(k)+
+      '55">'+nomeDanno(k)+' '+Math.round(Math.abs(v)*100)+'%</span>';
+    (v>0?su:giu).push(chip);
+  }
+  if(!su.length&&!giu.length)return vuoto?'<div class="tmpR"><b>NULLA DI PARTICOLARE</b> '+
+    'carne e cilicio: ogni natura la trova viva</div>':'';
+  let h='';
+  if(su.length)h+='<div class="tmpR"><b>REGGE</b>'+su.join('')+'</div>';
+  if(giu.length)h+='<div class="tmpR sc"><b>SCOPERTA</b>'+giu.join('')+'</div>';
+  return h;
+}
+/* la corazza è una sottrazione, e va detta come numero: è l'unica difesa che
+   il giocatore può scrostare invece che aggirare */
+function corazzaRiga(tipi){
+  const v=tipi.map(k=>ENEMIES[k].armor);
+  const tutte=v.every(x=>x===v[0])?String(v[0]):v.join(' · ');
+  return '<br><span class="cmpN">CORAZZA '+tutte+'</span>';
+}
+/* quel che è di quella creatura e non del suo mondo: il fantasma che il ferro
+   passa attraverso, il Signore con la sua virtù */
+function propriaTempra(tipi,scen){
+  let h='';
+  tipi.forEach((k,i)=>{
+    const r=ENEMIES[k].res;if(!r)return;
+    const l=[];
+    for(const n of TDANNO){const v=r[n];if(!v)continue;
+      l.push('<span style="color:'+colDanno(n)+'">'+nomeDanno(n,mondoDi(scen[i]))+
+        (v>0?' regge ':' scoperta ')+Math.round(Math.abs(v)*100)+'%</span>');}
+    if(l.length)h+='<br><i>'+ENEMIES[k].name+': '+l.join(' · ')+'</i>';
+  });
+  return h;
+}
+/* ═══ IL LIBRO DELLA VEGLIA ═══
+   Tutte le regole in un posto solo. Le sei nature e le tempre si ricavano
+   dalle tabelle — DANNI, RES, TOWERS — e non sono ricopiate a mano: una
+   pergamena che invecchia mentre il gioco cambia sarebbe peggio di nessuna
+   pergamena. */
+function pgNature(){
+  let h='';
+  for(const k of TDANNO){
+    const D=DANNI[k];
+    // chi lo porta: si legge dal catalogo, così un edificio nuovo entra da solo
+    const chi=TORDER.filter(t=>TOWERS[t].nat===k).map(t=>TOWERS[t].short.toLowerCase());
+    h+='<div class="pgN"><span class="pgNn" style="color:'+D.col+'">'+D.nome+'</span>'+
+      '<span class="pgNd">'+D.desc+
+      '<span class="pgNc">CORAZZA: '+corazzaDice(D.corazza)+
+      (chi.length?' · '+chi.join(', '):' · nessun edificio, per ora')+'</span></span></div>';
+  }
+  return h;
+}
+function pgTempre(){
+  let h='<table class="pgT"><tr><th>VEGLIA</th><th>REGGE</th><th>È SCOPERTA A</th></tr>';
+  for(let a=1;a<=NSCEN;a++){
+    const r=RES[a]||{},su=[],giu=[];
+    for(const k of TDANNO){const v=r[k];if(!v)continue;
+      (v>0?su:giu).push(nomeDanno(k,mondoDi(a)).toLowerCase()+' '+Math.round(Math.abs(v)*100)+'%');}
+    h+='<tr><td>'+ATTO[a].nome+'</td><td>'+(su.join('<br>')||'—')+'</td><td>'+
+      (giu.join('<br>')||'—')+'</td></tr>';
+  }
+  return h+'</table>';
+}
+/* Il conto fatto per davvero, sui numeri veri del reliquiario e del Trono.
+   Non si scrive a mano: una pergamena che invecchia mentre il gioco cambia è
+   peggio di nessuna pergamena. */
+function pgEsempio(){
+  const st=tstats({type:'reliquiario',lv:1}),d=ENEMIES.trono,r=resDi(3,'trono');
+  const conto=(nat,morde)=>{
+    const t=r[nat]||0;
+    return {t,v:Math.max(1,Math.round(st.dmg*(1-t)-d.armor*morde))};
+  };
+  const a=conto('arcano',DANNI.arcano.corazza),f=conto('fisico',DANNI.fisico.corazza);
+  const dice=t=>t>0?'lo regge al '+Math.round(t*100)+'%':
+    (t<0?'gli è scoperto del '+Math.round(-t*100)+'%':'lo prende intero');
+  return '<div class="pgQ">Un <b>reliquiario</b> da '+st.dmg+' in arcano contro un <b>'+d.name+
+    '</b> del Giudizio, corazza '+d.armor+', che '+dice(a.t)+':<br>'+
+    st.dmg+' × '+(1-a.t).toFixed(2)+' = <b>'+a.v+'</b> — la corazza non entra nel conto, '+
+    'l\'arcano non la vede.<br>Lo stesso numero in <b>fisico</b>, che invece '+dice(f.t)+
+    ': '+st.dmg+' × '+(1-f.t).toFixed(2)+' meno '+d.armor+' di corazza fa <b>'+f.v+
+    '</b>.<br><i>Contro quel '+d.name+' il ferro vale più del sacro.</i></div>';
+}
+function pergamenaHtml(){
+  let h='<div class="pgRullo alto" style="background-image:url('+PERG.rullo+')"></div>'+
+    '<div class="pgCarta" style="background-image:url('+PERG.carta+')">';
+  h+='<div class="pgH">COME SI VEGLIA</div>'+
+    '<span class="pgOc">S</span>ei il campanaro, e la soglia è una sola. Dal valico a nord '+
+    'scende la processione; in fondo, dove il sagrato finisce, c\'è il cancello. Tutto quello '+
+    'che devi fare è non lasciarli passare.<br><br>'+
+    'Tocca un edificio nella barra in basso, poi una <b>lastra libera</b> per erigerlo. Tocca un '+
+    'edificio già eretto per vederne la gittata, <b>potenziarlo</b> o demolirlo — ti torna il '+
+    '60% di quel che ci hai speso. Suonare la campana mentre un\'ondata è ancora in corso '+
+    '<b>anticipa la successiva</b> e frutta lacrime in più: è il modo di correre, e si paga.<br><br>'+
+    'Le <b>lacrime</b> le lasciano i caduti. Non c\'è altra moneta.';
+  h+='<div class="pgH">I SIGILLI</div>'+
+    'Ogni ondata suonata te ne concede <b>uno</b>. Ogni creatura che varca la soglia te ne toglie '+
+    'quanti ne vale — la fanteria uno, le cose grosse fino a sei. Quando scendono sotto zero la '+
+    'veglia è finita.<br><br>'+
+    'Nella prima veglia parti da <b>zero sigilli</b>: non puoi sbagliare niente. Le veglie più '+
+    'profonde te ne concedono qualcuno in mano, perché aprono già dure.'+
+    '<div class="pgQ">I <b>Signori</b> — uno chiude ogni veglia — non tolgono sigilli: se varcano '+
+    'la soglia hai perso comunque, anche con tutti i sigilli intatti.</div>';
+  h+='<div class="pgH">LE SEI NATURE DEL DANNO</div>'+
+    'Un colpo non è solo un numero: è un numero e una <b>natura</b>. La natura decide quanto la '+
+    'corazza lo ferma e quanto quella creatura lo sopporta. Portare quattro edifici della stessa '+
+    'natura vuol dire trovarsi, prima o poi, davanti a una schiera che la regge tutta.'+
+    pgNature();
+  h+='<div class="pgH">LA CORAZZA</div>'+
+    'La corazza è una <b>sottrazione</b>: toglie un tanto a ogni colpo, e quindi punisce chi '+
+    'colpisce spesso e piano molto più di chi colpisce raro e forte. Trenta quadrelli da nove '+
+    'contro una corazza da sette non fanno quasi niente; un colpo di mangano non se ne accorge.'+
+    '<br><br>Contro la corazza ci sono tre risposte, e sono diverse fra loro:'+
+    '<div class="pgQ"><b>Scavalcarla</b> — arcano e veleno non la vedono, folgore quasi.<br>'+
+    '<b>Scrostarla</b> — lo scongiuro e il jammer non fanno male a nessuno: tolgono corazza a '+
+    'chi passa nella loro aura, e i colpi degli altri mordono.<br>'+
+    '<b>Spezzarla</b> — le cose grosse portano piastre che si rompono a metà vita: da lì la '+
+    'corazza cala di colpo, ma diventano più rapide.</div>';
+  h+='<div class="pgH">LE TEMPRE</div>'+
+    'La <b>tempra</b> è quanto una schiera sopporta una natura, e viene dalla sua storia: chi '+
+    'vive nel fuoco non lo teme, chi è stato giudicato ha già visto il sacro, chi è fatto di '+
+    'protocolli sa cosa aspettarsi da un impulso. Ogni veglia ne regge una <b>e</b> ne scopre '+
+    'un\'altra: non c\'è muro che non abbia una porta.'+
+    pgTempre()+
+    '<span class="pgNc">Alcune creature fanno storia a sé: i <b>fantasmi</b> se li passa '+
+    'attraverso il ferro, e ogni <b>Signore</b> ha la sua virtù. Stanno nel compendio delle '+
+    'schiere, dentro ogni mondo.</span>';
+  h+='<div class="pgH">QUEL CHE RESTA ADDOSSO</div>'+
+    'Due nature non finiscono col colpo. L\'<b>ustione</b> del fuoco e il <b>marciume</b> del '+
+    'veleno restano a lavorare da soli, e non li ferma nessuna corazza — bruciano e marciscono '+
+    'dentro. La tempra invece li ferma, e si conta una volta sola quando si appiccano.<br><br>'+
+    'La <b>pece</b> della caldaia è un caso a parte: non è un colpo, è un tratto di strada che '+
+    'fa male finché dura.';
+  h+='<div class="pgH">IL CONTO, IN CHIARO</div>'+
+    'Nessun numero è nascosto. Un colpo che arriva addosso si conta così:'+
+    '<div class="pgQ">danno × (1 − tempra) − corazza × quanto quella natura la sente<br>'+
+    '<i>e comunque mai meno di 1</i></div>'+
+    'Prima la tempra, poi la corazza: la creatura assorbe la sua parte e la piastra ferma quel '+
+    'che resta. Il fondo di 1 c\'è sempre — un bersaglio molto corazzato dev\'essere duro, non '+
+    'immortale.'+
+    pgEsempio();
+  h+='<div class="pgH">QUEL CHE SI GUADAGNA</div>'+
+    'In mano hai <b>quattro</b> edifici su '+conta(TORDER.length)+': gli altri si guadagnano. '+
+    'Gli edifici di un mondo si aprono contando <b>caduti in quel mondo</b>; i <b>gradi</b> di un '+
+    'edificio si aprono usandolo — sono i caduti su cui ha messo mano lui, e ci si contano anche '+
+    'quelli che ha solo rallentato o scorticato.<br><br>'+
+    'In armeria trovi i due stati: la <b>catena</b> vuol dire che il mondo è ancora sigillato, '+
+    'la <b>barra</b> quanti caduti mancano.';
+  h+='<div class="pgH">LA CAMPAGNA</div>'+
+    'Mondi, e dentro ognuno le sue veglie da venti ondate. Compiute le venti puoi <b>restare a '+
+    'vegliare</b> senza fine oppure scendere alla veglia dopo — ma <b>le torri non ti seguono</b>: '+
+    'di là si ricomincia da pietra nuda, con più lacrime in mano e creature già più dure. '+
+    'Una veglia aperta resta aperta e si rigioca dalla mappa. Dalla pausa la puoi '+
+    '<b>sospendere</b>: la ritrovi dov\'era.<br><br>'+
+    'Anche <b>la via</b> cambia: nel sagrato serpeggia e ti concede tempo, più a fondo si '+
+    'distende. Meno curve vuol dire meno tiri prima della soglia.';
+  h+='<div style="height:6px"></div></div>'+
+    '<div class="pgRullo basso" style="background-image:url('+PERG.rullo+')"></div>';
+  return h;
+}
 function buildHelp(){
   const scen=MONDO[msel].scen.length?MONDO[msel].scen:[1];
   const nomi=scen.map(a=>ATTO[a].nome.replace(/^(LA|IL) /,'').toLowerCase());
-  let h='<div class="cmpT cmpI">Tocca un edificio nella barra, poi una lastra libera del sagrato '+
-    'per consacrarlo. Tocca un edificio già eretto per vederne la gittata, potenziarlo o '+
-    'demolirlo (rimborso 60%). Suonare la campana durante un\'ondata anticipa la successiva e '+
-    'frutta lacrime in più.<br><br><b>I sigilli.</b> Ogni ondata te ne dà uno, ogni fuga te ne '+
-    'toglie. Alla Veglia parti da zero e non puoi sbagliare niente; le veglie più profonde te ne '+
-    'concedono qualcuno in mano, perché aprono già dure.<br><br>'+
-    '<b>La campagna</b> è fatta di mondi, e ogni mondo di veglie da venti ondate l\'una. Ognuna è '+
-    'a sé — compiute le venti puoi restare a vegliare senza fine oppure scendere alla successiva, '+
-    'ma <b>le torri non ti seguono</b>: di là si ricomincia da pietra nuda, con più lacrime in '+
-    'mano e creature già più dure. Una veglia aperta resta aperta: la si rigioca dalla mappa '+
-    'quando si vuole, e la si può <b>sospendere</b> dalla pausa per riprenderla dopo.<br><br>'+
-    '<b>La via</b> non è la stessa dappertutto: nel sagrato serpeggia e ti concede tempo, più a '+
-    'fondo si distende. Meno curve vuol dire meno tiri prima della soglia.<br><br>'+
-    'Quel che puoi erigere sta nell\'<b>armeria</b>: '+conta(TORDER.length)+' edifici, '+
-    conta(NSLOT)+' per veglia.</div>';
+  let h='<div class="cmpT cmpI">Chi scende, e con che cosa regge. Le regole del gioco — come si '+
+    'erige, i sigilli, le sei nature del danno, il conto per intero — stanno nel <b>Libro della '+
+    'Veglia</b>, nella schermata di apertura.<br><br>Quel che puoi erigere sta nell'+"'"+'<b>armeria</b>: '+
+    conta(TORDER.length)+' edifici, '+conta(NSLOT)+' per veglia.</div>';
+  // le tempre di ogni veglia del mondo: è qui che si decide che cosa portare
+  h+='<div class="cmpH">LE TEMPRE · CHE COSA REGGONO</div>';
+  h+='<div class="cmpT cmpI">Ogni natura di danno trova chi la sopporta e chi non se ne '+
+    'difende. Una veglia non si vince con una natura sola — e nemmeno chiudendone una senza '+
+    'aprirne un\'altra: si mescola.</div>';
+  for(const a of scen){
+    h+='<div class="tmpB"><div class="tmpN">'+ATTO[a].nome+'</div>'+
+      tempreHtml(RES[a]||{},true)+'</div>';
+  }
   h+='<div class="cmpH">LE SCHIERE · '+nomi.join(' · ')+'</div>';
   for(const r of RUOLI){
     const t=scen.map(a=>ROSTER[a][r[0]]);
     h+=cmpR(t.map(k=>spr(k,3)).join(''),
-      t.map((k,i)=>i?'<i>'+ENEMIES[k].name+'</i>':ENEMIES[k].name).join(' · '),r[1]);
+      t.map((k,i)=>i?'<i>'+ENEMIES[k].name+'</i>':ENEMIES[k].name).join(' · '),
+      r[1]+corazzaRiga(t)+propriaTempra(t,scen));
   }
   h+='<div class="cmpH">I LEGGENDARI</div>';
   for(const r of LEGG){
     const t=scen.map(a=>ROSTER[a][r[0]]);
     h+=cmpR(t.map(k=>spr(k,2)).join(''),
-      t.map((k,i)=>i?'<i>'+ENEMIES[k].name+'</i>':ENEMIES[k].name).join(' · '),r[1]);
+      t.map((k,i)=>i?'<i>'+ENEMIES[k].name+'</i>':ENEMIES[k].name).join(' · '),
+      r[1]+corazzaRiga(t)+propriaTempra(t,scen));
   }
   return h;
 }
@@ -4548,11 +4945,21 @@ function menu(){
   // IL RITO non sta qui: parla delle schiere, e le schiere sono di un mondo.
   // Si trova dentro la mappa del mondo, insieme alle sue veglie.
   showScreen("L'ULTIMA<br>VEGLIA",NMONDI+' MONDI · VENTI ONDATE A VEGLIA · v6',LORE_INTRO,
-    'ENTRA NELLA CAMPAGNA',null,
+    'ENTRA NELLA CAMPAGNA','IL LIBRO DELLA VEGLIA',
     COLLAUDO?'<b>ACCOUNT COLLAUDO</b> · TUTTO SBLOCCATO':
       (PROG.unl>1?'VEGLIE APERTE: <b>'+ROMAN(PROG.unl)+' / '+ROMAN(NSCEN)+'</b>':null),
     sosp.length?'RIPRENDI · '+ATTO[sosp[sosp.length-1]].nome:null,
     COLLAUDO?'TORNA AL PROFILO NORMALE':'ACCOUNT COLLAUDO · TUTTO SBLOCCATO');
+}
+/* Il libro sta nella home e non dentro un mondo: parla delle regole, che sono
+   di tutta la campagna. Il compendio delle schiere invece resta dov'è, perché
+   le creature sono di un mondo. */
+function libro(){
+  G.state='menu';smode='libro';
+  showScreen('IL LIBRO<br>DELLA VEGLIA','LE REGOLE, LE NATURE DEL DANNO, LE TEMPRE',
+    pergamenaHtml(),'TORNA INDIETRO',null,null,null,null);
+  el('screen').classList.add('wide');el('screen').classList.add('perg');
+  el('scLore').scrollTop=0;
 }
 function help(){
   smode='help';
@@ -4697,6 +5104,13 @@ function armSlotHtml(){
                 nessun conto da mostrare: quei caduti non li si può nemmeno fare
    `conto`      il mondo è aperto ma l'edificio no: via la catena, resta l'ombra
                 e compare la barra con quanti ne mancano */
+/* la pastiglia della natura: un colore e una parola, che è tutto quel che
+   serve per capire contro chi mandarlo prima ancora di leggere i numeri */
+function natPill(nat){
+  if(!nat)return '<span class="natP sost">SOSTEGNO</span> ';
+  return '<span class="natP" style="color:'+colDanno(nat)+';border-color:'+colDanno(nat)+
+    '55">'+nomeDanno(nat)+'</span> ';
+}
 function armStato(k){
   const c=TOWERS[k];
   if(edificioAperto(k))return 'aperto';
@@ -4738,7 +5152,7 @@ function armRiga(k){
     '<span class="ap">'+spr(k+'1',2)+'</span>'+
     '<span class="at"><span class="an">'+cfg.short+
       '<span class="ar">'+(cfg.ruolo||'')+'</span></span>'+
-      '<span class="ad">'+cfg.desc+'<br><i>'+numeri+'</i></span>'+piede+'</span>'+
+      '<span class="ad">'+cfg.desc+'<br>'+natPill(cfg.nat)+'<i>'+numeri+'</i></span>'+piede+'</span>'+
     '<span class="armActions">'+scegli+
       '<button type="button" class="armMore" data-arm-info="'+k+'">INFO</button></span>'+
     (stato==='sigillato'?'<span class="armLucch"><i></i><b></b></span>':'')+'</div>';
@@ -4773,9 +5187,10 @@ function armStatistiche(k,lv){
     v.push('GITTATA <b>'+Math.round(st.range)+'</b> · CADENZA <b>'+st.rate.toFixed(2)+'s</b>');
   }
   if(st.splash)v.push('AREA <b>'+Math.round(st.splash)+'</b> · USTIONE <b>'+st.burn.toFixed(0)+'/s</b>');
+  if(st.tox)v.push('MARCIUME <b>'+st.tox.toFixed(0)+'/s</b> PER <b>4s</b>');
   if(st.pull)v.push('ARRETRA <b>'+Math.round(st.pull)+' px</b>');
-  if(st.ap===1)v.push('<i>Trapassa ogni corazza</i>');
-  else if(st.ap>0)v.push('<i>Ignora il '+Math.round(st.ap*100)+'% della corazza</i>');
+  if(st.nat)v.push('NATURA <b style="color:'+colDanno(st.nat)+'">'+nomeDanno(st.nat)+
+    '</b> · <i>'+corazzaDice(st.morde)+'</i>');
   return v.join('<br>');
 }
 function armDettaglio(k){
@@ -4889,7 +5304,8 @@ el('scLore').addEventListener('click',ev=>{
 });
 el('scMain').addEventListener('click',()=>{
   audio();
-  if(smode==='help')mappa();          // il compendio è roba del mondo
+  if(smode==='libro')menu();          // il libro è roba di tutti: si torna alla home
+  else if(smode==='help')mappa();     // il compendio è roba del mondo
   else if(smode==='albo')mondi();
   else if(smode==='armeria'){if(armScegli)startScen(tsel,armSel);else mondi();}
   else if(smode==='mondi')mappa();
@@ -4902,7 +5318,8 @@ el('scMain').addEventListener('click',()=>{
 });
 el('scAlt').addEventListener('click',()=>{
   audio();
-  if(smode==='avanti')restaAVegliare();
+  if(smode==='menu')libro();
+  else if(smode==='avanti')restaAVegliare();
   else if(smode==='mondi')menu();
   else if(smode==='armeria')armScegli?mappa():mondi();
   else if(smode==='mappa'||smode==='fine')mondi();
@@ -5161,13 +5578,13 @@ async function cambiaProfilo(){
    creatura ripresa a metà rogo cadrebbe per opera di nessuno e i gradi di chi
    ci stava lavorando non avanzerebbero */
 const CAMPI_NEMICO=['type','hp','max','speed','armor','bounty','seg','segD','x','y',
-  'dir','prog','slowAmt','burn','burnT','flash','bob','spawnT','stepT','broken',
-  'mani'];
+  'dir','prog','slowAmt','burn','burnT','tox','toxT','flash','bob','spawnT','stepT',
+  'broken','mani'];
 /* Un proiettile insegue un oggetto, e un oggetto non si scrive su disco: il
    bersaglio si salva come posto nella lista delle creature, e al ritorno si
    riaggancia. Sono pochi e vivono un attimo, ma bastano a far divergere due
    partite altrimenti identiche — una caldaia ne ha quasi sempre uno per aria. */
-const CAMPI_COLPO=['x','y','lx','ly','speed','dmg','ap','splash','burn','pull',
+const CAMPI_COLPO=['x','y','lx','ly','speed','dmg','nat','morde','splash','burn','pull',
   'pozR','pozT','col','life','type','trail','a','mani'];
 function istantanea(){
   const e2=[],indice=new Map();
@@ -5190,7 +5607,8 @@ function istantanea(){
     enemies:e2,shots:s2,
     queue:G.queue.map(q=>({t:q.t,at:q.at,wave:q.wave})),
     // la pece dura qualche secondo: troppo per buttarla via come una favilla
-    pozze:G.pozze.map(p=>({x:p.x,y:p.y,r:p.r,t:p.t,max:p.max,dps:p.dps,ap:p.ap,mani:p.mani}))};
+    pozze:G.pozze.map(p=>({x:p.x,y:p.y,r:p.r,t:p.t,max:p.max,dps:p.dps,
+      nat:p.nat,morde:p.morde,mani:p.mani}))};
 }
 function ripristina(s){
   if(!s||!s.act)return false;
@@ -5210,7 +5628,8 @@ function ripristina(s){
   G.towers.sort((a,b)=>a.y-b.y);rebuildFree();ricalcolaTorri();
   for(const d of s.enemies||[]){
     const def=ENEMIES[d.type];if(!def)continue;
-    const e={def,alive:true,escaped:false};
+    // la tempra si rimette a mano come la scheda: si ricava da atto e specie
+    const e={def,alive:true,escaped:false,res:resDi(G.act,d.type)};
     for(const k of CAMPI_NEMICO)e[k]=d[k];
     G.enemies.push(e);
     if(def.final){G.bossRef=e;G.bossHp=Math.max(0,e.hp/e.max);}
@@ -5222,7 +5641,8 @@ function ripristina(s){
   }
   for(const q of s.queue||[])if(ENEMIES[q.t])G.queue.push({t:q.t,at:+q.at||0,wave:q.wave|0});
   for(const p of s.pozze||[])G.pozze.push({x:+p.x||0,y:+p.y||0,r:+p.r||0,t:+p.t||0,
-    max:+p.max||1,dps:+p.dps||0,ap:+p.ap||0,mani:p.mani|0});
+    max:+p.max||1,dps:+p.dps||0,nat:p.nat,morde:p.morde===undefined?1:+p.morde,
+    mani:p.mani|0});
   el('bSpeed').textContent='×'+G.speed;
   el('bSpeed').classList.toggle('on',G.speed>1);
   uiDirty();syncUI();fit();
@@ -5311,6 +5731,7 @@ if('serviceWorker' in navigator&&location.protocol.startsWith('http'))
   navigator.serviceWorker.register('sw.js').catch(()=>{});
 
 /* ─────────── AVVIO ─────────── */
+buildPergamena();   // carta e legno: una volta sola, poi sono due data URL
 ricalcolaSoglie();   // prima di ogni cosa: senza, nessuna soglia scatterebbe mai
 buildBar();
 menu();
