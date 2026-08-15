@@ -89,8 +89,9 @@ function carica(opzioni = {}) {
         'istantanea,ripristina,salvaPartita,scartaSalvataggio,riprendi,' +
         'haSalvataggio,scenariSospesi,SAVE,apriPausa,chiudiPausa,gameOver,' +
         'TORDER,NSLOT,QUATERNA_BASE,quaterneValida,ricalcolaTorri,arretra,buildBar,' +
-        'edificioAperto,gradoMax,mancaEdificio,mancaGrado,uccMondo,uccTorre,' +
-        'ricalcolaSoglie,GRADI_LIEVI,GRADI_ALTRI,contaCaduto,' +
+        'edificioAperto,edificioConcesso,edificioPagato,edificioCompra,gradoMax,' +
+        'mancaGrado,uccTorre,GRADI_LIEVI,GRADI_ALTRI,contaCaduto,' +
+        'framDai,framRec,framOndata,framTetto,FRAM_PRIMA,FRAM_REC,FRAM_TETTO,FRAM_SEGNO,' +
         'armeria,buildArmeria,help,buildHelp,damage,tstats,makeSprite,ART,PAL_TOW,' +
         'cambiaProfilo,MUSICA,musicaAggiorna,musicaToggle,hideScreen,lex};' +
         '\nglobalThis.__T.getProfilo=()=>({collaudo:COLLAUDO,unl:PROG.unl,msel,tsel,smode});' +
@@ -103,16 +104,16 @@ function carica(opzioni = {}) {
   const T = globalThis.__T;
   T.G.sound = false;
   /* Un banco che vuole provare una quaterna qualunque deve prima averla
-     guadagnata: edifici e gradi si aprono contando caduti, e un profilo appena
-     nato ha in mano solo i quattro storici al primo grado. Chi misura il
-     bilanciamento di un insieme (quaterne.js) o il salvataggio (salva.js)
-     apre tutto e va dritto al punto; sim.js no — quello deve restare il metro
-     di chi comincia adesso. */
+     guadagnata: gli edifici chiedono la loro veglia compiuta e il prezzo in
+     frammenti, i gradi si aprono contando caduti, e un profilo appena nato ha
+     in mano solo i quattro storici al primo grado. Chi misura il bilanciamento
+     di un insieme (quaterne.js) o il salvataggio (salva.js) apre tutto e va
+     dritto al punto; sim.js no — quello deve restare il metro di chi comincia
+     adesso. */
   T.apriTutto = () => {
     T.PROG.unl = T.NSCEN;
-    for (let m = 1; m <= T.NMONDI; m++) T.PROG.ucc[m] = 999999;
-    for (const k of T.TORDER) T.PROG.tk[k] = 999999;
-    T.ricalcolaSoglie();
+    for (let a = 1; a <= T.NSCEN; a++) T.PROG.fin[a] = true;
+    for (const k of T.TORDER) { T.PROG.sbl[k] = true; T.PROG.tk[k] = 999999; }
   };
   return { T, G: T.G, registro };
 }

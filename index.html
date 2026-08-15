@@ -172,8 +172,11 @@ canvas#menubg.off{display:none}
 .clsR.mut .v{color:#4a423a}
 .clsR.on{background:rgba(201,162,39,.08)}
 /* armeria: quattro slot espliciti, poi il catalogo degli edifici */
-.armSlotsW{position:sticky;top:0;z-index:2;margin:0 -2px 10px;padding:5px 2px 8px;
-  background:linear-gradient(180deg,#09070d 82%,rgba(9,7,13,0));text-align:left}
+/* la sfumatura in coda serve a non tagliare di netto, ma il pieno deve reggere
+   fin quasi in fondo: sotto ci scorrono le schede del catalogo, e mezza scheda
+   che traspare dall'intestazione si legge come un difetto */
+.armSlotsW{position:sticky;top:0;z-index:2;margin:0 -2px 10px;padding:5px 2px 10px;
+  background:linear-gradient(180deg,#09070d 0,#09070d 94%,rgba(9,7,13,0));text-align:left}
 .armSlotsH{font-size:8px;letter-spacing:.25em;color:#8b7f6c;margin-bottom:5px}
 .armSlots{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
 .armSlot{height:64px;padding:4px 2px;border:1px solid #332b3d;border-radius:3px;
@@ -185,24 +188,50 @@ canvas#menubg.off{display:none}
 .armSlot .asT{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   font-size:7px;letter-spacing:.06em;color:#c9a227}
 .armSlot.vuoto .asT{color:#584f45}
-.armR{display:flex;gap:8px;align-items:flex-start;padding:8px 6px;text-align:left;
-  border:1px solid #332b3d;border-radius:3px;margin-bottom:5px;background:rgba(14,11,19,.58);
-  width:100%;font:inherit}
-.armR.on{border-color:#c9a227;background:rgba(201,162,39,.09)}
-.armR .ap{flex:0 0 auto;width:34px;display:flex;align-items:flex-end;justify-content:center;
-  padding-top:2px}
-.armR .ap img{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
-.armR .at{flex:1 1 auto;min-width:0}
-.armR .an{display:block;font-size:9.5px;letter-spacing:.13em;color:#c9a227}
-.armR .ar{font-size:7.5px;letter-spacing:.18em;color:#7d6a4a;margin-left:6px}
-.armR .ad{display:block;font-size:8.5px;line-height:1.6;color:#7a6f60;margin-top:3px}
-.armR .ad i{color:#8fa5b0;font-style:normal}
-.armActions{flex:0 0 63px;display:flex;flex-direction:column;gap:5px}
-.armActions button,.armBack,.armInfoPick{min-height:24px;padding:4px 3px;border-radius:2px;
-  font:600 7.5px/1.2 ui-monospace,monospace;letter-spacing:.08em}
+/* Il catalogo è una griglia di schede compatte, non una colonna di righe:
+   sedici edifici in colonna singola sono sedici schermate di scorrimento, e
+   quel che serve qui è vedere a colpo d'occhio dove si è arrivati. Descrizione
+   e numeri stanno nella scheda di dettaglio, a un tocco di distanza.
+   Due colonne sul telefono, tre da tablet in su (in fondo al blocco). */
+.armGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:4px}
+.armCard{display:flex;flex-direction:column;text-align:center;position:relative;
+  border:1px solid #332b3d;border-radius:3px;background:rgba(14,11,19,.58);overflow:hidden}
+.armCard.on{border-color:#c9a227;background:rgba(201,162,39,.09)}
+.acBody{width:100%;display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:7px 4px 5px;background:transparent;border:0;color:inherit;font:inherit}
+.acI{height:30px;display:flex;align-items:flex-end;justify-content:center}
+.acI img{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+.acN{display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-size:9px;letter-spacing:.1em;color:#c9a227}
+.acRuolo{display:block;padding:0 4px 6px;font-size:6.8px;letter-spacing:.13em;color:#7d6a4a}
+/* la targa del prezzo si vede da subito, anche a veglia non compiuta: la porta
+   ha due serrature e non se ne deve scoprire una alla volta */
+.acAdv{display:block;margin-top:2px;font-size:6.8px;letter-spacing:.12em;color:#6b5f7d}
+.acAdv.vicino{color:#b79ae8}
+.acAct{width:100%;min-height:22px;padding:4px 3px;border-radius:0;
+  font:600 7.5px/1.2 ui-monospace,monospace;letter-spacing:.06em}
 .armPick{border:1px solid #5a4a22;background:#1b1510;color:#c9a227}
 .armPick.on{border-color:#8a6f1c;background:#2a2114;color:#f7e08a}
+.armApri{border:1px solid #4a3a6a;background:#161022;color:#b79ae8;line-height:1.3}
+.armApri.no{border-color:#2f2740;background:#0e0b16;color:#6b5f7d}
+/* la serratura che il denaro non apre: grigio tratteggiato, mai viola — il
+   viola è il colore dei frammenti e prometterebbe che basti pagare */
+.acGate{display:block;border:1px dashed #3a3344;background:#0b0910;color:#6f6656;
+  line-height:1.3;text-align:center}
+.armInfoPick.gate{border:1px dashed #3a3344;background:#0b0910;color:#6f6656;text-align:center}
+/* i frammenti non sono lacrime: viola, mai oro, così a colpo d'occhio non si
+   confonde la moneta che resta con quella che muore a fine veglia */
+.fram{color:#b79ae8;white-space:nowrap}
+.armChiuso{font-size:8.5px;line-height:1.7;color:#8b7f6c;margin:8px 0 2px;
+  padding:7px 8px;border:1px solid #2f2740;border-radius:3px;background:rgba(22,16,34,.5)}
+.armChiuso b{color:#b79ae8}
+.armBack,.armInfoPick{min-height:24px;padding:4px 3px;border-radius:2px;
+  font:600 7.5px/1.2 ui-monospace,monospace;letter-spacing:.08em}
 .armMore,.armBack{border:1px solid #3a3344;background:#100d16;color:#8fa5b0}
+@media (min-width:480px){
+  .armGrid{grid-template-columns:repeat(3,1fr)}
+  #screen.wide .lore{max-width:520px}
+}
 .armInfoHead{padding:7px 2px 10px;border-bottom:1px solid #332b3d}
 .armInfoHead .nome{font-size:12px;letter-spacing:.16em;color:#c9a227}
 .armInfoHead .ruolo{font-size:8px;letter-spacing:.2em;color:#8fa5b0;margin:3px 0 7px}
@@ -220,40 +249,29 @@ canvas#menubg.off{display:none}
 #armCont{font-size:9px;letter-spacing:.12em;color:#8b7f6c;margin:2px 0 8px}
 #armCont b{color:#c9a227}
 /* ── quel che non si è ancora guadagnato ──
-   Due stati, e devono leggersi al primo sguardo senza leggere una parola:
-   il mondo ancora sigillato porta la catena e il lucchetto; il mondo aperto
-   toglie la catena ma lascia l'edificio in ombra, con la barra che dice
-   quanti ne mancano. Il buio è lo stesso: cambia solo che cosa lo tiene. */
-.armR.chiuso{position:relative;border-color:#241f2b;background:rgba(8,6,12,.72)}
-.armR.chiuso .ap img{filter:grayscale(1) brightness(.34)}
-.armR.chiuso .an{color:#584f45}
-.armR.chiuso .ar,.armR.chiuso .ad{color:#4a423a}
-.armR.chiuso .ad i{color:#4a5a63}
-.armR.sigillato::before{content:'';position:absolute;inset:0;border-radius:3px;pointer-events:none;
+   Devono leggersi al primo sguardo senza leggere una parola: il mondo ancora
+   sigillato porta la catena e il lucchetto; il mondo aperto toglie la catena
+   ma lascia l'edificio in ombra, con sotto quel che manca — la veglia o il
+   prezzo. Il buio è lo stesso: cambia solo che cosa lo tiene. */
+.armCard.chiuso{border-color:#241f2b;background:rgba(8,6,12,.72)}
+.armCard.chiuso .acI img{filter:grayscale(1) brightness(.34)}
+.armCard.chiuso .acN{color:#584f45}
+.armCard.sigillato::before{content:'';position:absolute;inset:0;border-radius:3px;pointer-events:none;
   background:repeating-linear-gradient(-52deg,rgba(120,132,142,.20) 0 4px,
-    rgba(120,132,142,.05) 4px 7px,transparent 7px 15px);}
+    rgba(120,132,142,.05) 4px 7px,transparent 7px 15px);z-index:1}
 /* il lucchetto: un arco e un corpo, due riquadri — a questa scala un disegno
    più dettagliato diventa una macchia */
 /* il lucchetto sta sull'edificio, non sul tasto INFO: la scheda si deve
    poter leggere anche di quel che non si è ancora guadagnato */
-.armLucch{position:absolute;left:13px;top:50%;margin-top:-11px;width:16px;height:22px;
-  pointer-events:none;filter:drop-shadow(0 0 4px rgba(0,0,0,.95))}
+.armLucch{position:absolute;left:50%;top:14px;margin-left:-8px;width:16px;height:22px;
+  pointer-events:none;z-index:2;filter:drop-shadow(0 0 4px rgba(0,0,0,.95))}
 .armLucch i{position:absolute;left:3px;top:0;width:10px;height:9px;border:2px solid #6e7a84;
   border-bottom:0;border-radius:5px 5px 0 0}
 .armLucch b{position:absolute;left:0;top:8px;width:16px;height:14px;border:1px solid #4a545c;
   border-radius:2px;background:#20262c;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
 .armLucch b::after{content:'';position:absolute;left:7px;top:4px;width:2px;height:6px;
   background:#6e7a84}
-.armR.sigillato .armActions{opacity:.45}
-/* la barra: quanti ne mancano, non una percentuale — il giocatore conta teste */
-.armProg{display:block;margin-top:6px}
-.armProg .apB{display:block;height:5px;border:1px solid #332b3d;border-radius:2px;
-  background:#0b0910;overflow:hidden}
-.armProg .apF{display:block;height:100%;min-width:2px;
-  background:linear-gradient(90deg,#5a4a22,#c9a227)}
-.armProg .apT{display:block;font-size:7.5px;letter-spacing:.14em;color:#8b7f6c;margin-top:3px}
-.armProg .apT b{color:#c9a227;font-weight:600}
-.armR.chiuso .armMore{border-color:#2b2434;color:#5f6f78}
+.armCard.sigillato .acAct{opacity:.45}
 .armLv.chiuso .lvPic img{filter:grayscale(1) brightness(.36)}
 .armLv.chiuso .lvN{color:#584f45}
 .armLv.chiuso .lvStat{color:#584f45}
@@ -1763,49 +1781,54 @@ buildPercorso(1);
    altri non fanno — chi macina a contatto, chi sostiene i vicini, chi apre le
    corazze da lontano — perché la scelta sia laterale e non una classifica.
    `ruolo` è quel mestiere in una parola, e serve all'armeria.
-   `mondo` e `ucc` sono la sua storia: di che mondo è, e quanti caduti di quel
-   mondo bisogna aver contato prima che si conceda. `ucc:0` vuol dire dato in
-   mano fin dal principio — sono i quattro storici e nessun altro. Chi aggiunge
-   un edificio a un mondo nuovo scrive due numeri qui e non tocca altro. */
+   `mondo`, `veglia` e `fr` sono la sua storia: di che mondo è, quale veglia di
+   quel mondo bisogna aver compiuto perché si conceda, e quanti frammenti costa
+   aprirlo. Servono tutt'e due: la veglia non si compra e il prezzo non si
+   guadagna vegliando, così il denaro può risparmiare la macina ma mai la
+   strada. `veglia:0` vuol dire dato in mano fin dal principio — sono i quattro
+   storici e nessun altro, e devono restarlo: sotto i quattro la quaterna non si
+   riempie e non si scende in campo.
+   Chi aggiunge un edificio a un mondo nuovo scrive tre numeri qui e non tocca
+   altro; i gradi, quelli, restano appesi ai caduti (vedi IL CONTO DEI CADUTI). */
 const TOWERS={
   spine:{name:'TORRE DELLE SPINE',short:'SPINE',ruolo:'TIRO RAPIDO',cost:45,dmg:9,rate:.55,range:48,ap:0,
-    mondo:1,ucc:0,desc:'Quadrelli rapidi su un solo bersaglio.'},
+    mondo:1,veglia:0,fr:0,desc:'Quadrelli rapidi su un solo bersaglio.'},
   braciere:{name:'BRACIERE VOTIVO',short:'BRACIERE',ruolo:'AREA',cost:80,dmg:11,rate:1.25,range:42,ap:.5,
-    mondo:1,ucc:0,splash:15,burn:5,desc:'Fuoco ad area, incendia e ignora metà corazza.'},
+    mondo:1,veglia:0,fr:0,splash:15,burn:5,desc:'Fuoco ad area, incendia e ignora metà corazza.'},
   campana:{name:'CAMPANA DEL SILENZIO',short:'CAMPANA',ruolo:'RALLENTA',cost:65,dmg:7,rate:1.9,range:40,ap:1,
-    mondo:1,ucc:0,aura:true,slow:.45,desc:'Rallenta del 45% e percuote tutti nell\'aura.'},
+    mondo:1,veglia:0,fr:0,aura:true,slow:.45,desc:'Rallenta del 45% e percuote tutti nell\'aura.'},
   reliquiario:{name:'RELIQUIARIO',short:'RELIQUIARIO',ruolo:'GITTATA',cost:140,dmg:52,rate:2.2,range:82,ap:1,
-    mondo:1,ucc:0,beam:true,desc:'Raggio istantaneo, lunga gittata, trapassa ogni corazza.'},
+    mondo:1,veglia:0,fr:0,beam:true,desc:'Raggio istantaneo, lunga gittata, trapassa ogni corazza.'},
   ossario:{name:'OSSARIO',short:'OSSARIO',ruolo:'MACINA',cost:45,dmg:8,rate:.45,range:31,ap:.25,
-    mondo:1,ucc:250,aura:true,slow:0,desc:'Non mira: rode chiunque gli passi accanto. Gittata cortissima, '+
+    mondo:1,veglia:1,fr:60,aura:true,slow:0,desc:'Non mira: rode chiunque gli passi accanto. Gittata cortissima, '+
     'va dove la via si stringe.'},
   salmodia:{name:'SALMODIA',short:'SALMODIA',ruolo:'SOSTEGNO',cost:95,dmg:0,rate:0,range:44,ap:0,
-    mondo:1,ucc:2800,sostegno:{dmg:.22,rate:.11},desc:'Non colpisce: gli edifici che la odono battono '+
+    mondo:1,veglia:3,fr:220,sostegno:{dmg:.22,rate:.11},desc:'Non colpisce: gli edifici che la odono battono '+
     '<i>più forte e più spesso</i>.'},
   mangano:{name:'MANGANO',short:'MANGANO',ruolo:'COLPO GROSSO',cost:112,dmg:84,rate:2.8,range:54,ap:.8,
-    mondo:1,ucc:2100,desc:'Un colpo solo, lento ed enorme, che sfonda quasi ogni corazza. Sulla truppa fitta '+
+    mondo:1,veglia:3,fr:180,desc:'Un colpo solo, lento ed enorme, che sfonda quasi ogni corazza. Sulla truppa fitta '+
     'è uno spreco.'},
   arpione:{name:'ARPIONE',short:'ARPIONE',ruolo:'ARRETRA',cost:80,dmg:7,rate:1.8,range:50,ap:.5,
-    mondo:1,ucc:1000,pull:13,desc:'Fa poco male: <i>ributta indietro</i> lungo la via. Le cose grosse le smuove '+
+    mondo:1,veglia:2,fr:110,pull:13,desc:'Fa poco male: <i>ributta indietro</i> lungo la via. Le cose grosse le smuove '+
     'poco, il Signore quasi niente.'},
   caldaia:{name:'CALDAIA DI PECE',short:'CALDAIA',ruolo:'PECE',cost:95,dmg:13,rate:2.2,range:44,ap:.5,
-    mondo:1,ucc:1500,pozza:{r:19,dur:4.5},desc:'Versa pece che <i>resta a bruciare</i>: non un colpo, un tratto '+
+    mondo:1,veglia:2,fr:140,pozza:{r:19,dur:4.5},desc:'Versa pece che <i>resta a bruciare</i>: non un colpo, un tratto '+
     'di strada che fa male finché dura.'},
   scongiuro:{name:'SCONGIURO',short:'SCONGIURO',ruolo:'SCORTICA',cost:78,dmg:0,rate:0,range:42,ap:0,
-    mondo:1,ucc:600,cut:.55,desc:'Non fa male: <i>scrosta la corazza</i> di chi passa, e i colpi degli altri '+
+    mondo:1,veglia:1,fr:80,cut:.55,desc:'Non fa male: <i>scrosta la corazza</i> di chi passa, e i colpi degli altri '+
     'mordono. Il rovescio della salmodia.'},
   impulso:{name:'RIPETITORE A IMPULSI',short:'IMPULSO',ruolo:'RAFFICA',cost:58,dmg:8,rate:.34,range:52,ap:.12,
-    mondo:2,ucc:250,desc:'Una raffica di fotoni: poco per colpo, quasi nessuna pausa.'},
+    mondo:2,veglia:4,fr:120,desc:'Una raffica di fotoni: poco per colpo, quasi nessuna pausa.'},
   plasma:{name:'FORGIA AL PLASMA',short:'PLASMA',ruolo:'AREA',cost:105,dmg:16,rate:1.35,range:46,ap:.55,
-    mondo:2,ucc:1500,splash:18,burn:7,desc:'Fonde gruppi e corazze in una pozza di luce.'},
+    mondo:2,veglia:5,fr:230,splash:18,burn:7,desc:'Fonde gruppi e corazze in una pozza di luce.'},
   stasi:{name:'FARO DI STASI',short:'STASI',ruolo:'RALLENTA',cost:88,dmg:6,rate:1.55,range:46,ap:1,
-    mondo:2,ucc:600,aura:true,slow:.52,desc:'Piega il tempo locale e consuma ogni intruso nell’aura.'},
+    mondo:2,veglia:4,fr:150,aura:true,slow:.52,desc:'Piega il tempo locale e consuma ogni intruso nell’aura.'},
   rotaia:{name:'OBELISCO A ROTAIA',short:'ROTAIA',ruolo:'PRECISIONE',cost:155,dmg:66,rate:2.35,range:90,ap:1,
-    mondo:2,ucc:2100,beam:true,desc:'Un colpo lineare, istantaneo, oltre ogni corazza.'},
+    mondo:2,veglia:6,fr:280,beam:true,desc:'Un colpo lineare, istantaneo, oltre ogni corazza.'},
   sciame:{name:'NIDO DI DRONI',short:'SCIAME',ruolo:'SOSTEGNO',cost:118,dmg:0,rate:0,range:50,ap:0,
-    mondo:2,ucc:2800,sostegno:{dmg:.25,rate:.14},desc:'I droni riallineano le armi vicine: più danno, meno attesa.'},
+    mondo:2,veglia:6,fr:320,sostegno:{dmg:.25,rate:.14},desc:'I droni riallineano le armi vicine: più danno, meno attesa.'},
   disturbo:{name:'JAMMER DEL VUOTO',short:'JAMMER',ruolo:'DISARMA',cost:96,dmg:0,rate:0,range:48,ap:0,
-    mondo:2,ucc:1000,cut:.62,desc:'Spegne i protocolli difensivi e apre le corazze al fuoco alleato.'}
+    mondo:2,veglia:5,fr:190,cut:.62,desc:'Spegne i protocolli difensivi e apre le corazze al fuoco alleato.'}
 };
 /* l'ordine in cui l'armeria li mostra: prima i quattro di sempre */
 const TORDER=['spine','braciere','campana','reliquiario',
@@ -2081,29 +2104,38 @@ const QUATERNA_BASE=['spine','braciere','campana','reliquiario'];
    `rec`  l'albo d'oro: per ogni scenario fino a cinque serie {w ondate,
           k caduti}, dalla più lunga. Non si distingue fra chi si è fermato
           alle venti e chi ha tirato avanti nell'infinito: conta l'ondata.
-   `ucc`  i caduti contati in ogni mondo: è la moneta con cui si aprono gli
-          edifici di quel mondo
    `tk`   i caduti contati da ogni edificio, per tipo: è la moneta con cui si
-          aprono i suoi gradi */
-const PROG={unl:1,fin:{},rec:{},arm:{},ucc:{},tk:{}};
+          aprono i suoi gradi
+   `sbl`  gli edifici comprati. È l'unica cosa che si scrive davvero come
+          «aperto» invece di ricavarla: un acquisto è un fatto avvenuto, non
+          una soglia, e deve reggere anche se un giorno il prezzo cambia
+   `fr`   i frammenti in cassa
+   `gio`  il tetto di oggi: {d il giorno, n quanti già presi a prezzo pieno} */
+const PROG={unl:1,fin:{},rec:{},arm:{},tk:{},sbl:{},fr:0,gio:null};
 let COLLAUDO=false,CAMBIO_PROFILO=false,PROFILO_NORMALE=null;
 const NALBO=5;
 /* ═══ QUEL CHE SI È GUADAGNATO ═══
-   Niente si concede: un edificio si apre quando il mondo a cui appartiene è
-   aperto **e** in quel mondo si sono contati abbastanza caduti; un grado si
-   apre quando quell'edificio ne ha contati abbastanza da solo.
-   Nulla di tutto questo si scrive in memoria come «sbloccato»: si ricava dai
-   due contatori, che sono l'unica cosa salvata. Una sorgente sola, e le soglie
-   restano ritoccabili senza lasciare in giro sblocchi che non tornano.
+   Niente si concede. Un edificio si apre a due condizioni insieme: la veglia
+   che lo custodisce dev'essere compiuta, e va pagato in frammenti. La prima non
+   si compra e il secondo non si veglia — è così che il denaro, il giorno che
+   entrerà, potrà risparmiare la macina ma mai la strada, e le pietre di un
+   mondo non finiscono in mano a chi quel mondo non l'ha mai visto.
+   I gradi no: quelli restano appesi ai caduti fatti con quell'edificio, e
+   nessuno li vende. Quel che hai aperto, quanto vale te lo guadagni usandolo.
    Il collaudo apre tutto: è un banco di prova, non una partita. */
-const uccMondo=m=>PROG.ucc[m]|0;
 const uccTorre=k=>PROG.tk[k]|0;
 const soglieGradi=k=>QUATERNA_BASE.indexOf(k)>=0?GRADI_LIEVI:GRADI_ALTRI;
+const edificioPagato=k=>!!(PROG.sbl&&PROG.sbl[k]);
+/* la veglia che lo custodisce è stata compiuta: la prima delle due serrature,
+   e l'unica che non si possa scavalcare in nessun modo */
+function edificioConcesso(k){
+  const c=TOWERS[k];if(!c)return false;
+  return !(c.veglia>0)||!!PROG.fin[c.veglia];
+}
 function edificioAperto(k){
   const c=TOWERS[k];if(!c)return false;
-  if(!(c.ucc>0)||COLLAUDO)return true;
-  const m=c.mondo||1;
-  return mondoAperto(m)&&uccMondo(m)>=c.ucc;
+  if(!(c.veglia>0)||COLLAUDO)return true;
+  return edificioConcesso(k)&&edificioPagato(k);
 }
 /* fin dove si può salire con questo edificio, oggi */
 function gradoMax(k){
@@ -2112,28 +2144,85 @@ function gradoMax(k){
   let g=1;for(let i=0;i<s.length&&n>=s[i];i++)g++;
   return Math.min(MAXLV,g);
 }
-/* quanti caduti mancano: per l'edificio, e per il suo prossimo grado */
-const mancaEdificio=k=>Math.max(0,(TOWERS[k].ucc|0)-uccMondo(TOWERS[k].mondo||1));
+/* quanti caduti mancano al prossimo grado di questo edificio */
 function mancaGrado(k,lv){
   const s=soglieGradi(k);
   if(lv<2||lv>MAXLV)return 0;
   return Math.max(0,s[lv-2]-uccTorre(k));
 }
-/* La prossima soglia di ogni mondo, così a ogni caduto si guarda un numero e
-   non sedici edifici: il conto passa di qui centinaia di volte per ondata.
-   Va rifatta quando cambia quel che è aperto — un mondo nuovo, un profilo
-   nuovo, una soglia varcata. */
-const soglieProssime={};
-function ricalcolaSoglie(){
-  for(let m=1;m<=NMONDI;m++){
-    let s=Infinity;
-    for(const k of TORDER){
-      const c=TOWERS[k];
-      if((c.mondo||1)!==m||!(c.ucc>0)||edificioAperto(k))continue;
-      if(c.ucc<s)s=c.ucc;
-    }
-    soglieProssime[m]=s;
-  }
+/* ═══ I FRAMMENTI ═══
+   La seconda moneta, e la sola che sopravviva alla veglia: le lacrime si
+   spendono in campo e muoiono lì, i frammenti restano e pagano gli edifici.
+   Si guadagnano in tre modi, tutti agganciati all'albo d'oro e non alla
+   semplice fine partita: la prima conquista di una veglia — una volta sola,
+   quindi irripetibile per costruzione — il proprio record battuto, poco per
+   volta e con un tetto al giorno, e le ondate oltre la ventesima, a scalare,
+   così l'infinito non diventa il modo migliore per fare cassa.
+   Il vincolo che regge tutto: quel che un giorno si comprerà con denaro vero
+   sono frammenti, e i frammenti non aprono da soli nemmeno una porta — dietro
+   ce n'è sempre una veglia che va compiuta giocando. */
+const FRAM_PRIMA={1:50,2:80,3:120,4:150,5:190,6:240};
+const FRAM_REC={1:10,2:15};   // per mondo: i mondi ancora chiusi ereditano il secondo
+const FRAM_TETTO=50;          // al giorno, record e infinito insieme
+const FRAM_OLTRE=.2;          // quel che resta del guadagno passato il tetto
+const FRAM_SEGNO='❖';
+const framRec=a=>FRAM_REC[mondoDi(a)]||FRAM_REC[2];
+/* Oltre la ventesima il pagamento cala a scalini: dieci ondate a tre, dieci a
+   due, dieci a una, poi una ogni tre. Chi veglia mille ondate non si compra
+   la campagna. */
+function framOndata(extra){
+  if(extra<=10)return 3;
+  if(extra<=20)return 2;
+  if(extra<=30)return 1;
+  return extra%3===0?1:0;
+}
+/* La giornata è quella dell'orologio locale: non c'è un server a cui chiedere
+   che ore siano, e non ci sarà. Chi sposta le lancette si regala un tetto in
+   più — è il prezzo per non avere infrastruttura, ed è un prezzo onesto. */
+const framOggi=()=>{const d=new Date();
+  return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();};
+function framGiorno(){
+  const o=framOggi();
+  if(!PROG.gio||typeof PROG.gio!=='object')PROG.gio={d:o,n:0};
+  if(PROG.gio.d!==o){PROG.gio.d=o;PROG.gio.n=0;}
+  return PROG.gio;
+}
+/* Il tetto è morbido: non spegne il guadagno, lo assottiglia. Chi ha già
+   preso i suoi cinquanta continua a prendere qualcosa — un quinto — così la
+   sera non sembra un muro, ma nemmeno conviene restare a macinare.
+   Solo la parte pagata a prezzo pieno consuma il tetto: passata quella soglia
+   si resta al quinto fino a mezzanotte. */
+function framTetto(n){
+  if(n<=0)return 0;
+  const g=framGiorno(),resta=Math.max(0,FRAM_TETTO-g.n);
+  const pieno=Math.min(n,resta),ridotto=n-pieno;
+  g.n+=pieno;
+  return pieno+(ridotto>0?Math.max(1,Math.round(ridotto*FRAM_OLTRE)):0);
+}
+let framSess=0;   // quanti ne ha fruttati la veglia in corso: lo dicono le schermate di fine
+/* L'unica porta da cui i frammenti entrano. `tetto` distingue le due fonti
+   ripetibili — record e infinito — dalla prima conquista, che è una per
+   veglia e quindi non ha bisogno di essere frenata. */
+function framDai(n,tetto){
+  n=tetto?framTetto(n):Math.max(0,n|0);
+  if(n<=0)return 0;
+  PROG.fr=(PROG.fr|0)+n;
+  framSess+=n;
+  progSalva();
+  return n;
+}
+const framRiga=()=>framSess>0?' · '+FRAM_SEGNO+' <b>+'+framSess+'</b>':'';
+/* Comprare un edificio: la veglia dev'essere già compiuta, i frammenti in
+   cassa, e non si paga due volte. Il collaudo non compra niente perché ha già
+   tutto. */
+function edificioCompra(k){
+  const c=TOWERS[k];
+  if(!c||!(c.veglia>0)||edificioAperto(k)||!edificioConcesso(k))return false;
+  const p=c.fr|0;
+  if((PROG.fr|0)<p)return false;
+  PROG.fr=(PROG.fr|0)-p;
+  if(!PROG.sbl||typeof PROG.sbl!=='object')PROG.sbl={};
+  PROG.sbl[k]=true;progSalva();return true;
 }
 /* Una quaterna dalla memoria non è mai da fidarsi: può venire da una versione
    con altri edifici, essere stata scritta male, o portarsi dietro un edificio
@@ -3524,27 +3613,17 @@ function kill(e){
   if(heavy)G.shake=6;
 }
 /* ═══ IL CONTO DEI CADUTI ═══
-   Ogni creatura che cade vale due volte: una per il mondo — ed è quel che apre
-   gli edifici nuovi — e una per l'edificio che l'ha finita, ed è quel che ne
-   apre i gradi. Chi è scappato non conta: si contano i caduti, non i passati.
+   Il caduto conta per l'edificio che ci ha messo mano, ed è quel che ne apre i
+   gradi. Gli edifici in sé non si aprono più qui — quelli chiedono una veglia
+   compiuta e un prezzo, e nessuna delle due cose si decide mentre si combatte.
+   Chi è scappato non conta: si contano i caduti, non i passati.
    Non si scrive in memoria a ogni morte — a ×3 sono centinaia di scritture per
    ondata: si segna che c'è da salvare e si salva ai punti fermi (fine ondata,
-   pausa, fine partita) e subito quando qualcosa si apre, che è raro. */
+   pausa, fine partita) e subito quando un grado si apre, che è raro. */
 let progSporco=false;
 function progSalvaSeSporco(){if(progSporco)progSalva();}
 function contaCaduto(e){
-  const m=mondoDi(G.act);
-  const n=(PROG.ucc[m]|0)+1;PROG.ucc[m]=n;
   progSporco=true;
-  // un numero solo da confrontare, non i sedici edifici
-  if(n>=(soglieProssime[m]===undefined?Infinity:soglieProssime[m])){
-    for(const k of TORDER){
-      const c=TOWERS[k];
-      if((c.mondo||1)!==m||!(c.ucc>0)||c.ucc!==soglieProssime[m])continue;
-      if(edificioAperto(k))annuncia('EDIFICIO CONCESSO',c.short);
-    }
-    ricalcolaSoglie();progSalva();
-  }
   // il caduto va a tutti quelli che ci hanno messo mano, non al solo ultimo
   // colpo: sedici bit da guardare, e si guardano una volta per morte
   const mani=e.mani|0;
@@ -3736,6 +3815,8 @@ function update(dt){
     G.waveOn=false;
     G.lacrime+=25+wAbs(G.wave)*6;
     progSalvaSeSporco();   // il conto dei caduti si scrive qui, non a ogni morte
+    // oltre la ventesima ogni ondata frutta qualcosa, sempre meno
+    if(G.endless&&G.wave>20)framDai(framOndata(G.wave-20),true);
     // venti ondate chiudono lo scenario: da lì si sceglie
     if(!G.endless&&G.wave>=20)compiuto();
     else salvaPartita();   // fra un'ondata e l'altra il punto è fermo: si segna
@@ -4694,53 +4775,47 @@ function armSlotHtml(){
 /* Lo stato di un edificio in armeria, in una parola sola:
    `aperto`     lo si può portare in campo
    `sigillato`  il suo mondo è ancora chiuso — catena e lucchetto, e non c'è
-                nessun conto da mostrare: quei caduti non li si può nemmeno fare
-   `conto`      il mondo è aperto ma l'edificio no: via la catena, resta l'ombra
-                e compare la barra con quanti ne mancano */
+                niente da mostrare: quella veglia non la si può nemmeno tentare
+   `veglia`     il mondo è aperto ma la veglia che lo custodisce non è compiuta:
+                il prezzo si vede lo stesso, così nessuno scopre la seconda
+                serratura solo dopo aver girato la prima
+   `prezzo`     la veglia è compiuta: manca solo pagare */
 function armStato(k){
   const c=TOWERS[k];
   if(edificioAperto(k))return 'aperto';
-  return mondoAperto(c.mondo||1)?'conto':'sigillato';
+  if(!mondoAperto(c.mondo||1))return 'sigillato';
+  return edificioConcesso(k)?'prezzo':'veglia';
 }
-function armBarra(k){
-  const c=TOWERS[k],fatti=uccMondo(c.mondo||1),manca=mancaEdificio(k);
-  const q=Math.max(0,Math.min(1,c.ucc?fatti/c.ucc:1));
-  return '<span class="armProg"><span class="apB"><span class="apF" style="width:'+
-    (q*100).toFixed(1)+'%"></span></span><span class="apT">ANCORA <b>'+manca+
-    '</b> CADUTI · '+fatti+' / '+c.ucc+'</span></span>';
-}
+/* la scheda del catalogo: sagoma, nome, e una riga sola che dice a che punto
+   sei. Descrizione e numeri stanno nella scheda di dettaglio, che si apre
+   toccando — qui servono sedici edifici a colpo d'occhio, non sedici schede */
 function armRiga(k){
   const cfg=TOWERS[k],slot=armSel.indexOf(k),dentro=slot>=0;
-  const stato=armStato(k),chiuso=stato!=='aperto';
-  const st=tstats({type:k,lv:1});
-  let numeri;
-  if(cfg.sostegno)numeri='sostegno · voce '+Math.round(st.range);
-  else if(cfg.cut)numeri='scrosta '+Math.round(st.cut*100)+'% · aura '+Math.round(st.range);
-  else if(cfg.pozza)numeri='gittata '+Math.round(st.range)+' · pece '+st.dmg+'/s per '+
-    st.pozT.toFixed(1)+'s';
-  else if(cfg.aura)numeri=(st.slow>0?'rallenta '+Math.round(st.slow*100)+'% · ':'')+
-    'aura '+Math.round(st.range)+' · '+(st.dmg/st.rate).toFixed(1)+' dps';
-  else numeri='gittata '+Math.round(st.range)+' · '+(st.dmg/st.rate).toFixed(1)+' dps';
-  let scegli='';
-  if(armScegli&&!chiuso){
-    const et=slot===armSlot?'SCELTA':(dentro?'SPOSTA QUI':'SCEGLI');
-    scegli='<button type="button" class="armPick'+(slot===armSlot?' on':'')+
-      '" data-arm-choose="'+k+'">'+et+'</button>';
+  const stato=armStato(k),chiuso=stato!=='aperto',prezzo=cfg.fr|0;
+  let azione;
+  if(stato==='aperto'){
+    if(armScegli){
+      const et=slot===armSlot?'SCELTA':(dentro?'SPOSTA':'SCEGLI');
+      azione='<button type="button" class="acAct armPick'+(slot===armSlot?' on':'')+
+        '" data-arm-choose="'+k+'">'+et+'</button>';
+    }else azione='<span class="acRuolo">'+(cfg.ruolo||'')+'</span>';
+  }else if(stato==='sigillato')azione='<span class="acAct acGate">MONDO<br>SIGILLATO</span>';
+  else if(stato==='veglia')azione='<span class="acAct acGate">COMPI<br>'+ATTO[cfg.veglia].nome+'</span>';
+  else{
+    const puoi=(PROG.fr|0)>=prezzo;
+    azione='<button type="button" class="acAct armApri'+(puoi?'':' no')+'" data-arm-apri="'+k+
+      '">'+(puoi?'APRI':'SERVE')+' '+FRAM_SEGNO+prezzo+'</button>';
   }
-  // sotto la descrizione: la barra se c'è un conto aperto, la ragione se il
-  // mondo è ancora chiuso
-  let piede='';
-  if(stato==='conto')piede=armBarra(k);
-  else if(stato==='sigillato')piede='<span class="ad"><i>'+MONDO[cfg.mondo||1].nome+
-    ' · ancora sigillato</i></span>';
-  return '<div class="armR'+(dentro?' on':'')+(chiuso?' chiuso':'')+
+  // il prezzo si vede fin dal principio, anche a veglia non compiuta: la porta
+  // ha due serrature e si devono vedere tutt'e due da subito
+  const targa=chiuso?'<span class="acAdv'+(stato==='prezzo'?' vicino':'')+'">'+
+    (stato==='sigillato'?MONDO[cfg.mondo||1].nome:FRAM_SEGNO+' '+prezzo)+'</span>':'';
+  return '<div class="armCard'+(dentro?' on':'')+(chiuso?' chiuso':'')+
     (stato==='sigillato'?' sigillato':'')+'" data-t="'+k+'">'+
-    '<span class="ap">'+spr(k+'1',2)+'</span>'+
-    '<span class="at"><span class="an">'+cfg.short+
-      '<span class="ar">'+(cfg.ruolo||'')+'</span></span>'+
-      '<span class="ad">'+cfg.desc+'<br><i>'+numeri+'</i></span>'+piede+'</span>'+
-    '<span class="armActions">'+scegli+
-      '<button type="button" class="armMore" data-arm-info="'+k+'">INFO</button></span>'+
+    '<button type="button" class="acBody" data-arm-info="'+k+'">'+
+      '<span class="acI">'+spr(k+'1',2)+'</span>'+
+      '<span class="acN">'+cfg.short+'</span>'+targa+
+    '</button>'+azione+
     (stato==='sigillato'?'<span class="armLucch"><i></i><b></b></span>':'')+'</div>';
 }
 function armCosto(k,lv){
@@ -4783,15 +4858,29 @@ function armDettaglio(k){
   let h=armSlotHtml()+'<button type="button" class="armBack" data-arm-back="1">← TUTTI GLI EDIFICI</button>'+
     '<div class="armInfoHead"><div class="nome">'+cfg.name+'</div><div class="ruolo">'+cfg.ruolo+'</div>'+
     '<div class="desc">'+cfg.desc+'</div></div>';
-  if(stato==='sigillato')h+='<div class="cmpT cmpI">Appartiene a <b>'+MONDO[cfg.mondo||1].nome+
-    '</b>, che è ancora sigillato. Finché quella soglia non si apre non c\'è conto da fare.</div>';
-  else if(stato==='conto')h+='<div class="cmpT cmpI">Si concede dopo <b>'+cfg.ucc+
-    '</b> caduti in <b>'+MONDO[cfg.mondo||1].nome+'</b>. Ne hai contati <b>'+
-    uccMondo(cfg.mondo||1)+'</b>.</div>'+armBarra(k);
+  if(stato!=='aperto'){
+    const prezzo=cfg.fr|0,tuoi=PROG.fr|0;
+    h+='<div class="armChiuso">Appartiene a <b>'+MONDO[cfg.mondo||1].nome+'</b>. Ha due '+
+      'serrature: <b>'+ATTO[cfg.veglia].nome+'</b> compiuta, e '+FRAM_SEGNO+' <b>'+prezzo+
+      '</b> — ne hai '+FRAM_SEGNO+' <b>'+tuoi+'</b>.<br>'+
+      (stato==='sigillato'
+        ?'Quel mondo è ancora sigillato: quella veglia non la si può nemmeno tentare.'
+        :stato==='veglia'
+          ?'La veglia non è ancora compiuta, e non c\'è prezzo che la sostituisca.'
+          :'La veglia è compiuta: manca solo pagare.')+
+      '<br><br>Aperto una volta, è tuo per sempre — in ogni veglia di ogni mondo.</div>';
+    if(stato==='prezzo'){
+      const puoi=tuoi>=prezzo;
+      h+='<button type="button" class="armInfoPick'+(puoi?'':' no')+'" data-arm-apri="'+k+'">'+
+        (puoi?'APRI PER '+FRAM_SEGNO+prezzo:'TI MANCANO '+FRAM_SEGNO+(prezzo-tuoi))+'</button>';
+    }else h+='<div class="armInfoPick gate">'+(stato==='sigillato'
+      ?'MONDO ANCORA SIGILLATO':'COMPI PRIMA '+ATTO[cfg.veglia].nome)+'</div>';
+  }
   if(armScegli&&stato==='aperto')h+='<button type="button" class="armInfoPick" data-arm-choose="'+k+
     '">ASSEGNA ALLO SLOT '+ROMAN(armSlot+1)+'</button>';
   h+='<div class="cmpH">I CINQUE GRADI</div>';
-  h+='<div class="cmpT cmpI">I gradi non si comprano soltanto: si aprono usando l\'edificio. '+
+  h+='<div class="cmpT cmpI">I gradi <b>non si comprano con i frammenti</b>: si aprono usando '+
+    'l\'edificio, e in campo si pagano in lacrime come sempre. '+
     'Con questo hai contato <b>'+uccTorre(k)+'</b> caduti — sei al grado <b>'+ROMAN(g)+'</b>.</div>';
   for(let lv=1;lv<=MAXLV;lv++){
     const c=armCosto(k,lv),prezzo=lv===1?'ERIGI <b>◈'+c.passo+'</b>':
@@ -4817,8 +4906,14 @@ function buildArmeria(){
     conta(TORDER.length)+', <b>'+conta(NSLOT)+'</b> in campo. La quaterna si sceglie prima di '+
     'scendere e non si cambia più: sceglila guardando la veglia che ti aspetta, non l\'ultima '+
     'che hai vinto.'+
-    '<br><br>Gli altri si guadagnano contando caduti nel mondo a cui appartengono, e ogni '+
-    'edificio ha <b>cinque gradi</b> che si aprono usandolo: i primi quattro crescono di sagoma, '+
+    '<br><br>Gli altri hanno <b>due serrature</b>: la veglia che li custodisce dev\'essere '+
+    'compiuta, e vanno pagati in <b>frammenti</b> ('+FRAM_SEGNO+'), che restano fra una veglia e '+
+    'l\'altra e si raccolgono compiendo una veglia per la prima volta, battendo il proprio record '+
+    'e tenendo le ondate oltre la ventesima. Nessuna delle due sostituisce l\'altra: le pietre '+
+    'della Città non si concedono a chi la Città non l\'ha ancora vista, per quanti frammenti '+
+    'abbia in mano.'+
+    '<br><br>I <b>gradi</b>, quelli, non si comprano affatto: si aprono <b>usando</b> l\'edificio, '+
+    'e il caduto va a tutti quelli che ci hanno messo mano. I primi quattro crescono di sagoma, '+
     'il quinto cambia materia — marmo e oro, fiamma fredda — e non si ingrandisce più.</div>';
   // un blocco per mondo: così si vede a colpo d'occhio che cosa manca e dove
   for(let m=1;m<=NMONDI;m++){
@@ -4826,7 +4921,7 @@ function buildArmeria(){
     if(!righe.length)continue;
     h+='<div class="cmpH">'+MONDO[m].nome+' · '+righe.filter(edificioAperto).length+
       ' SU '+righe.length+'</div>';
-    for(const k of righe)h+=armRiga(k);
+    h+='<div class="armGrid">'+righe.map(armRiga).join('')+'</div>';
   }
   return h;
 }
@@ -4834,15 +4929,16 @@ function armeriaAggiorna(){
   el('scLore').innerHTML=buildArmeria();
   const sc=el('scScore');
   sc.classList.remove('hidden');
+  const borsa=' · <span class="fram">'+FRAM_SEGNO+' <b>'+(PROG.fr|0)+'</b></span>';
   if(armScegli){
     const n=armPiene();
-    sc.innerHTML=armAvviso||('SLOT <b>'+ROMAN(armSlot+1)+'</b> ATTIVO · '+
-      (n<NSLOT?'DA RIEMPIRE: <b>'+(NSLOT-n)+'</b>':'QUATERNA PRONTA'));
+    sc.innerHTML=(armAvviso||('SLOT <b>'+ROMAN(armSlot+1)+'</b> ATTIVO · '+
+      (n<NSLOT?'DA RIEMPIRE: <b>'+(NSLOT-n)+'</b>':'QUATERNA PRONTA')))+borsa;
     el('scMain').textContent='SCENDI · '+ATTO[tsel].nome;
     el('scMain').disabled=!armPronta();
   }else{
-    sc.innerHTML='<b>'+TORDER.filter(edificioAperto).length+'</b> EDIFICI SU '+TORDER.length+
-      ' · '+conta(NSLOT).toUpperCase()+' IN CAMPO';
+    sc.innerHTML=(armAvviso||('<b>'+TORDER.filter(edificioAperto).length+'</b> EDIFICI SU '+
+      TORDER.length+' · '+conta(NSLOT).toUpperCase()+' IN CAMPO'))+borsa;
   }
 }
 function armeria(scegli){
@@ -4863,6 +4959,22 @@ el('scLore').addEventListener('click',ev=>{
   if(slot&&armScegli){
     audio();armSlot=Math.max(0,Math.min(NSLOT-1,Number(slot.dataset.armSlot)||0));
     armAvviso='SLOT <b>'+ROMAN(armSlot+1)+'</b> · scegli un edificio dal catalogo';
+    armeriaAggiorna();return;
+  }
+  /* comprare si può da tutt'e due i modi dell'armeria: chi la sta solo
+     sfogliando non deve prima fingere di scendere in campo */
+  const apri=hit('[data-arm-apri]');
+  if(apri){
+    audio();
+    const k=apri.dataset.armApri,c=TOWERS[k].fr|0;
+    if(edificioCompra(k)){
+      armAvviso='<b>'+TOWERS[k].short+'</b> è aperto · da ora è tuo in ogni veglia';
+      // appena aperto, se c'è uno slot libero ci entra: era quello che si voleva
+      if(armScegli){const v=armSel.indexOf(null);if(v>=0){armSel[v]=k;armSlot=v;
+        armAvviso='<b>'+TOWERS[k].short+'</b> aperto e messo allo slot '+ROMAN(v+1);}}
+    }else if(!edificioConcesso(k))
+      armAvviso='<b>'+TOWERS[k].short+'</b> · prima va compiuta <b>'+ATTO[TOWERS[k].veglia].nome+'</b>';
+    else armAvviso='<b>'+TOWERS[k].short+'</b> · ti mancano '+FRAM_SEGNO+(c-(PROG.fr|0));
     armeriaAggiorna();return;
   }
   const info=hit('[data-arm-info]');
@@ -4937,6 +5049,7 @@ function azzeraCampo(a){
   G.enemies.length=0;G.towers.length=0;G.shots.length=0;G.beams.length=0;
   G.parts.length=0;G.rings.length=0;G.queue.length=0;G.pozze.length=0;
   G.sel=null;G.build=null;G.waveOn=false;G.t=0;G.killed=0;G.shake=0;
+  framSess=0;   // il conto dei frammenti è di questa veglia, non di quella prima
   CODA_AVVISI.length=0;   // gli avvisi di ieri non si affacciano sulla veglia di oggi
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(grid[r][c]===3)grid[r][c]=0;
   rebuildFree();
@@ -4983,34 +5096,34 @@ function gameOver(){
       'Si è chinato per entrare, e la porta era comunque troppo bassa.<br><br>'+
       'Contro una cosa simile non si resiste: la si ferma prima, oppure non la si ferma.',
       'RIPROVA','TORNA ALLA MAPPA',
-      'FERMATO AL <b>'+Math.round((1-(G.bossHp||0))*100)+'%</b> · CADUTI: <b>'+G.killed+'</b>');
+      'FERMATO AL <b>'+Math.round((1-(G.bossHp||0))*100)+'%</b> · CADUTI: <b>'+G.killed+'</b>'+framRiga());
   else if(G.act>=4)
     showScreen('CONNESSIONE<br>INTERROTTA','LA CITTÀ HA VINTO',
       'I sigilli di rete sono esauriti. Il protocollo ostile ha attraversato la soglia e '+
       'la città ha riscritto il tuo nome come un errore.<br><br>Il canale può essere riaperto. '+
       'La pioggia, intanto, non ha mai smesso.',
       'RIAVVIA LO SCENARIO','TORNA ALLA MAPPA',
-      'PROTOCOLLO <b>'+ROMAN(Math.max(1,rel))+'</b> · UNITÀ DISATTIVATE: <b>'+G.killed+'</b>');
+      'PROTOCOLLO <b>'+ROMAN(Math.max(1,rel))+'</b> · UNITÀ DISATTIVATE: <b>'+G.killed+'</b>'+framRiga());
   else if(G.act===3)
     showScreen('IL LIBRO<br>SI CHIUDE','IL GIUDIZIO HA VINTO',
       'I sigilli sono finiti. Ciò che scendeva dal cielo aperto è entrato in ordine, '+
       'in fila, senza fretta, come chi non ha mai avuto dubbi.<br><br>'+
       'Il tuo nome era in quel libro. Adesso non c\'è più.',
       'RIPROVA IL GIUDIZIO','TORNA ALLA MAPPA',
-      'GIUDIZIO <b>'+ROMAN(Math.max(1,rel))+'</b> · CADUTI: <b>'+G.killed+'</b>');
+      'GIUDIZIO <b>'+ROMAN(Math.max(1,rel))+'</b> · CADUTI: <b>'+G.killed+'</b>'+framRiga());
   else if(G.act===2)
     showScreen('IL FUOCO<br>È DENTRO','LA CREPA HA VINTO',
       'I sigilli sono cenere. Ciò che saliva dal fondo adesso siede dove sedeva il santo, '+
       'e la pietra sopra di te comincia a colare.<br><br>'+
       'Il sagrato tornerà a essere consacrato. Qualcuno dovrà rifare tutto daccapo.',
       'RIPROVA LA DISCESA','TORNA ALLA MAPPA',
-      'DISCESA <b>'+ROMAN(Math.max(1,rel))+'</b> · CADUTI: <b>'+G.killed+'</b>');
+      'DISCESA <b>'+ROMAN(Math.max(1,rel))+'</b> · CADUTI: <b>'+G.killed+'</b>'+framRiga());
   else
     showScreen('LE CAMPANE<br>TACCIONO','IL CORTEO HA VARCATO LA SOGLIA',
       'I sigilli sono infranti. Ciò che scendeva dal valico ora è dentro la navata, '+
       'e canta con la tua voce.<br><br>Un\'altra veglia ti attende, campanaro.',
       'VEGLIA DI NUOVO','TORNA ALLA MAPPA',
-      'ONDATE RESISTITE: <b>'+ROMAN(Math.max(1,rel))+'</b> · CADUTI: <b>'+G.killed+'</b>');
+      'ONDATE RESISTITE: <b>'+ROMAN(Math.max(1,rel))+'</b> · CADUTI: <b>'+G.killed+'</b>'+framRiga());
 }
 /* Venti ondate compiute: da qui si sceglie. Proseguire all'infinito lascia
    in piedi tutto quello che si è costruito; scendere alla veglia dopo no —
@@ -5049,7 +5162,10 @@ const CHIUSURA={
    significa che la partita continua: è l'unico ramo che non scarta il sospeso. */
 function compiuto(){
   const a=G.act,fineMondo=ultimoDelMondo(a),ultimo=a>=NSCEN;
+  // va guardato prima che il flag si alzi: la prima conquista è una sola
+  const primaVolta=!PROG.fin[a];
   G.state='won';PROG.fin[a]=true;segna();
+  if(primaVolta)framDai(FRAM_PRIMA[a]||0,false);
   chiudiPausa();msel=mondoDi(a);tsel=a;
   if(!ultimo)sblocca(a+1);
   progSalva();
@@ -5072,7 +5188,7 @@ function compiuto(){
   showScreen(c.tit,c.sub,c.testo+coda,
     fineMondo?'RESTA A VEGLIARE':'SCENDI · '+ATTO[a+1].nome,
     fineMondo?'TORNA AI MONDI':'RESTA A VEGLIARE',
-    'ONDATE: <b>'+ROMAN(G.wave)+'</b> · CADUTI: <b>'+G.killed+'</b> · TORRI: <b>'+G.towers.length+'</b>',
+    'ONDATE: <b>'+ROMAN(G.wave)+'</b> · CADUTI: <b>'+G.killed+'</b> · TORRI: <b>'+G.towers.length+'</b>'+framRiga(),
     null);
 }
 /* restare a vegliare: la partita prosegue, quindi il sospeso si riscrive */
@@ -5090,10 +5206,7 @@ function progSalva(){
     window.storage.set(COLLAUDO?'veglia:prog:test':'veglia:prog',JSON.stringify(PROG));}catch(e){}
 }
 function sblocca(a){
-  if(a>PROG.unl&&a<=NSCEN){PROG.unl=a;progSalva();
-    // un mondo che si apre mette in conto i suoi edifici: la prossima soglia
-    // da guardare non è più la stessa
-    ricalcolaSoglie();}
+  if(a>PROG.unl&&a<=NSCEN){PROG.unl=a;progSalva();}
 }
 /* L'albo: si infila la serie, si riordina per ondata (a parità, per caduti)
    e si tiene solo la cima. Ci passa ogni fine partita, anche l'abbandono. */
@@ -5101,10 +5214,15 @@ function segna(){
   progSalvaSeSporco();   // anche una veglia senza ondate compiute ha contato caduti
   if(G.wave<1)return;
   const l=albo(G.act).slice();
+  const prima=l[0]?l[0].w:0;   // il primato di prima: si paga solo se lo si supera
   l.push({w:G.wave,k:G.killed});
   l.sort((x,y)=>y.w-x.w||y.k-x.k);
   PROG.rec[G.act]=l.slice(0,NALBO);
   progSalva();
+  /* Rigiocare una veglia senza andare più a fondo non frutta niente: è questo
+     che tiene lontano il macinare la prima veglia all'infinito. Il canale è
+     auto-limitante — non ci si batte da soli senza scendere davvero. */
+  if(G.wave>prima)framDai(framRec(G.act),true);
 }
 
 /* ═══ PARTITE SOSPESE ═══
@@ -5136,12 +5254,13 @@ async function cambiaProfilo(){
       PROFILO_NORMALE={prog:copiaMemoria(PROG),save:copiaMemoria(SAVE)};
       COLLAUDO=true;
       const p=await leggiMemoria('veglia:prog:test'),s=await leggiMemoria('veglia:save:test');
-      sostituisciMemoria(PROG,p||{unl:NSCEN,fin:{},rec:{},arm:{},ucc:{},tk:{}});
+      sostituisciMemoria(PROG,p||{unl:NSCEN,fin:{},rec:{},arm:{},tk:{},sbl:{},fr:0,gio:null});
       PROG.fin=PROG.fin&&typeof PROG.fin==='object'?PROG.fin:{};
       PROG.rec=PROG.rec&&typeof PROG.rec==='object'?PROG.rec:{};
       PROG.arm=PROG.arm&&typeof PROG.arm==='object'?PROG.arm:{};
-      PROG.ucc=PROG.ucc&&typeof PROG.ucc==='object'?PROG.ucc:{};
       PROG.tk=PROG.tk&&typeof PROG.tk==='object'?PROG.tk:{};
+      PROG.sbl=PROG.sbl&&typeof PROG.sbl==='object'?PROG.sbl:{};
+      PROG.fr=Math.max(0,PROG.fr|0);
       PROG.unl=NSCEN;sostituisciMemoria(SAVE,s||{});migraProg();progSalva();
       tsel=MONDO[2].scen[0];msel=2;applyAct(tsel);
     }else{
@@ -5153,7 +5272,6 @@ async function cambiaProfilo(){
       PROG.unl=Math.min(NSCEN,Math.max(1,PROG.unl|0)||1);
       tsel=PROG.unl;msel=mondoDi(tsel);applyAct(tsel);
     }
-    ricalcolaSoglie();   // cambia il profilo, cambia quel che è già guadagnato
     menu();
   }finally{CAMBIO_PROFILO=false;}
 }
@@ -5264,8 +5382,11 @@ function riprendiOScendi(a){if(!riprendi(a))startScen(a);}
       if(p.fin&&typeof p.fin==='object')PROG.fin=p.fin;
       if(p.rec&&typeof p.rec==='object')PROG.rec=p.rec;
       if(p.arm&&typeof p.arm==='object')PROG.arm=p.arm;
-      if(p.ucc&&typeof p.ucc==='object')PROG.ucc=p.ucc;
       if(p.tk&&typeof p.tk==='object')PROG.tk=p.tk;
+      if(p.sbl&&typeof p.sbl==='object')PROG.sbl=p.sbl;
+      if(p.gio&&typeof p.gio==='object')PROG.gio=p.gio;
+      PROG.fr=Math.max(0,p.fr|0);
+      PROG.pag=!!p.pag;
     }
   }else{
     // dalla vecchia campagna unica da sessanta ondate al conto per veglia
@@ -5280,7 +5401,6 @@ function riprendiOScendi(a){if(!riprendi(a))startScen(a);}
     }
   }
   migraProg();
-  ricalcolaSoglie();   // la memoria è arrivata: si sa da dove si riparte
   const sv=await window.storage.get('veglia:save');
   if(sv&&sv.value){
     const p=JSON.parse(sv.value);
@@ -5304,6 +5424,16 @@ function migraProg(){
     const l=albo(a);
     if(!PROG.fin[a]&&(a<PROG.unl||(l[0]&&l[0].w>=20))){PROG.fin[a]=true;tocco=true;}
   }
+  /* Chi aveva già compiuto delle veglie prima che i frammenti esistessero non
+     può ritrovarsi a zero: la prima conquista gli si paga adesso, tutta in una
+     volta. `pag` è il segno che il conto è stato saldato, e non si ripete. */
+  if(!PROG.pag){
+    let arretrato=0;
+    for(let a=1;a<=NSCEN;a++)if(PROG.fin[a])arretrato+=FRAM_PRIMA[a]||0;
+    PROG.pag=true;
+    if(arretrato>0)PROG.fr=(PROG.fr|0)+arretrato;
+    tocco=true;
+  }
   if(tocco)progSalva();
 }
 
@@ -5311,7 +5441,6 @@ if('serviceWorker' in navigator&&location.protocol.startsWith('http'))
   navigator.serviceWorker.register('sw.js').catch(()=>{});
 
 /* ─────────── AVVIO ─────────── */
-ricalcolaSoglie();   // prima di ogni cosa: senza, nessuna soglia scatterebbe mai
 buildBar();
 menu();
 fit();

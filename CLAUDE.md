@@ -139,13 +139,15 @@ fermato alle venti e chi ha tirato avanti nell'infinito — conta l'ondata.
 `segna()` infila, riordina e taglia a `NALBO`; ci passa anche l'abbandono.
 
 **Memoria**, due chiavi via `window.storage`, mai `localStorage`:
-- `veglia:prog` → `PROG` = `{unl, fin, rec, arm, ucc, tk}`: fin dove si è
-  arrivati, quali scenari sono **compiuti** (`unl` non basta: l'ultimo scenario
-  non ha un successivo da sbloccare), l'albo, l'ultima quaterna per scenario, i
-  caduti contati **per mondo** (`ucc`) e **per edificio** (`tk`). Migra dal
-  vecchio `veglia:best` e dal vecchio `rec[a]` a record singolo (`migraProg`);
-  una memoria senza `ucc`/`tk` riparte da zero contatori, cioè dai quattro
-  storici — voluto: sono l'unica cosa che si può dare a chi non ha una storia.
+- `veglia:prog` → `PROG` = `{unl, fin, rec, arm, tk, sbl, fr, gio, pag}`: fin dove
+  si è arrivati, quali scenari sono **compiuti** (`unl` non basta: l'ultimo
+  scenario non ha un successivo da sbloccare), l'albo, l'ultima quaterna per
+  scenario, i caduti contati **per edificio** (`tk`, apre i gradi), gli edifici
+  **comprati** (`sbl`), i **frammenti** in cassa (`fr`), il tetto di oggi (`gio`)
+  e il segno che l'arretrato è stato saldato (`pag`). Migra dal vecchio
+  `veglia:best` e dal vecchio `rec[a]` a record singolo (`migraProg`); una
+  memoria senza `tk`/`sbl` riparte dai quattro storici al primo grado — voluto:
+  sono l'unica cosa che si può dare a chi non ha una storia.
 - `veglia:save` → `SAVE`, una partita sospesa per scenario. Separata apposta:
   un salvataggio malandato non si deve portare dietro l'albo d'oro.
 - L'account Collaudo usa `veglia:prog:test` e `veglia:save:test`: apre tutte le
@@ -227,29 +229,49 @@ Sei edifici hanno meccaniche proprie, non solo numeri diversi:
 ## Quel che si guadagna
 
 Niente è concesso in partenza tranne i quattro storici al primo grado. Il resto
-si compra con l'unica moneta che il gioco produce: **i caduti**.
+si guadagna in due monete diverse, e non sono intercambiabili: **le veglie e i
+frammenti** aprono gli edifici, **i caduti** ne aprono i gradi.
 
-**Gli edifici** si aprono contando caduti **nel mondo a cui appartengono**.
-Ogni voce di `TOWERS` dichiara `mondo` e `ucc`, e non serve altro: aggiungere un
-edificio a un mondo nuovo è scrivere due numeri lì. Le soglie sono 250, 600,
-1000, 1500, 2100, 2800 per i sei di ogni mondo — uno scenario compiuto vale
-circa 850 caduti, quindi il primo arriva a metà della prima veglia e l'ultimo
-poco dopo aver compiuto il mondo. I quattro storici hanno `ucc:0`.
+**Gli edifici** hanno due serrature insieme. Ogni voce di `TOWERS` dichiara
+`mondo`, `veglia` (quale veglia di quel mondo va compiuta) e `fr` (quanto costa
+aprirlo): aggiungere un edificio a un mondo nuovo è scrivere tre numeri lì. I
+quattro storici hanno `veglia:0` e devono restarci — sotto i quattro la quaterna
+non si riempie e non si scende in campo.
 
-**I gradi** si aprono usando l'edificio: `GRADI_LIEVI` (8/30/80/160) per i
-quattro storici, `GRADI_ALTRI` (20/70/180/380) per gli altri dodici. Due
-tabelle e non una perché i quattro storici sono la quaterna di riferimento su
-cui è tarato `ATTO`, e un cancello troppo stretto lì sposterebbe il
-bilanciamento invece di aggiungersi: a 10/40/100/200 la prima Veglia non regge
-più un `×1.05` e il punto di rottura si sposta; a 8/30/80/160 torna a rompersi
-dove si è sempre rotta (`×1.10`) e il cancello si sente lo stesso — si arriva in
-fondo con otto sigilli in meno. Sono numeri da sweep, non da intuito.
+La prima serratura non si compra e la seconda non si veglia. È questo che tiene
+il denaro fuori dalla progressione il giorno che i frammenti si venderanno: si
+potrà risparmiare la macina, mai la strada, e le pietre di un mondo non
+finiscono in mano a chi quel mondo non l'ha mai visto. `edificioConcesso`
+risponde della veglia, `edificioPagato` del prezzo, `edificioAperto` di
+tutt'e due; `edificioCompra` è l'unico posto da cui si paga.
 
-**Niente di tutto questo si scrive come «sbloccato»**: si ricava da due
-contatori, che sono l'unica cosa in memoria (`PROG.ucc` per mondo, `PROG.tk` per
-edificio). Una sorgente sola, e le soglie restano ritoccabili senza lasciare in
-giro sblocchi che non tornano. `edificioAperto`, `gradoMax`, `mancaEdificio` e
-`mancaGrado` sono le sole quattro domande che il resto del gioco fa.
+**I frammenti** (`FRAM_*`, `framDai`) sono la moneta che sopravvive alla veglia,
+e un giorno si comprerà con denaro vero. Entrano da tre porte, tutte agganciate
+all'albo d'oro e non alla semplice fine partita: la **prima conquista** di una
+veglia (`FRAM_PRIMA`, 50→240), irripetibile per costruzione; il **proprio record
+battuto** (`framRec`, 10 nel primo mondo e 15 nel secondo) — rigiocare senza
+andare più a fondo non frutta niente, ed è questo che rende il canale
+auto-limitante; le **ondate oltre la ventesima** (`framOndata`), a scalare
+3/2/1/1-ogni-tre, così l'infinito non diventa il modo migliore per fare cassa.
+Sopra i due canali ripetibili c'è un **tetto morbido** di `FRAM_TETTO` al giorno
+(`framTetto`): passato quello non si azzera, si assottiglia a un quinto — la
+sera non sembra un muro ma non conviene restare a macinare. Il giorno è quello
+dell'orologio locale: chi sposta le lancette si regala un tetto in più, ed è il
+prezzo onesto per non avere infrastruttura.
+
+Il conto della campagna: dieci edifici da aprire per **2080** frammenti, contro
+gli ~885 che frutta una prima traversata completa. Il resto si macina o si
+comprerà — ed è voluto che sia così. Quel che **non** deve mai succedere è che
+serva comprare per finire la campagna: `sim.js` gira coi soli quattro storici e
+deve continuare a compierli tutti e sei. È la garanzia, e si verifica lì.
+
+**I gradi** si aprono usando l'edificio, e non si comprano affatto: `GRADI_LIEVI`
+(8/30/80/160) per i quattro storici, `GRADI_ALTRI` (20/70/180/380) per gli altri
+dodici. Due tabelle e non una perché i quattro storici sono la quaterna di
+riferimento su cui è tarato `ATTO`, e un cancello troppo stretto lì sposterebbe
+il bilanciamento invece di aggiungersi: a 10/40/100/200 la prima Veglia non
+regge più un `×1.05` e il punto di rottura si sposta; a 8/30/80/160 torna a
+rompersi dove si è sempre rotta (`×1.10`). Sono numeri da sweep, non da intuito.
 
 **Il caduto va a chi ci ha messo mano, non all'ultimo colpo.** Era la parte
 sbagliata alla prima stesura e si è vista subito nella simulazione: la campana
@@ -264,10 +286,9 @@ passa da 14 a 585 e gli scenari 2-6 tornano **identici al bit** a prima.
 
 Il conto **non** si scrive su disco a ogni morte — sarebbero centinaia di
 scritture per ondata a ×3: si segna `progSporco` e si salva ai punti fermi (fine
-ondata, sospensione, fine partita) e subito quando qualcosa si apre, che è raro.
-`soglieProssime` tiene la prossima soglia di ogni mondo, così a ogni caduto si
-confronta un numero e non sedici edifici; va rifatta (`ricalcolaSoglie`) quando
-cambia quel che è aperto: avvio, mondo nuovo, cambio di profilo, soglia varcata.
+ondata, sospensione, fine partita) e subito quando un grado si apre, che è raro.
+Gli edifici, quelli, non si aprono mai mentre si combatte: le loro due serrature
+si girano in armeria e a fine veglia.
 
 **L'avviso** (`annuncia`/`avvisiTick`, `#avviso`) compare e scompare da solo in
 alto, dove non incrocia il banner dell'ondata. Uno per volta e in coda: in
@@ -287,15 +308,23 @@ in modalità scelta si tocca prima lo slot e poi `SCEGLI` sull'edificio. Se
 l'edificio è già equipaggiato, i due slot si scambiano. Ogni riga ha un tasto
 `INFO` che apre sprite, costi e statistiche di tutti e cinque i gradi.
 
-Il catalogo è **raggruppato per mondo** e ogni riga ha tre stati, che si devono
-leggere senza leggere una parola: aperta; **sigillata** — il mondo è ancora
-chiuso, catena in diagonale e lucchetto sull'edificio, nessun conto da mostrare
-perché quei caduti non li si può nemmeno fare; **in conto** — il mondo è aperto
-ma l'edificio no: via la catena, resta l'ombra e compare la barra con quanti ne
-mancano. Il lucchetto sta sulla sagoma e non sul tasto `INFO`: la scheda si deve
-poter leggere anche di quel che non si è guadagnato, e nella scheda i gradi
-chiusi dicono quanti caduti mancano. In partita lo stesso conto sta sul tasto
-del pannello (`GRADO III · −40`) invece del prezzo.
+Il catalogo è una **griglia** di schede compatte — due colonne sul telefono, tre
+da 480px in su — **raggruppata per mondo**: sedici edifici in colonna singola
+sono sedici schermate di scorrimento, e qui serve vedere a colpo d'occhio dove
+si è arrivati. Descrizione e numeri stanno nella scheda di dettaglio, a un tocco.
+
+Ogni scheda ha quattro stati, che si devono leggere senza leggere una parola:
+**aperto**; **sigillato** — il mondo è ancora chiuso, catena in diagonale e
+lucchetto sulla sagoma; **veglia** — il mondo è aperto ma la veglia che lo
+custodisce non è compiuta; **prezzo** — la veglia c'è, manca solo pagare.
+Il prezzo si vede **fin da subito**, anche a veglia non compiuta: la porta ha due
+serrature e non se ne deve scoprire una alla volta, che è il modo più sicuro di
+far sentire estorto un premium. Per lo stesso motivo la serratura che il denaro
+non apre è grigia tratteggiata e **mai viola**: il viola è il colore dei
+frammenti e prometterebbe che basti pagare. Il lucchetto sta sulla sagoma e non
+sul tasto `INFO`: la scheda si deve poter leggere anche di quel che non si è
+guadagnato, e lì i gradi chiusi dicono quanti caduti mancano. In partita lo
+stesso conto sta sul tasto del pannello (`GRADO III · −40`) invece del prezzo.
 
 **Sigilli (vite):** se ne guadagna **1 per ondata** e si muore quando scendono
 sotto zero. Nella Veglia si parte da **0** e le prime ondate non perdonano
