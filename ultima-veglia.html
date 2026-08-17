@@ -183,6 +183,20 @@ canvas#menubg.off{display:none}
 .armSlot .asT{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   font-size:7px;letter-spacing:.06em;color:#c9a227}
 .armSlot.vuoto .asT{color:#584f45}
+/* ── l'introduzione: un rigo sempre, la regola a chi la chiede ──
+   La regola delle due serrature si impara una volta sola, ma stava distesa in
+   cima a ogni visita: tre capoversi da riscorrere ogni volta per arrivare alle
+   schede. Fuori resta il conto, che cambia a ogni acquisto; dentro va la
+   regola, che non cambia mai. Si apre sul posto e non in un'altra schermata —
+   il compendio parla delle schiere, e rimanda qui, non viceversa. */
+.armSpiegaB{display:inline-flex;align-items:center;margin-left:5px;
+  font:600 7.5px/1 ui-monospace,monospace;letter-spacing:.08em;color:#8fa5b0;
+  border:1px solid #3a3344;border-radius:2px;background:#100d16;padding:3px 6px}
+/* niente animazione d'apertura: l'altezza del testo dipende da quanto è
+   stretto lo schermo, e un tetto fisso qui taglierebbe la spiegazione a metà
+   proprio sui telefoni più piccoli */
+.armSpiegaT{display:none;margin-top:7px;padding-top:7px;border-top:1px solid #241f2b}
+.armSpiegaT.on{display:block}
 /* Il catalogo è una griglia di schede compatte, non una colonna di righe:
    sedici edifici in colonna singola sono sedici schermate di scorrimento, e
    quel che serve qui è vedere a colpo d'occhio dove si è arrivati. Descrizione
@@ -4752,7 +4766,7 @@ function alboScreen(){
    in cui si compone la quaterna da portare in veglia.
    Due modi, stessa schermata: si sfoglia (dai mondi) oppure si sceglie
    (dalla mappa, prima di scendere). */
-let armSel=[],armScegli=false,armAvviso='',armSlot=0,armInfo=null;
+let armSel=[],armScegli=false,armAvviso='',armSlot=0,armInfo=null,armSpiega=false;
 const armPiene=()=>armSel.filter(k=>TOWERS[k]).length;
 const armPronta=()=>armPiene()===NSLOT&&new Set(armSel).size===NSLOT;
 function armSlotHtml(){
@@ -4898,9 +4912,12 @@ function buildArmeria(){
   if(armInfo&&TOWERS[armInfo])return armDettaglio(armInfo);
   const aperti=TORDER.filter(edificioAperto).length;
   let h=armSlotHtml()+'<div class="cmpT cmpI"><b>'+conta(aperti)+'</b> edifici su '+
-    conta(TORDER.length)+', <b>'+conta(NSLOT)+'</b> in campo. La quaterna si sceglie prima di '+
-    'scendere e non si cambia più: sceglila guardando la veglia che ti aspetta, non l\'ultima '+
-    'che hai vinto.'+
+    conta(TORDER.length)+', <b>'+conta(NSLOT)+'</b> in campo: la quaterna si sceglie prima di '+
+    'scendere e non si cambia più.'+
+    '<button type="button" class="armSpiegaB" data-arm-spiega="1">COME FUNZIONA '+
+    (armSpiega?'▴':'▾')+'</button>'+
+    '<div class="armSpiegaT'+(armSpiega?' on':'')+'">'+
+    'Scegli guardando la veglia che ti aspetta, non l\'ultima che hai vinto.'+
     '<br><br>Gli altri hanno <b>due serrature</b>: la veglia che li custodisce dev\'essere '+
     'compiuta, e vanno pagati in <b>frammenti</b> ('+FRAM_SEGNO+'), che restano fra una veglia e '+
     'l\'altra e si raccolgono compiendo una veglia per la prima volta, battendo il proprio record '+
@@ -4909,7 +4926,8 @@ function buildArmeria(){
     'abbia in mano.'+
     '<br><br>I <b>gradi</b>, quelli, non si comprano affatto: si aprono <b>usando</b> l\'edificio, '+
     'e il caduto va a tutti quelli che ci hanno messo mano. I primi quattro crescono di sagoma, '+
-    'il quinto cambia materia — marmo e oro, fiamma fredda — e non si ingrandisce più.</div>';
+    'il quinto cambia materia — marmo e oro, fiamma fredda — e non si ingrandisce più.'+
+    '</div></div>';
   // un blocco per mondo: così si vede a colpo d'occhio che cosa manca e dove
   for(let m=1;m<=NMONDI;m++){
     const righe=TORDER.filter(k=>(TOWERS[k].mondo||1)===m);
@@ -4937,7 +4955,7 @@ function armeriaAggiorna(){
   }
 }
 function armeria(scegli){
-  smode='armeria';armScegli=!!scegli;armAvviso='';armSlot=0;armInfo=null;
+  smode='armeria';armScegli=!!scegli;armAvviso='';armSlot=0;armInfo=null;armSpiega=false;
   const q=quaterneValida(PROG.arm[tsel]||QUATERNA_BASE);
   armSel=Array.from({length:NSLOT},(_,i)=>q[i]||null);
   showScreen("L'ARMERIA",scegli?'SCEGLI CON CHE COSA SCENDERE':'LE PIETRE CHE PUOI CONSACRARE',
@@ -4971,6 +4989,18 @@ el('scLore').addEventListener('click',ev=>{
       armAvviso='<b>'+TOWERS[k].short+'</b> · prima va compiuta <b>'+ATTO[TOWERS[k].veglia].nome+'</b>';
     else armAvviso='<b>'+TOWERS[k].short+'</b> · ti mancano '+FRAM_SEGNO+(c-(PROG.fr|0));
     armeriaAggiorna();return;
+  }
+  /* il «come funziona» si apre e si chiude sul posto, senza rifare la pagina:
+     rifarla riporterebbe il catalogo in cima proprio mentre lo si sta leggendo.
+     A tenere il vero è comunque armSpiega, che buildArmeria rilegge: chi compra
+     un edificio mentre la spiegazione è aperta se la ritrova aperta */
+  const spiega=hit('[data-arm-spiega]');
+  if(spiega){
+    audio();armSpiega=!armSpiega;
+    const t=el('scLore').querySelector('.armSpiegaT');
+    if(t)t.classList.toggle('on',armSpiega);
+    spiega.textContent='COME FUNZIONA '+(armSpiega?'▴':'▾');
+    return;
   }
   const info=hit('[data-arm-info]');
   if(info){audio();armInfo=info.dataset.armInfo;armAvviso='';armeriaAggiorna();
