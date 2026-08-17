@@ -375,9 +375,11 @@ const C={
   blood:'#8e1b25', ember:'#e8703a', flame:'#f2c14e', spirit:'#7fa8b8'
 };
 /* Identità visiva corrente: i primi tre atti sono il mondo gotico, dal
-   quarto al sesto si entra nella città neon. È dichiarata prima del percorso
-   perché anche gli ingombri decorativi cambiano materia fra i mondi. */
-let INF=false,APO=false,CYBER=false,CYFASE=0;
+   quarto al sesto si entra nella città neon, dal settimo al nono nella polis
+   greca. È dichiarata prima del percorso perché anche gli ingombri decorativi
+   cambiano materia fra i mondi.
+   POLFASE dice quale dei tre assedi: 0 i Persiani, 1 i Romani, 2 gli Unni. */
+let INF=false,APO=false,CYBER=false,CYFASE=0,POLIS=false,POLFASE=0;
 
 /* ─────────── PIXEL ART ─────────── */
 const ART={};
@@ -974,6 +976,248 @@ for(let v=0;v<CY_SCHIERE.length;v++)for(const ruolo in CY_SCHIERE[v]){
   const nome=CY_SCHIERE[v][ruolo],art=ART[nome]||cyberMobArt(ruolo,v);
   reg(nome,art,PAL_NEON[v],'#ffffff');
   if(ruolo==='big'||ruolo==='final')reg(nome+'_b',art,PAL_NEON_B[v],'#ffffff');
+}
+
+/* MONDO III — GLI ESERCITI CHE SALGONO LA STRADA. Tre secoli, tre eserciti,
+   una sola città: i Persiani del Gran Re, le legioni di Roma, gli Unni.
+   Le terne di tinte sono una per esercito — bronzo e porpora, ferro e rosso,
+   cuoio e ruggine — e usano le stesse chiavi delle altre schiere. */
+const PAL_ELL=[
+ {s:'#d8b25a',m:'#8c6a3a',x:'#2b1c14',c:'#e8c452',r:'#8e3a6a',y:'#f2dc8a',q:'#fff4d8',p:'#5a3a6a'},
+ {s:'#c9c3b4',m:'#7d8593',x:'#26221c',c:'#b0762e',r:'#9c2a26',y:'#e8c452',q:'#f2ece0',p:'#6a4a2a'},
+ {s:'#c2a882',m:'#6e6a5c',x:'#241d16',c:'#a8763c',r:'#7a3428',y:'#d8c07a',q:'#efe6d2',p:'#5a4632'}
+];
+const PAL_ELL_B=[
+ {s:'#f0d089',m:'#b08a4a',x:'#3a2618',c:'#ffe89a',r:'#b8508e',y:'#fff0b8',q:'#ffffff',p:'#7c5290'},
+ {s:'#e8e2d0',m:'#a3aab8',x:'#332e26',c:'#d89a48',r:'#c43a32',y:'#ffe89a',q:'#ffffff',p:'#8f6a3c'},
+ {s:'#e0cba4',m:'#948f7c',x:'#332a20',c:'#cf9a54',r:'#a04a38',y:'#f0dca0',q:'#ffffff',p:'#7c6448'}
+];
+/* ═══ IL SOLDATO ANTICO ═══
+   A quattordici pixel il fante si legge da tre cose sole, e sono queste:
+   la CRESTA sopra l'elmo, lo SCUDO TONDO sempre sullo stesso fianco — così la
+   schiera ha un fronte e non una folla — e l'ASTA che spunta più in alto di
+   tutto. Chi è veloce va a cavallo e allora lo scudo sparisce: corpo lungo,
+   gambe aperte, e si distingue dal fante prima ancora del colore.
+   Il comandante porta due pennacchi laterali, il fantasma resta ammantato. */
+function ellMobArt(ruolo,variante){
+  const dim={base:[9,10],fast:[11,11],tank:[13,14],ghost:[11,13],big:[21,24],boss:[17,20],final:[29,30]}[ruolo];
+  const w=dim[0],h=dim[1],a=matricePixel(w,h),cx=Math.floor(w/2);
+  /* l'ammantato: nessun metallo addosso, orlo che si sfilaccia in basso */
+  if(ruolo==='ghost'){
+    pxBox(a,cx-2,2,5,4,'s');pxBox(a,cx-1,3,3,2,'x');pxPut(a,cx,3,'c');
+    pxPut(a,cx-1,1,'s');pxPut(a,cx,0,'q');pxPut(a,cx+1,1,'s');
+    for(let y=6;y<h;y++){
+      const half=Math.min(cx-1,2+Math.floor((y-6)*.55));
+      for(let x=cx-half;x<=cx+half;x++)
+        if(y<h-2||(x+y)%2)pxPut(a,x,y,(x===cx-half||x===cx+half)?'m':'s');
+    }
+    return a.map(r=>r.join(''));
+  }
+  /* a cavallo: il corpo del cavallo è orizzontale, il cavaliere ci sta sopra */
+  if(ruolo==='fast'){
+    const gy=h-4;                       // linea del ventre
+    pxBox(a,1,gy-2,w-3,3,'s');          // tronco
+    pxBox(a,w-4,gy-4,3,3,'s');          // collo
+    pxBox(a,w-3,gy-5,2,2,'m');          // testa
+    pxPut(a,w-2,gy-5,'x');
+    pxLine(a,1,gy-2,0,gy-4,'m');        // coda
+    pxBox(a,2,gy+1,1,3,'x');pxBox(a,4,gy+1,1,3,'x');   // gambe aperte
+    pxBox(a,w-5,gy+1,1,3,'x');pxBox(a,w-7,gy+1,1,3,'x');
+    const ry=gy-8;                      // il cavaliere
+    pxBox(a,cx-1,ry+2,3,4,'m');
+    pxBox(a,cx-1,ry,3,3,'s');pxPut(a,cx,ry+1,'x');
+    pxBox(a,cx-1,ry-1,3,1,'r');         // cresta
+    for(let y=0;y<h-3;y++)pxPut(a,w-1,y,'m');          // asta
+    pxPut(a,w-1,0,'c');
+    return a.map(r=>r.join(''));
+  }
+  /* il grosso non è un fante più grande: è una MACCHINA. Ruote, telaio, e in
+     cima la cosa che gli dà il nome — le lame del carro, il castello della
+     torre, la testa d'ariete. A questa scala la ruota è ciò che si legge per
+     primo, ed è quella che lo separa da tutto il resto della schiera. */
+  if(ruolo==='big'){
+    const ry=h-5,rr=4;                  // le due ruote
+    for(const rx of [5,w-6])for(let dy=-rr;dy<=rr;dy++)for(let dx=-rr;dx<=rr;dx++){
+      const d=dx*dx+dy*dy;
+      if(d>rr*rr)continue;
+      pxPut(a,rx+dx,ry+dy,d>(rr-1)*(rr-1)?'m':(Math.abs(dx)<1||Math.abs(dy)<1?'m':'x'));
+    }
+    pxBox(a,3,ry-6,w-6,5,'s');          // cassa
+    pxBox(a,4,ry-5,w-8,3,'m');
+    pxLine(a,3,ry-6,w-4,ry-6,'c');
+    if(variante===0){                   // carro falcato: lame ai mozzi
+      for(const rx of [5,w-6]){pxLine(a,rx-6,ry-3,rx-1,ry,'q');pxLine(a,rx+1,ry,rx+6,ry-3,'q');}
+      pxBox(a,cx-2,ry-11,5,5,'s');pxBox(a,cx-1,ry-10,3,3,'x');
+      pxBox(a,cx-1,ry-13,3,2,'r');      // il pennacchio dell'auriga
+    }else if(variante===1){             // torre d'assedio: castello a piani
+      pxBox(a,4,ry-17,w-8,11,'s');
+      for(let y=ry-15;y>ry-17+11;y-=4)pxBox(a,5,y,w-10,1,'m');
+      pxBox(a,cx-2,ry-15,5,4,'x');      // la feritoia
+      for(let x=4;x<w-4;x+=3)pxBox(a,x,ry-18,2,1,'s');   // merli
+      pxBox(a,w-5,ry-12,3,7,'m');       // la passerella calata
+    }else{                              // ariete: trave sospesa e testa di ferro
+      pxBox(a,3,ry-12,w-6,3,'m');       // il tetto
+      for(let x=5;x<w-4;x+=4)pxLine(a,x,ry-9,x,ry-7,'x');// le corde
+      pxBox(a,4,ry-7,w-9,3,'s');        // la trave
+      pxBox(a,w-7,ry-8,5,5,'m');        // la testa
+      pxBox(a,w-6,ry-7,3,3,'c');
+    }
+    return a.map(r=>r.join(''));
+  }
+  const grande=ruolo==='boss'||ruolo==='final';
+  const headW=grande?7:(ruolo==='tank'?5:3);
+  const headY=2,bodyW=grande?Math.floor(w*.52):(ruolo==='tank'?7:5);
+  const bodyY=headY+3,bodyH=h-bodyY-3;
+  const bx0=cx-Math.floor(bodyW/2),bx1=cx+Math.floor(bodyW/2);
+  /* L'ASTA. Sta appoggiata alla spalla destra, non a mezz'aria: fra il pugno
+     e il legno non ci deve essere buco, se no legge come un palo piantato
+     dietro al soldato invece che come un'arma in mano. */
+  const ax=Math.min(w-1,bx1+1);
+  for(let y=0;y<h-3;y++)pxPut(a,ax,y,'m');
+  pxPut(a,ax,0,'c');
+  pxPut(a,ax-1,bodyY+1,'y');            // il pugno che la tiene
+  /* LA CRESTA: due file piene, larghe quanto l'elmo. Una sola non si vede. */
+  pxBox(a,cx-Math.floor(headW/2),headY-2,headW,1,'r');
+  pxBox(a,cx-Math.floor(headW/2)+1,headY-1,headW-2,1,'r');
+  /* elmo e feritoia degli occhi */
+  pxBox(a,cx-Math.floor(headW/2),headY,headW,3,'m');
+  pxBox(a,cx-Math.floor(headW/2)+1,headY+1,headW-2,1,'x');
+  /* corpo */
+  pxBox(a,bx0,bodyY,bodyW,bodyH,'s');
+  if(grande||ruolo==='tank')pxBox(a,bx0+1,bodyY+1,bodyW-2,Math.max(1,bodyH-3),'m');
+  /* gambe (prima dello scudo: lo scudo le copre, come in una schiera vera) */
+  const piede=Math.max(1,Math.floor(bodyW*.3));
+  pxBox(a,bx0,h-3,piede,3,'x');
+  pxBox(a,bx1-piede+1,h-3,piede,3,'x');
+  /* LO SCUDO TONDO, sempre sul fianco sinistro. Cerchio scuro con l'orlo di
+     metallo e l'umbone chiaro in mezzo: contro il corpo, che è chiaro, deve
+     stare per contrasto — un tondo dello stesso colore del torso sparisce. */
+  const sr=grande?5:(ruolo==='tank'?3:2),sx=bx0-(grande?1:0),sy=bodyY+Math.floor(bodyH*.45);
+  for(let dy=-sr;dy<=sr;dy++)for(let dx=-sr;dx<=sr;dx++){
+    const d=dx*dx+dy*dy;
+    if(d>sr*sr)continue;
+    pxPut(a,sx+dx,sy+dy,d>(sr-1)*(sr-1)?'x':'m');
+  }
+  pxPut(a,sx,sy,'c');
+  if(sr>=3){pxPut(a,sx-1,sy,'c');pxPut(a,sx+1,sy,'c');pxPut(a,sx,sy-1,'c');pxPut(a,sx,sy+1,'c');}
+  if(sr>=5){pxPut(a,sx,sy-2,'y');pxPut(a,sx,sy+2,'y');pxPut(a,sx-2,sy,'y');pxPut(a,sx+2,sy,'y');}
+  /* il comandante porta due pennacchi laterali */
+  if(ruolo==='boss'){
+    pxBox(a,cx-Math.floor(headW/2)-2,headY,1,3,'r');
+    pxBox(a,cx+Math.floor(headW/2)+2,headY,1,3,'r');
+    pxPut(a,cx-Math.floor(headW/2)-2,headY-1,'y');
+    pxPut(a,cx+Math.floor(headW/2)+2,headY-1,'y');
+  }
+  return a.map(r=>r.join(''));
+}
+/* ═══ I TRE CHE CHIUDONO LA POLIS ═══
+   Alla stessa scala del Santo e dell'Agnello (29×30). Non si somigliano fra
+   loro perché non si somigliano gli eserciti: uno è veste e oro fino a terra,
+   uno è ferro squadrato e insegna, uno è pelliccia e una lama sola. */
+ART.granre=[                     // tiara, barba, veste lunga, scettro di lato
+'.............ccc.............',
+'............ccccc........c...',
+'...........ccyyycc......ccc..',
+'...........ccccccc.......c...',
+'...........syyyyys.......m...',
+'...........yxyyyxy.......m...',
+'...........yyyyyyy.......m...',
+'..........mxxxxxxxm......m...',
+'..........mxxxxxxxm......m...',
+'...........xxxxxxx.......m...',
+'..........rxxxxxxxr......m...',
+'........rrrrxxxxxrrrr....m...',
+'.......rrrrrrxxxrrrrrr...m...',
+'......rrrrrrrcccrrrrrrr..m...',
+'......rrrrrrcyycrrrrrrr..m...',
+'......rrrrrrrcccrrrrrrr..m...',
+'......prrrrrrrrrrrrrrrp..m...',
+'......prrrrrrrrrrrrrrrp..m...',
+'......prrrrcrrrrrcrrrrp..m...',
+'......prrrrrrrrrrrrrrrp..m...',
+'.....pprrrrrrrrrrrrrrrpp.m...',
+'.....pprrrrcrrrrrcrrrrpp.m...',
+'.....pprrrrrrrrrrrrrrrpp.m...',
+'.....ppprrrrrrrrrrrrrppp.m...',
+'.....ppprrrrrrrrrrrrrppp.m...',
+'.....pppprrrrrrrrrrrpppp.m...',
+'.....ccccccccccccccccccc.m...',
+'.....ppppppppppppppppppp.m...',
+'.....ppppppppppppppppppp.....',
+'.....xxxxxxxxxxxxxxxxxxx.....'];
+ART.console=[                    // cresta trasversale, corazza, scudo, aquila
+'.........rrrrrrrrrrr.........',
+'........rrrrrrrrrrrrr........',
+'..........mmmmmmmmm..........',
+'.........mmmmmmmmmmm....y....',
+'.........mmsssssssmm...yyy...',
+'.........mmsxxsxxsmm..yyyyy..',
+'.........mmsssssssmm...yyy...',
+'..........mmsssssmm.....y....',
+'...........xxxxxxx......m....',
+'.........ccccccccccc....m....',
+'........ccccccccccccc...m....',
+'.mmmmmmmmcccccccccccc...m....',
+'.mrrrrrrmcccccccccccc...m....',
+'.mrrrrrrmccccxxxxcccc...m....',
+'.mrrrrrrmcccxccccxccc...m....',
+'.mrrrrrrmcccxccccxccc...m....',
+'.mrrrrrrmccccxxxxcccc...m....',
+'.mrryyrrmcccccccccccc...m....',
+'.mryyyyrmcccccccccccc...m....',
+'.mrryyrrmcccccccccccc...m....',
+'.mrrrrrrmcccccccccccc...m....',
+'.mrrrrrrmmmmmmmmmmmmm...m....',
+'.mrrrrrrmpp.pp.pp.pp....m....',
+'.mrrrrrrmpp.pp.pp.pp....m....',
+'.mmmmmmmmpp.pp.pp.pp....m....',
+'..........mmm...mmm.....m....',
+'..........mmm...mmm.....m....',
+'..........sss...sss.....m....',
+'..........xxx...xxx.....m....',
+'..........xxx...xxx..........'];
+ART.flagello=[                   // colbacco, pelliccia, lama curva alzata
+'.........................qqq.',
+'.........................mqq.',
+'......ppppp..............mqq.',
+'.....ppppppp............mqqq.',
+'.....ppppppp............mqq..',
+'.....psssssp...........mqqq..',
+'.....psxsxsp..........mqqq...',
+'.....psssssp.........mqqq....',
+'......pxxxp........mmqqq.....',
+'.....ppppppp.....mmqqqq......',
+'....ppppppppp..mmqqqq........',
+'...pppppppppp.mmqqqq.........',
+'...ppppppppppmmqqq...........',
+'..pppsssssppppmmm............',
+'..ppsssssssppp.pp............',
+'..psssssssssp................',
+'..pssspppsssp................',
+'..pssspppsssp................',
+'..psssppppssp................',
+'..prrrrrrrrrp................',
+'..psssssssssp................',
+'..pssspppsssp................',
+'..pssspppsssp................',
+'...pssssssssp................',
+'...pppssssppp................',
+'....ppsssspp.................',
+'....mmm..mmm.................',
+'....mmm..mmm.................',
+'....xxx..xxx.................',
+'....xxx..xxx.................'];
+const EL_SCHIERE=[
+ {base:'portascudi',fast:'saka',tank:'immortale',ghost:'magio',big:'falcato',boss:'satrapo',final:'granre'},
+ {base:'legionario',fast:'velite',tank:'testuggine',ghost:'genio',big:'torre',boss:'legato',final:'console'},
+ {base:'predone',fast:'arciere',tank:'catafratto',ghost:'sciamano',big:'ariete',boss:'khan',final:'flagello'}
+];
+/* stesso patto del mondo neon: chi ha una sagoma a mano in ART la usa, gli
+   altri li ricava il generatore dal solo ruolo. */
+for(let v=0;v<EL_SCHIERE.length;v++)for(const ruolo in EL_SCHIERE[v]){
+  const nome=EL_SCHIERE[v][ruolo],art=ART[nome]||ellMobArt(ruolo,v);
+  reg(nome,art,PAL_ELL[v],'#ffffff');
+  if(ruolo==='big'||ruolo==='final')reg(nome+'_b',art,PAL_ELL_B[v],'#ffffff');
 }
 
 
@@ -1654,6 +1898,95 @@ function cyberTowerArt(tipo,lv){
   return a.map(r=>r.join(''));
 }
 
+/* ═══ GLI EDIFICI DELLA POLIS ═══
+   Marmo e bronzo. Al quinto grado il marmo si fa statuario e il bronzo oro,
+   come nel primo mondo il quinto cambia materia invece di crescere.
+   Tutti e sei posano su uno STILOBATE di tre gradini: è la cosa che li fa
+   leggere come un solo mondo, e sopra di esso ognuno deve avere una sagoma
+   che gli altri cinque non hanno — a quattordici pixel conta il profilo. */
+const PAL_EL_TOW={s:'#cbbfa4',o:'#4a4133',m:'#8f7f62',x:'#2b2419',c:'#c08a3a',r:'#9c3a2a',
+  y:'#e8c452',q:'#f5ecd0',p:'#6f7f6a',w:'#b0a184',d:'#6b5f48',b:'#7e8b7a',v:'#fff4d8',t:'#5a3a24'};
+const PAL_EL_TOW5={s:'#f2ecdc',o:'#9a8a6a',m:'#e2d6b8',x:'#4a3f2c',c:'#f0c860',r:'#c9583c',
+  y:'#ffe89a',q:'#ffffff',p:'#9fb09a',w:'#fbf6e8',d:'#b8a988',b:'#c2cdbc',v:'#ffffff',t:'#8a5c34'};
+const EL_TOWER_SET=new Set(['arcieri','anfora','tripode','ballista','peana','maledizione']);
+function ellTowerArt(tipo,lv){
+  const w=14+(lv-1)*2,h=17+(lv-1)*3,a=matricePixel(w,h),cx=Math.floor(w/2);
+  /* lo stilobate: tre gradini di marmo, il più largo in basso */
+  pxBox(a,0,h-1,w,1,'o');
+  pxBox(a,1,h-2,w-2,1,'w');
+  pxBox(a,2,h-3,w-4,1,'s');
+  pxBox(a,3,h-4,w-6,1,'q');
+  const base=h-4;                       // il piano su cui posa l'edificio
+  if(tipo==='arcieri'){
+    /* torre di conci: corsi di malta, feritoie strette, merli in cima */
+    const bw=Math.min(w-6,5+lv*2),hb=Math.floor(bw/2);
+    pxBox(a,cx-hb,5,bw,base-5,'s');
+    for(let y=7;y<base;y+=3)pxBox(a,cx-hb,y,bw,1,'m');       // corsi
+    for(let y=8;y<base-2;y+=4){pxPut(a,cx,y,'x');pxPut(a,cx,y+1,'x');}  // feritoie
+    pxBox(a,cx-hb-1,4,bw+2,1,'w');                            // cornice
+    for(let x=cx-hb;x<=cx+hb;x+=2)pxBox(a,x,2,1,2,'s');       // merli
+  }else if(tipo==='anfora'){
+    /* fornello tozzo, l'anfora panciuta sopra, la bocca accesa davanti */
+    pxBox(a,cx-4,base-6,9,6,'m');
+    pxBox(a,cx-5,base-7,11,1,'w');
+    pxBox(a,cx-2,base-4,5,4,'x');                             // bocca
+    pxBox(a,cx-1,base-3,3,3,'r');pxPut(a,cx,base-2,'y');
+    const ay=base-13;
+    pxBox(a,cx-3,ay+2,7,5,'t');                               // pancia
+    pxBox(a,cx-2,ay+7,5,1,'t');
+    pxBox(a,cx-1,ay,3,2,'t');                                 // collo
+    pxPut(a,cx-4,ay+2,'d');pxPut(a,cx+4,ay+2,'d');            // anse
+    pxPut(a,cx-4,ay+3,'d');pxPut(a,cx+4,ay+3,'d');
+    pxPut(a,cx,ay-1,'y');
+  }else if(tipo==='tripode'){
+    /* tre gambe di bronzo, la coppa, il fumo che sale */
+    const cy2=base-9;
+    pxLine(a,cx-4,base-1,cx-2,cy2+1,'c');
+    pxLine(a,cx+4,base-1,cx+2,cy2+1,'c');
+    pxLine(a,cx,base-1,cx,cy2+1,'d');
+    pxBox(a,cx-4,cy2-2,9,3,'c');                              // coppa
+    pxBox(a,cx-3,cy2-1,7,1,'y');
+    pxBox(a,cx-5,cy2-3,11,1,'m');                             // labbro
+    for(let i=0;i<3+lv;i++)pxPut(a,cx+((i%3)-1),cy2-5-i,i%2?'q':'v');
+  }else if(tipo==='ballista'){
+    /* telaio di legno, due matasse di tendine, il dardo in canala */
+    const fy=base-7;
+    pxBox(a,cx-5,fy,11,3,'t');                                // telaio
+    pxBox(a,cx-6,fy-3,3,4,'d');pxBox(a,cx+4,fy-3,3,4,'d');    // matasse
+    pxBox(a,cx-6,fy-3,3,1,'m');pxBox(a,cx+4,fy-3,3,1,'m');
+    pxLine(a,cx-4,fy-1,cx+4,fy-1,'x');                        // corda
+    pxBox(a,cx-1,fy-2,3,1,'m');                               // canala
+    pxLine(a,cx,fy-2,cx,fy-7-lv,'m');                         // dardo
+    pxPut(a,cx,fy-8-lv,'c');
+    pxLine(a,cx-5,fy+3,cx-5,base-1,'t');                      // gambe
+    pxLine(a,cx+5,fy+3,cx+5,base-1,'t');
+  }else if(tipo==='peana'){
+    /* un portico piccolo: stilobate, colonne, architrave, il coro sotto */
+    const pw=Math.min(w-4,7+lv*2),hp=Math.floor(pw/2),ty=base-12;
+    pxBox(a,cx-hp-1,ty,pw+2,1,'v');                           // gocciolatoio
+    pxBox(a,cx-hp,ty+1,pw,2,'q');                             // architrave
+    for(let x=cx-hp;x<=cx+hp;x+=3){
+      pxBox(a,x-1,ty+3,3,1,'q');                              // capitello
+      pxBox(a,x,ty+4,1,base-ty-5,'s');                        // colonna
+    }
+    pxBox(a,cx-hp,base-1,pw,1,'w');
+    for(let i=-1;i<=1;i++){                                   // il coro
+      pxBox(a,cx+i*3-1,base-5,2,3,'p');
+      pxPut(a,cx+i*3-1,base-6,'y');
+    }
+  }else{
+    /* la stele di piombo: righe incise fitte e i chiodi che la fissano */
+    const sw2=Math.min(w-8,3+lv*2),hs=Math.floor(sw2/2),ty=base-13;
+    pxBox(a,cx-hs,ty,sw2,base-ty,'b');
+    pxBox(a,cx-hs,ty,sw2,1,'m');
+    for(let y=ty+2;y<base-1;y+=2)pxBox(a,cx-hs+1,y,sw2-2,1,'x');
+    pxPut(a,cx-hs,ty+1,'m');pxPut(a,cx+hs,ty+1,'m');          // chiodi
+    pxPut(a,cx-hs,base-2,'m');pxPut(a,cx+hs,base-2,'m');
+    pxPut(a,cx,ty-1,'r');
+  }
+  return a.map(r=>r.join(''));
+}
+
 const TSKIN={
   spine:[ART.spine,ART.spine2,ART.spine3,ART.spine4],
   braciere:[ART.braciere,ART.braciere2,ART.braciere3,ART.braciere4],
@@ -1667,12 +2000,16 @@ const TSKIN={
   scongiuro:[ART.scongiuro,ART.scongiuro2,ART.scongiuro3,ART.scongiuro4]
 };
 for(const k of CY_TOWER_SET)TSKIN[k]=[1,2,3,4].map(lv=>cyberTowerArt(k,lv));
+for(const k of EL_TOWER_SET)TSKIN[k]=[1,2,3,4].map(lv=>ellTowerArt(k,lv));
 for(const k in TSKIN){
-  const cy=CY_TOWER_SET.has(k),pal=cy?PAL_CY_TOW:PAL_TOW,pal5=cy?PAL_CY_TOW5:PAL_TOW5;
-  TSKIN[k].forEach((a,i)=>{S[k+(i+1)]=makeSprite(a,pal,'#100d16',true);});
+  const cy=CY_TOWER_SET.has(k),el=EL_TOWER_SET.has(k);
+  const pal=cy?PAL_CY_TOW:(el?PAL_EL_TOW:PAL_TOW);
+  const pal5=cy?PAL_CY_TOW5:(el?PAL_EL_TOW5:PAL_TOW5);
+  const bordo=el?'#3a3226':'#100d16';
+  TSKIN[k].forEach((a,i)=>{S[k+(i+1)]=makeSprite(a,pal,bordo,true);});
   // il quinto riusa la sagoma del quarto: stessa mole, materia diversa
   TSKIN[k].push(TSKIN[k][3]);
-  S[k+'5']=makeSprite(TSKIN[k][3],pal5,cy?'#2b5d72':'#6b5a3a',true);
+  S[k+'5']=makeSprite(TSKIN[k][3],pal5,cy?'#2b5d72':(el?'#8a7a52':'#6b5a3a'),true);
 }
 /* punto da cui parte il colpo, misurato dall'alto dello sprite */
 const TTIP={spine:[4,4,5,6,6],braciere:[6,5,5,6,6],campana:[8,10,12,14,14],reliquiario:[4,5,5,6,6]};
@@ -1689,6 +2026,16 @@ const PAL_CY_DEC={s:'#343746',o:'#171a24',m:'#697084',x:'#070a12',c:'#20d8ff',r:
 S.antenna=makeSprite(ART.antenna,PAL_CY_DEC,'#080a12',true);
 S.terminale=makeSprite(ART.terminale,PAL_CY_DEC,'#080a12',true);
 S.segnale=makeSprite(ART.segnale,PAL_CY_DEC,'#080a12',true);
+/* Gli arredi della polis. La colonna è spezzata perché una città assediata
+   tre volte in tre secoli non è una città nuova; l'ara è l'unica delle tre
+   che fa luce, ed è fuoco d'olio, non luce fredda. */
+ART.colonna=['..ssm..','.sssm..','.smsm..','.smsm..','.smsm..','.smsm..','.smsm..','sssssm.','.ooooo.'];
+ART.ara=['...c...','..ccc..','.crcrc.','..crc..','.sssss.','sssssss','.smmms.','.smmms.','sssssss'];
+ART.cippo=['.sssss.','.sxxxs.','.sssss.','.sxxxs.','.sssss.','.sxxxs.','.sssss.','mmmmmmm','.ooooo.'];
+const PAL_EL_DEC={s:'#bfb49a',o:'#4a4133',m:'#8f8268',x:'#3a3226',c:'#e8703a',r:'#c9583c',p:'#7e8b7a'};
+S.colonna=makeSprite(ART.colonna,PAL_EL_DEC,'#2b2419',true);
+S.ara=makeSprite(ART.ara,PAL_EL_DEC,'#2b2419',true);
+S.cippo=makeSprite(ART.cippo,PAL_EL_DEC,'#2b2419',true);
 function blit(x,sp,px,py,flip,alpha){
   if(alpha!==undefined)x.globalAlpha=alpha;
   if(flip){x.save();x.translate(Math.round(px)+sp.w/2,0);x.scale(-1,1);
@@ -1711,7 +2058,17 @@ const WPS={
   3:[[1,-2],[1,5],[8,5],[8,12],[5,12],[5,19]],                              // 31 caselle
   4:[[1,-2],[1,3],[10,3],[10,7],[3,7],[3,12],[8,12],[8,15],[5,15],[5,19]],
   5:[[1,-2],[1,4],[9,4],[9,9],[2,9],[2,14],[5,14],[5,19]],
-  6:[[1,-2],[1,5],[10,5],[10,11],[4,11],[4,15],[5,15],[5,19]]
+  6:[[1,-2],[1,5],[10,5],[10,11],[4,11],[4,15],[5,15],[5,19]],
+  /* MONDO III. Le tre salite alla porta della polis hanno la stessa lunghezza
+     delle tre della città neon — 45, 39 e 37 caselle — perché i valori di
+     ATTO[7..9].hp sono quelli tarati là: cambiare il tracciato sotto numeri
+     tarati altrove vorrebbe dire spostare la difficoltà senza accorgersene.
+     A variare è il disegno, e dice chi sta salendo: i Persiani girano intorno
+     alla città in quattro traverse, le legioni salgono in tre, gli Unni in
+     due e mezzo — nessun assedio, solo arrivo. */
+  7:[[1,-2],[1,2],[10,2],[10,6],[3,6],[3,10],[8,10],[8,14],[5,14],[5,19]],
+  8:[[1,-2],[1,4],[10,4],[10,9],[3,9],[3,14],[5,14],[5,19]],
+  9:[[1,-2],[1,5],[9,5],[9,11],[3,11],[3,15],[5,15],[5,19]]
 };
 let WP=WPS[1];
 const PATHPX=[],SEGLEN=[],pathSet=new Set();
@@ -1750,9 +2107,10 @@ function buildPercorso(a){
   DECOR.length=0;blocked.clear();LIGHTS.length=0;
   for(const d of DECOR_ALL){
     if(isPath(d[0],d[1]))continue;
-    const tipo=CYBER?(d[2]==='candela'?'terminale':(d[2]==='croce'?'antenna':'segnale')):d[2];
+    const tipo=CYBER?(d[2]==='candela'?'terminale':(d[2]==='croce'?'antenna':'segnale'))
+              :(POLIS?(d[2]==='candela'?'ara':(d[2]==='croce'?'cippo':'colonna')):d[2]);
     DECOR.push([d[0],d[1],tipo]);blocked.add(d[1]*COLS+d[0]);
-    if(tipo==='candela'||tipo==='terminale')LIGHTS.push({x:d[0]*TILE+8,y:d[1]*TILE+4});
+    if(tipo==='candela'||tipo==='terminale'||tipo==='ara')LIGHTS.push({x:d[0]*TILE+8,y:d[1]*TILE+4});
   }
 }
 buildPercorso(1);
@@ -1805,12 +2163,27 @@ const TOWERS={
   sciame:{name:'NIDO DI DRONI',short:'SCIAME',ruolo:'SOSTEGNO',cost:118,dmg:0,rate:0,range:50,ap:0,
     mondo:2,ucc:2800,sostegno:{dmg:.25,rate:.14},desc:'I droni riallineano le armi vicine: più danno, meno attesa.'},
   disturbo:{name:'JAMMER DEL VUOTO',short:'JAMMER',ruolo:'DISARMA',cost:96,dmg:0,rate:0,range:48,ap:0,
-    mondo:2,ucc:1000,cut:.62,desc:'Spegne i protocolli difensivi e apre le corazze al fuoco alleato.'}
+    mondo:2,ucc:1000,cut:.62,desc:'Spegne i protocolli difensivi e apre le corazze al fuoco alleato.'},
+  arcieri:{name:'TORRE DEGLI ARCIERI',short:'ARCIERI',ruolo:'RAFFICA',cost:58,dmg:8,rate:.34,range:52,ap:.12,
+    mondo:3,ucc:250,desc:'Una gragnola di frecce: poco per colpo, quasi nessuna pausa.'},
+  anfora:{name:'ANFORA INCENDIARIA',short:'ANFORA',ruolo:'AREA',cost:105,dmg:16,rate:1.35,range:46,ap:.55,
+    mondo:3,ucc:1500,splash:18,burn:7,desc:'Vasi di pece accesa sulla truppa fitta: brucia gruppi e corazze.'},
+  tripode:{name:'TRIPODE DELL\'ORACOLO',short:'TRIPODE',ruolo:'RALLENTA',cost:88,dmg:6,rate:1.55,range:46,ap:1,
+    mondo:3,ucc:600,aura:true,slow:.52,desc:'Il fumo profetico confonde il passo di chi entra nell\'aura.'},
+  ballista:{name:'BALLISTA',short:'BALLISTA',ruolo:'PRECISIONE',cost:155,dmg:66,rate:2.35,range:90,ap:1,
+    mondo:3,ucc:2100,beam:true,desc:'Un dardo teso, istantaneo, che passa da parte a parte ogni corazza.'},
+  peana:{name:'IL PEANA',short:'PEANA',ruolo:'SOSTEGNO',cost:118,dmg:0,rate:0,range:50,ap:0,
+    mondo:3,ucc:2800,sostegno:{dmg:.25,rate:.14},desc:'Non colpisce: il canto di guerra fa battere i vicini '+
+    '<i>più forte e più spesso</i>.'},
+  maledizione:{name:'TAVOLETTA DI MALEDIZIONE',short:'MALEDIZIONE',ruolo:'DISARMA',cost:96,dmg:0,rate:0,range:48,ap:0,
+    mondo:3,ucc:1000,cut:.62,desc:'Incide il nome del nemico nel piombo: <i>le difese si sfaldano</i> e i colpi '+
+    'degli altri mordono.'}
 };
 /* l'ordine in cui l'armeria li mostra: prima i quattro di sempre */
 const TORDER=['spine','braciere','campana','reliquiario',
   'ossario','salmodia','mangano','arpione','caldaia','scongiuro',
-  'impulso','plasma','stasi','rotaia','sciame','disturbo'];
+  'impulso','plasma','stasi','rotaia','sciame','disturbo',
+  'arcieri','anfora','tripode','ballista','peana','maledizione'];
 const NSLOT=4;   // quanti se ne portano in campo
 /* ═══ CHI CI HA MESSO MANO ═══
    Un caduto non è opera dell'ultimo colpo soltanto. La campana ne uccide una
@@ -1913,7 +2286,31 @@ const ENEMIES={
   nulla:{name:'Spettro Null',hp:86,speed:57,armor:6,bounty:15,dmg:1,slowResist:.72,alpha:.8,float:true},
   assedio:{name:'Costrutto d’Assedio',hp:675,speed:13,armor:19,bounty:94,dmg:3,big:true,slowResist:.55,breakAt:.5},
   arconte:{name:'Arconte di Sistema',hp:1880,speed:17,armor:18,bounty:188,dmg:6,boss:true,spawner:4},
-  matrice:{name:'La Matrice Nera',hp:380,speed:9,armor:24,bounty:900,dmg:99,final:true,big:true,slowResist:.8,breakAt:.45,spawner:5}
+  matrice:{name:'La Matrice Nera',hp:380,speed:9,armor:24,bounty:900,dmg:99,final:true,big:true,slowResist:.8,breakAt:.45,spawner:5},
+  // MONDO III · IL MARE DI NAVI (i Persiani del Gran Re)
+  portascudi:{name:'Portascudi',hp:42,speed:34,armor:2,bounty:8,dmg:1},
+  saka:{name:'Saka a Cavallo',hp:31,speed:67,armor:1,bounty:9,dmg:1},
+  immortale:{name:'Immortale',hp:175,speed:20,armor:10,bounty:18,dmg:2},
+  magio:{name:'Magio del Fuoco',hp:70,speed:54,armor:4,bounty:13,dmg:1,slowResist:.68,alpha:.76,float:true},
+  falcato:{name:'Carro Falcato',hp:510,speed:13,armor:15,bounty:72,dmg:3,big:true,slowResist:.5,breakAt:.5},
+  satrapo:{name:'Il Satrapo',hp:1450,speed:17,armor:14,bounty:145,dmg:6,boss:true,spawner:4},
+  granre:{name:'Il Gran Re',hp:310,speed:9,armor:20,bounty:700,dmg:99,final:true,big:true,slowResist:.75,breakAt:.45,spawner:5},
+  // MONDO III · IL FERRO ORDINATO (le legioni di Roma)
+  legionario:{name:'Legionario',hp:48,speed:35,armor:3,bounty:9,dmg:1},
+  velite:{name:'Velite',hp:35,speed:69,armor:2,bounty:10,dmg:1},
+  testuggine:{name:'Testuggine',hp:205,speed:20,armor:12,bounty:20,dmg:2},
+  genio:{name:'Genio della Legione',hp:78,speed:55,armor:5,bounty:14,dmg:1,slowResist:.7,alpha:.78,float:true},
+  torre:{name:'Torre d\'Assedio',hp:590,speed:13,armor:17,bounty:82,dmg:3,big:true,slowResist:.52,breakAt:.5},
+  legato:{name:'Il Legato',hp:1650,speed:17,armor:16,bounty:165,dmg:6,boss:true,spawner:4},
+  console:{name:'Il Console',hp:340,speed:9,armor:22,bounty:800,dmg:99,final:true,big:true,slowResist:.78,breakAt:.45,spawner:5},
+  // MONDO III · LA STEPPA CHE ARRIVA (gli Unni)
+  predone:{name:'Predone',hp:55,speed:36,armor:4,bounty:10,dmg:1},
+  arciere:{name:'Arciere a Cavallo',hp:39,speed:72,armor:3,bounty:11,dmg:1},
+  catafratto:{name:'Catafratto',hp:235,speed:21,armor:14,bounty:22,dmg:2},
+  sciamano:{name:'Sciamano della Steppa',hp:86,speed:57,armor:6,bounty:15,dmg:1,slowResist:.72,alpha:.8,float:true},
+  ariete:{name:'Ariete di Guerra',hp:675,speed:13,armor:19,bounty:94,dmg:3,big:true,slowResist:.55,breakAt:.5},
+  khan:{name:'Il Khan',hp:1880,speed:17,armor:18,bounty:188,dmg:6,boss:true,spawner:4},
+  flagello:{name:'Il Flagello di Dio',hp:380,speed:9,armor:24,bounty:900,dmg:99,final:true,big:true,slowResist:.8,breakAt:.45,spawner:5}
 };
 /* i due atti condividono la struttura delle ondate, non le creature */
 const ROSTER={
@@ -1925,7 +2322,10 @@ const ROSTER={
      boss:'tromba',     final:'agnello'},
   4:CY_SCHIERE[0],
   5:CY_SCHIERE[1],
-  6:CY_SCHIERE[2]
+  6:CY_SCHIERE[2],
+  7:EL_SCHIERE[0],
+  8:EL_SCHIERE[1],
+  9:EL_SCHIERE[2]
 };
 const mob=k=>ROSTER[G.act][k];
 /* ═══ LA CAMPAGNA ═══
@@ -1956,7 +2356,13 @@ const ATTO={
   5:{hud:'ACIDO ',btn:'SOVRACCARICA · ',nome:'IL DISTRETTO ACIDO',
      sotto:'LE FABBRICHE NON DORMONO',hp:7.2,lac:3200,sig:8},
   6:{hud:'GRIGLIA ',btn:'ESEGUI IL PROTOCOLLO · ',nome:'LA GRIGLIA NERA',
-     sotto:'OLTRE IL CODICE',hp:5.2,lac:4700,sig:10}
+     sotto:'OLTRE IL CODICE',hp:5.2,lac:4700,sig:10},
+  7:{hud:'ARMATA ',btn:'ALZA GLI SCUDI · ',nome:'IL MARE DI NAVI',
+     sotto:'IL GRAN RE È SBARCATO',hp:5.8,lac:2100,sig:6},
+  8:{hud:'AQUILE ',btn:'SERRA LE FILE · ',nome:'IL FERRO ORDINATO',
+     sotto:'LE AQUILE SALGONO LA STRADA',hp:7.2,lac:3200,sig:8},
+  9:{hud:'STEPPA ',btn:'SBARRA LE PORTE · ',nome:'LA STEPPA CHE ARRIVA',
+     sotto:'NESSUN ORDINE, SOLO NUMERO',hp:5.2,lac:4700,sig:10}
 };
 const NSCEN=Object.keys(ATTO).length;
 /* ═══ I MONDI ═══
@@ -1975,12 +2381,15 @@ const MONDO={
      lore:'Sotto una pioggia che non finisce mai, la città ha sostituito i santi '+
        'con protocolli e le campane con impulsi. Tre livelli conducono al cuore '+
        'della rete: i bassifondi, le fabbriche, la Griglia Nera.'},
-  3:{nome:'IL TERZO MONDO',sotto:'PROSSIMAMENTE',scen:[],presto:true,
-     lore:'Una nuova soglia attende oltre il rumore bianco.'},
+  3:{nome:'LA POLIS', sotto:'IL MARE, IL FERRO, LA STEPPA', scen:[7,8,9],
+     lore:'Non più una soglia consacrata ma una città di uomini, e tre eserciti '+
+       'che in tre secoli diversi salgono la stessa strada: il mare di navi del '+
+       'Gran Re, le aquile che arrivano in ordine, la steppa che arriva senza. '+
+       'Qui non si veglia contro l\'aldilà: si tiene una porta contro la storia.'},
   4:{nome:'IL QUARTO MONDO',sotto:'PROSSIMAMENTE',scen:[],presto:true,
-     lore:'La rotta esiste, ma nessun segnale è ancora tornato.'},
+     lore:'Un\'altra soglia aspetta, più in là di questa strada.'},
   5:{nome:'IL QUINTO MONDO',sotto:'PROSSIMAMENTE',scen:[],presto:true,
-     lore:'L’ultima coordinata resta oscurata.'}
+     lore:'Più avanti ancora c\'è qualcosa, ma non se ne sa il nome.'}
 };
 const NMONDI=Object.keys(MONDO).length;
 /* ═══ IL LESSICO DI OGNI MONDO ═══
@@ -1999,7 +2408,11 @@ const LEXM={
   2:{rito:'INNESTO', ritoFatto:'INNESTO COMPLETO', compendio:'IL PROTOCOLLO',
      compendioBtn:'IL PROTOCOLLO — LE SCHIERE', schiere:'LE SCHIERE',
      erigi:'Installa la tua rete', daCapo:'Si riparte da griglia spenta',
-     tuoRito:'La tua rete', pietraNuda:'da griglia spenta'}
+     tuoRito:'La tua rete', pietraNuda:'da griglia spenta'},
+  3:{rito:'SCHIERAMENTO', ritoFatto:'SCHIERAMENTO COMPIUTO', compendio:'LA FALANGE',
+     compendioBtn:'LA FALANGE — LE SCHIERE', schiere:'LE SCHIERE',
+     erigi:'Schiera la tua difesa', daCapo:'Si riparte da mura sguarnite',
+     tuoRito:'La tua difesa', pietraNuda:'da mura sguarnite'}
 };
 /* il lessico del mondo a cui appartiene lo scenario in corso */
 const lex=(k,m)=>{const L=LEXM[m===undefined?mondoDi(G.act):m];return (L&&L[k])||LEX0[k];};
@@ -2008,7 +2421,8 @@ const mondoAperto=m=>{const s=MONDO[m].scen;return s.length>0&&s[0]<=PROG.unl;};
 const mondoCompiuto=m=>{const s=MONDO[m].scen;return s.length>0&&s.every(a=>!!PROG.fin[a]);};
 const ultimoDelMondo=a=>{const s=MONDO[mondoDi(a)].scen;return s[s.length-1]===a;};
 const BIGCRY={1:'SCENDE IL COLOSSO',2:'SALE IL TITANO',3:'AVANZA IL MIETITORE',
-  4:'ENTRA LO SCARICATORE',5:'IL MUTANTE È LIBERO',6:'SI AVVIA L’ASSEDIO'};
+  4:'ENTRA LO SCARICATORE',5:'IL MUTANTE È LIBERO',6:'SI AVVIA L’ASSEDIO',
+  7:'ARRIVA IL CARRO FALCATO',8:'AVANZA LA TORRE',9:'ROTOLA L\'ARIETE'};
 const WAVENAMES=['I Penitenti','La Processione','Cilicio','I Flagellanti','Ceneri Vive',
  'Il Corteo Muto','Sangue e Voto','Le Ombre Lunghe','Novena Nera','IL VESCOVO MARCIO',
  'Dopo il Rintocco','Reliquie Infrante','Il Digiuno','Coro di Ossa','Miserere',
@@ -2034,6 +2448,18 @@ const WAVENAMES6=['Boot Freddo','La Griglia','Frammenti','Cicli di Luce','Sentin
  'Protocollo Bianco','Null Pointer','Occhi di Sistema','Accesso Negato','L’ARCONTE',
  'Secondo Avvio','Memoria Ostile','Firewall','Processi Fantasma','Kernel Panic',
  'Zero Assoluto','Root','Ultima Chiave','Fine del Programma','LA MATRICE NERA'];
+const WAVENAMES7=['Il Mare di Navi','Terra e Acqua','I Portascudi','Gli Arcieri Saka','Fumo sul Golfo',
+ 'Il Ponte di Barche','Gli Immortali','Fuochi sulla Costa','Le Termopili','IL SATRAPO',
+ 'Dopo lo Sbarco','Frecce che Oscurano','La Falange Tiene','Carri Falcati','Sale e Sangue',
+ 'La Lunga Spiaggia','Nessuna Resa','L\'Ultimo Stretto','Salamina','IL GRAN RE'];
+const WAVENAMES8=['Le Aquile','Passo Ferrato','I Veliti','Il Vallo','Testuggine',
+ 'Ariete alle Porte','Le Baliste','Il Genio della Legione','Torri d\'Assedio','IL LEGATO',
+ 'Dopo la Breccia','Ordine e Silenzio','La Decima','Cavalli e Insegne','Corinto Brucia',
+ 'La Strada Dritta','Nessuna Trattativa','Ultimo Cippo','Sotto il Giogo','IL CONSOLE'];
+const WAVENAMES9=['Polvere all\'Orizzonte','La Steppa','I Predoni','Frecce dal Galoppo','Fuoco nei Campi',
+ 'Il Cerchio si Chiude','I Catafratti','Canti nella Notte','Nessun Assedio','IL KHAN',
+ 'Dopo il Guado','Cavalli senza Fine','Lo Sciamano','Arieti di Guerra','Cenere e Grano',
+ 'La Piana Vuota','Nessun Patto','L\'Ultima Porta','Fine delle Città','IL FLAGELLO DI DIO'];
 const ROMAN=n=>{const m=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],
  [40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];let s='';for(const[v,r]of m)while(n>=v){s+=r;n-=v}return s};
 
@@ -2051,6 +2477,7 @@ function waveDef(n){
 }
 NOMI[1]=WAVENAMES;NOMI[2]=WAVENAMES2;NOMI[3]=WAVENAMES3;
 NOMI[4]=WAVENAMES4;NOMI[5]=WAVENAMES5;NOMI[6]=WAVENAMES6;
+NOMI[7]=WAVENAMES7;NOMI[8]=WAVENAMES8;NOMI[9]=WAVENAMES9;
 /* La curva dentro uno scenario è sempre la stessa: quello che cambia da uno
    all'altro è il gradino di partenza (ATTO[a].hp). Oltre la ventesima si
    entra nell'infinito, e lì la salita riprende senza fermarsi più. */
@@ -2318,9 +2745,25 @@ const PAL_CYBER=[
  {C:{void:'#02040a',stoneA:'#101626',stoneB:'#151d31',stoneC:'#1b2540',crack:'#2b3960',pathA:'#171b2c',pathB:'#111625',pathC:'#273b68',pathEdge:'#5a8cff'},
   CF:{star:'#ffffff',star2:'#5a8cff',mtnFar:'#202b46',mtnFarTop:'#6584c2',mtnNear:'#0b1020',mtnNearTop:'#30446f',treeA:'#11182a',treeAHi:'#354c82',treeB:'#060a14',treeBHi:'#25365f',trunk:'#0c1020',wall:['#131a2b','#1a243a','#0e1524','#202c45'],mortar:'#050814',wallLip:'#3d5482',niche:'#02040b',moss:'#845cff',sagA:'#202b43',sagB:'#171f33',sagC:'#2a3858',sagGold:'#ffffff',cath:'#070a13',cathHi:'#11182a',trim:'#5a8cff',win:'#ffffff',portal:'#010207'}}
 ];
+/* ═══ LA POLIS ═══
+   Tre tavolozze, una per assedio, e tutte e tre di GIORNO: le veglie del
+   Campanaro sono notturne e la città neon non vede mai il sole, ma una polis
+   si difende alla luce — è la prima cosa che distingue questo mondo dagli
+   altri due, prima ancora dei nemici. Il mattino azzurro del mare, il
+   mezzogiorno bianco delle legioni, il pomeriggio giallo di polvere. */
+const PAL_POLIS=[
+ {C:{void:'#0a1420',stoneA:'#b8ad93',stoneB:'#c4b9a0',stoneC:'#cfc5ac',crack:'#8c8168',pathA:'#a8977a',pathB:'#96866c',pathC:'#c0ae8e',pathEdge:'#6f6249'},
+  CF:{star:'#e8f0f8',star2:'#7f9ab0',mtnFar:'#5a7288',mtnFarTop:'#9db4c8',mtnNear:'#3c5468',mtnNearTop:'#6d8698',treeA:'#3a4a32',treeAHi:'#61784a',treeB:'#2a3826',treeBHi:'#4a5e3a',trunk:'#4a3c28',wall:['#bcb098','#c8bca4','#b0a48c','#d2c8b0'],mortar:'#8a7f68',wallLip:'#e2d8c0',niche:'#4a4234',moss:'#7a8a52',sagA:'#cfc5ac',sagB:'#c2b79e',sagC:'#dad0b8',sagGold:'#c08a3a',cath:'#b4a890',cathHi:'#d8cdb4',trim:'#9c3a2a',win:'#e8c452',portal:'#2a2418'}},
+ {C:{void:'#141210',stoneA:'#c8c2b4',stoneB:'#d4cec0',stoneC:'#ded8ca',crack:'#948d7e',pathA:'#b0a892',pathB:'#9e9682',pathC:'#c8bfa6',pathEdge:'#756d5a'},
+  CF:{star:'#ffffff',star2:'#b0aa9a',mtnFar:'#7a7466',mtnFarTop:'#b8b2a2',mtnNear:'#565044',mtnNearTop:'#8a8474',treeA:'#4a4e36',treeAHi:'#727a52',treeB:'#383c28',treeBHi:'#585e3e',trunk:'#4e4230',wall:['#c6c0b0','#d2ccbc','#bab4a4','#dcd6c6'],mortar:'#928c7c',wallLip:'#ece6d6',niche:'#4e4a3c',moss:'#8a9060',sagA:'#ded8ca',sagB:'#d0cabc',sagC:'#e8e2d4',sagGold:'#b0762e',cath:'#c0baaa',cathHi:'#e2dccc',trim:'#9c2a26',win:'#e8c452',portal:'#2e2a20'}},
+ {C:{void:'#1a1208',stoneA:'#b09876',stoneB:'#bca283',stoneC:'#c8ae8f',crack:'#84704f',pathA:'#a08055',pathB:'#8e7048',pathC:'#b89468',pathEdge:'#6a5433'},
+  CF:{star:'#f0d8a8',star2:'#b08a58',mtnFar:'#8a6c48',mtnFarTop:'#c09868',mtnNear:'#6a4e30',mtnNearTop:'#9a7850',treeA:'#5a4a2a',treeAHi:'#8a7040',treeB:'#42361e',treeBHi:'#6a5630',trunk:'#4a3820',wall:['#b49c7a','#c0a886','#a89070','#ccb492'],mortar:'#846c4c',wallLip:'#e0c89c',niche:'#4a3a24',moss:'#8a7838',sagA:'#c8ae8f',sagB:'#baa081',sagC:'#d4ba9b',sagGold:'#a8763c',cath:'#ac9472',cathHi:'#d0b892',trim:'#7a3428',win:'#e8a03c',portal:'#2a1e10'}}
+];
 function applyAct(a){
   G.act=a;INF=(a===2);APO=(a===3);CYBER=a>=4&&a<=6;CYFASE=CYBER?a-4:0;
-  const src=CYBER?PAL_CYBER[CYFASE]:(a===2?PAL_INF:(a===3?PAL_APO:PAL_DAY));
+  POLIS=a>=7&&a<=9;POLFASE=POLIS?a-7:0;
+  const src=CYBER?PAL_CYBER[CYFASE]:(POLIS?PAL_POLIS[POLFASE]
+    :(a===2?PAL_INF:(a===3?PAL_APO:PAL_DAY)));
   // riparto sempre dalla veglia, così nessuna tinta resta appiccicata
   for(const k in PAL_DAY.C)C[k]=PAL_DAY.C[k];
   for(const k in PAL_DAY.CF)CF[k]=PAL_DAY.CF[k];
@@ -2388,7 +2831,151 @@ function drawNordCyber(g){
   const gx=OX+TILE+TILE/2;
   for(let y=18;y<OY;y++){const w=2+Math.round((y-18)/(OY-18)*6);rect(g,y%2?C.pathB:C.pathA,gx-w,y,w*2,1);rect(g,C.pathEdge,gx-w,y,1,1);rect(g,C.pathEdge,gx+w-1,y,1,1);}
 }
+/* Il fondale da cui arriva l'esercito. Niente bosco e niente skyline: un sole
+   alto che non partecipa — e dietro la polvere degli Unni si spegne — e sotto
+   di lui la cosa che sta salendo. Il mare coperto di navi, il campo che le
+   legioni hanno piantato in una notte, o la steppa, che non pianta niente
+   perché non le serve. In tutti e tre resta la strada che scende dal valico. */
+function drawNordPolis(g){
+  const sky=POLFASE===0?[[58,102,140],[150,180,198]]
+           :(POLFASE===1?[[92,110,128],[190,192,182]]:[[92,58,30],[196,148,92]]);
+  for(let y=0;y<OY;y++){
+    const t=y/OY,a=sky[0],b=sky[1];
+    rect(g,'rgb('+Math.round(a[0]+(b[0]-a[0])*t)+','+Math.round(a[1]+(b[1]-a[1])*t)+','+
+      Math.round(a[2]+(b[2]-a[2])*t)+')',0,y,CW,1);
+  }
+  const sx=CW-46,sy=9,sr=6;
+  const disco=POLFASE===2?'#e8a03c':(POLFASE===1?'#fffbe8':'#ffeec8');
+  const alone=POLFASE===2?'#c07c38':(POLFASE===1?'#e8e2c8':'#e8dca8');
+  for(let dy=-11;dy<=11;dy++)for(let dx=-11;dx<=11;dx++){
+    const d=Math.sqrt(dx*dx+dy*dy);
+    if(d>sr&&d<11&&rnd()<(11-d)/(POLFASE===2?15:8))rect(g,alone,sx+dx,sy+dy);
+  }
+  for(let dy=-sr;dy<=sr;dy++)for(let dx=-sr;dx<=sr;dx++)
+    if(dx*dx+dy*dy<=sr*sr)rect(g,disco,sx+dx,sy+dy);
+  const oriz=OY-14;
+  if(POLFASE===0){
+    for(let y=oriz;y<OY;y++)rect(g,(y-oriz)<(OY-oriz)/2?'#3e6a86':'#2e5670',0,y,CW,1);
+    for(let i=0;i<70;i++)                          // riflessi sull'acqua
+      rect(g,rnd()<.5?'#7fa8c0':'#5a86a4',(rnd()*CW)|0,oriz+((rnd()*(OY-oriz))|0),1+((rnd()*3)|0),1);
+    let X=-3;
+    while(X<CW){                                   // le navi, che non si contano
+      const w=5+((rnd()*5)|0),Y=oriz-1+((rnd()*8)|0),mx=X+(w>>1);
+      rect(g,'#4a3c28',mx,Y-6,1,6);                // albero
+      rect(g,'#e2d8c0',mx-2,Y-6,5,4);              // vela
+      rect(g,'#c9c3b4',mx-2,Y-6,5,1);
+      rect(g,'#3e2f20',X,Y,w,2);                   // scafo
+      rect(g,'#6a5436',X,Y+2,w,1);
+      X+=w+2+((rnd()*5)|0);
+    }
+  }else if(POLFASE===1){
+    rect(g,'#6a6250',0,oriz,CW,OY-oriz);           // terra battuta
+    rect(g,'#8a8270',0,oriz,CW,1);
+    for(let X=0;X<CW;X+=2)rect(g,'#4e4636',X,oriz-4,1,4);   // palizzata
+    rect(g,'#3e382c',0,oriz-5,CW,1);
+    for(let X=14;X<CW;X+=56){                      // torrette e insegne
+      rect(g,'#5a5240',X,oriz-11,9,11);
+      rect(g,'#6e6654',X,oriz-11,9,1);
+      rect(g,'#2e2a20',X+3,oriz-8,3,4);
+      rect(g,'#9c2a26',X+4,oriz-16,1,5);
+      rect(g,'#e8c452',X+3,oriz-17,3,2);
+    }
+    for(let X=4;X<CW;X+=13){                       // tende a due falde, in fila
+      const ty=oriz+2;
+      for(let k=0;k<4;k++)rect(g,k<2?'#cfc5ac':'#b0a48c',X+3-k,ty+k,1+k*2,1);
+      rect(g,'#8a8270',X,ty+4,7,1);
+    }
+  }else{
+    rect(g,'#9a7c4c',0,oriz,CW,OY-oriz);           // la piana
+    rect(g,'#b09268',0,oriz,CW,1);
+    for(let i=0;i<90;i++)                          // polvere
+      rect(g,rnd()<.5?'#c8a878':'#b08a58',(rnd()*CW)|0,oriz-6+((rnd()*(OY-oriz+6))|0),1+((rnd()*4)|0),1);
+    for(let i=0;i<34;i++){                         // cavalieri minuscoli
+      const X=(rnd()*CW)|0,Y=oriz+2+((rnd()*(OY-oriz-4))|0);
+      rect(g,'#4a3820',X,Y,3,2);
+      rect(g,'#4a3820',X+1,Y-2,1,2);
+      rect(g,'#2e2416',X+2,Y-5,1,4);               // l'asta
+    }
+    for(let k=0;k<4;k++){                          // strisce di foschia
+      g.globalAlpha=.20;rect(g,'#d8bc90',0,oriz-3+k*4,CW,2);g.globalAlpha=1;
+    }
+  }
+  const gx=OX+TILE+TILE/2;
+  for(let y=oriz;y<OY;y++){
+    const w=2+Math.round((y-oriz)/(OY-oriz)*6);
+    rect(g,y%2?C.pathB:C.pathA,gx-w,y,w*2,1);
+    rect(g,C.pathEdge,gx-w,y,1,1);rect(g,C.pathEdge,gx+w-1,y,1,1);
+  }
+}
+/* Le nicchie del sagrato qui sono EDICOLE VOTIVE: quattro tipi a rotazione,
+   e una sola delle quattro fa luce — la lampada a olio. */
+function edicolaPolis(g,X,Y,kind){
+  rect(g,CF.niche,X-1,Y+1,13,17);
+  rect(g,CF.wallLip,X-1,Y,13,1);
+  rect(g,CF.wallLip,X-1,Y+18,13,1);
+  rect(g,CF.sagB,X-1,Y+15,13,3);                   // il plinto
+  if(kind===0){                                     // la statuetta
+    rect(g,CF.sagC,X+4,Y+6,3,9);
+    rect(g,CF.sagC,X+4,Y+3,3,3);
+    rect(g,CF.sagA,X+2,Y+7,2,5);rect(g,CF.sagA,X+7,Y+7,2,5);
+  }else if(kind===1){                               // la lampada a olio
+    rect(g,'#6a5436',X+2,Y+10,7,3);
+    rect(g,'#8a6f42',X+2,Y+10,7,1);
+    rect(g,'#e8703a',X+8,Y+9,2,1);
+    rect(g,'#f2c14e',X+8,Y+7,1,2);
+    LIGHTS.push({x:X+8-OX,y:Y+8-OY});
+  }else if(kind===2){                               // l'anfora appoggiata
+    rect(g,'#7a5a38',X+3,Y+7,5,7);
+    rect(g,'#7a5a38',X+4,Y+5,3,2);
+    rect(g,'#5a4028',X+2,Y+7,1,3);rect(g,'#5a4028',X+8,Y+7,1,3);
+    rect(g,'#9a7a52',X+3,Y+7,5,1);
+  }else{                                            // la stele iscritta
+    rect(g,CF.sagA,X+2,Y+4,7,11);
+    for(let i=0;i<4;i++)rect(g,CF.portal,X+3,Y+6+i*2,5,1);
+  }
+}
+/* OPERA QUADRATA: corsi alti e regolari, e i giunti verticali sfalsati di
+   mezzo blocco fra un corso e il successivo. È quello sfalsamento a dire
+   «greco» — un muro a giunti allineati legge come mattoni moderni. */
+function drawMuraPolis(g){
+  const CORSO=9,BLOCCO=22;
+  for(const lato of [0,1]){
+    const x0=lato?CW-OX:0;
+    let y=-4,riga=0;
+    while(y<CH+CORSO){
+      rect(g,CF.wall[riga%2?1:0],x0,y,OX,CORSO);
+      rect(g,CF.mortar,x0,y+CORSO-1,OX,1);
+      const off=(riga%2)?0:BLOCCO/2;
+      for(let X=x0+off-BLOCCO;X<x0+OX;X+=BLOCCO)
+        if(X>x0)rect(g,CF.mortar,X,y,1,CORSO-1);
+      if(rnd()<.45)                                // blocchi rifatti, di tinta diversa
+        rect(g,CF.wall[2+((rnd()*2)|0)],x0+((rnd()*(OX-10))|0),y,10,CORSO-1);
+      y+=CORSO;riga++;
+    }
+    for(let k=0;k<2;k++){                          // semicolonne scanalate
+      const cx=x0+2+k*12;
+      rect(g,CF.sagB,cx,0,6,CH);
+      rect(g,CF.sagC,cx,0,1,CH);
+      for(let f=2;f<6;f+=2)rect(g,CF.sagA,cx+f,0,1,CH);
+      for(let Y=-6;Y<CH;Y+=68){                    // capitello
+        rect(g,CF.sagC,cx-1,Y,8,3);
+        rect(g,CF.wallLip,cx-1,Y,8,1);
+      }
+    }
+    let k=lato?2:0;
+    for(let ny=48;ny<CH-58;ny+=46){edicolaPolis(g,x0+(lato?7:6),ny,k%4);k++;}
+    const lt=lato?x0:x0+OX-6;                      // una fila di tegole, non merli
+    for(let Y=-3;Y<CH;Y+=6){
+      rect(g,CF.trim,lt,Y,6,4);
+      rect(g,CF.sagGold,lt,Y,6,1);
+      rect(g,CF.portal,lt,Y+4,6,2);
+    }
+    const li=lato?x0+6:x0+OX-7;                    // edera sul filo interno
+    for(let Y=0;Y<CH;Y++)if(rnd()<.28)rect(g,CF.moss,li,Y,1,1+((rnd()*3)|0));
+  }
+}
 function drawNord(g){
+  if(POLIS){drawNordPolis(g);return;}
   if(CYBER){drawNordCyber(g);return;}
   // cielo
   for(let y=0;y<OY;y++){
@@ -2547,6 +3134,7 @@ function drawMuraCyber(g){
   }
 }
 function drawMura(g){
+  if(POLIS){drawMuraPolis(g);return;}
   if(CYBER){drawMuraCyber(g);return;}
   for(const lato of [0,1]){
     const x0=lato?CW-OX:0;
@@ -2604,7 +3192,80 @@ function drawTerminaleCyber(g){
   // piste luminose e terminali
   for(const cx of [gx-48,gx-30,gx+30,gx+48]){rect(g,CF.cathHi,cx-2,y0+2,5,5);rect(g,CF.win,cx,y0+3,2,2);LIGHTS.push({x:cx+1-OX,y:y0+3-OY});}
 }
+/* A sud, al posto della cattedrale, il TEMPIO. Il frontone triangolare è la
+   cosa che lo dice da solo: una facciata a colonne senza timpano legge come
+   un portico qualunque. La soglia sta in mezzo al colonnato — è la porta che
+   si difende — e quattro bracieri la vegliano. */
+function drawAgora(g){
+  const y0=CH-OY, gx=OX+5*TILE+TILE/2, pav=6, fy=y0+pav;
+  /* il lastricato dell'agorà: lastre grandi, non mattonelle */
+  rect(g,CF.sagB,0,y0,CW,pav);
+  for(let Y=y0-1;Y<y0+pav;Y+=5)for(let X=-6+((Y%2)?9:0);X<CW;X+=19){
+    rect(g,rnd()<.5?CF.sagA:CF.sagC,X,Y,18,4);
+    rect(g,CF.mortar,X,Y+4,18,1);rect(g,CF.mortar,X+18,Y,1,5);
+  }
+  rect(g,CF.wallLip,0,y0,CW,1);
+  for(let Y=y0;Y<y0+pav+2;Y++){                 // la via che entra nel tempio
+    const w=8-Math.round((Y-y0)/pav*2);
+    rect(g,Y%2?C.pathB:C.pathA,gx-w,Y,w*2,1);
+  }
+  rect(g,CF.cath,0,fy,CW,CH-fy);
+  /* IL FRONTONE. Apice in alto e base in basso, e tutto dentro la fascia sud:
+     sopra y0 ci sono le lastre del campo, che lo coprirebbero — la prima
+     stesura sconfinava di là e del triangolo restava solo la base, cioè una
+     riga orizzontale come tutte le altre. Il timpano va scuro: contro il
+     marmo chiaro il tempio si deve leggere per sagoma, non per colore. */
+  const pw=50,ph=8;
+  for(let i=0;i<ph;i++){
+    const w=Math.max(1,Math.round(pw*(i+1)/ph));
+    rect(g,CF.portal,gx-w,fy+i,w*2,1);          // timpano
+    rect(g,CF.wallLip,gx-w,fy+i,2,1);           // cornice obliqua
+    rect(g,CF.wallLip,gx+w-1,fy+i,2,1);
+  }
+  for(let i=3;i<ph-1;i++){                      // il timpano scolpito
+    const w=Math.round(pw*(i+1)/ph);
+    if(rnd()<.8)rect(g,CF.sagGold,gx-w+4+((rnd()*Math.max(1,w*2-8))|0),fy+i,1+((rnd()*2)|0),1);
+  }
+  rect(g,CF.sagC,gx-pw-3,fy+ph,pw*2+6,2);       // geison orizzontale
+  rect(g,CF.wallLip,gx-pw-3,fy+ph,pw*2+6,1);
+  rect(g,CF.sagC,gx-1,fy-3,3,3);                // acroterio di colmo
+  rect(g,CF.sagGold,gx,fy-4,1,1);
+  for(const ax of [gx-pw-2,gx+pw+2]){           // acroteri d'angolo
+    rect(g,CF.sagC,ax-1,fy+ph-3,3,3);
+    rect(g,CF.sagGold,ax,fy+ph-4,1,1);
+  }
+  /* architrave con i triglifi */
+  const ay=fy+ph+2;
+  rect(g,CF.cathHi,0,ay,CW,4);
+  rect(g,CF.wallLip,0,ay,CW,1);
+  for(let X=2;X<CW;X+=11)rect(g,CF.trim,X,ay+1,3,3);
+  /* il colonnato dorico: fusti scanalati, echino e abaco */
+  const cy2=ay+4,NCOL=11,passo=CW/NCOL;
+  for(let i=0;i<NCOL;i++){
+    const cx=Math.round(i*passo+passo/2);
+    if(Math.abs(cx-gx)<13)continue;             // la soglia sta fra le colonne
+    rect(g,CF.sagB,cx-4,cy2+2,9,CH-cy2-2);
+    rect(g,CF.sagC,cx-4,cy2+2,2,CH-cy2-2);      // luce da nordovest
+    for(let f=0;f<3;f++)rect(g,CF.sagA,cx-1+f*2,cy2+2,1,CH-cy2-2);
+    rect(g,CF.sagC,cx-5,cy2,11,2);              // echino
+    rect(g,CF.wallLip,cx-6,cy2-1,13,1);         // abaco
+  }
+  /* la soglia: la porta che si difende */
+  rect(g,CF.portal,gx-10,cy2,21,CH-cy2);
+  rect(g,CF.sagGold,gx-11,cy2,1,CH-cy2);
+  rect(g,CF.sagGold,gx+11,cy2,1,CH-cy2);
+  /* i quattro bracieri: fuoco d'olio, non luce fredda */
+  for(const cx of [gx-52,gx-34,gx+34,gx+52]){
+    rect(g,'#6a5436',cx-3,y0+4,7,4);
+    rect(g,'#8a6f42',cx-3,y0+4,7,1);
+    rect(g,'#4a3c28',cx-1,y0+7,3,2);
+    rect(g,'#e8703a',cx-1,y0+1,3,3);
+    rect(g,'#f2c14e',cx,y0,2,2);
+    LIGHTS.push({x:cx+1-OX,y:y0-OY});
+  }
+}
 function drawSagrato(g){
+  if(POLIS){drawAgora(g);return;}
   if(CYBER){drawTerminaleCyber(g);return;}
   const y0=CH-OY, gx=OX+5*TILE+TILE/2, pav=7;
   // lastricato consacrato
@@ -2725,6 +3386,36 @@ function buildFG(){
     rect(fg,CF.win,rx-10,py0-1,1,CH-py0+1);rect(fg,CF.trim,rx+10,py0-1,1,CH-py0+1);
     return;
   }
+  if(POLIS){
+    /* Due ulivi stringono il varco. Non conifere: la chioma dell'ulivo è
+       rada e tonda, il tronco storto e grosso, e la foglia gira di taglio —
+       argento da una parte, verde dall'altra. È quella doppia tinta a farlo
+       leggere come un ulivo e non come un cespuglio qualunque. */
+    const oliva=(cx0,cy0,rr)=>{
+      rect(fg,'#4a3c28',cx0-1,cy0,3,26);                  // tronco
+      rect(fg,'#5c4c34',cx0,cy0,1,26);
+      for(const b of [[-1,6],[1,9],[-1,13]])              // rami storti
+        for(let s=0;s<5;s++)rect(fg,'#4a3c28',cx0+b[0]*s,cy0+b[1]-Math.round(s*.8),1,1);
+      for(let dy=-rr;dy<=rr;dy++)for(let dx=-rr-2;dx<=rr+2;dx++){
+        const d=(dx*dx)/((rr+2)*(rr+2))+(dy*dy)/(rr*rr);
+        if(d>1||rnd()<.30)continue;                       // chioma rada
+        rect(fg,rnd()<.34?'#9aa882':(rnd()<.5?'#4e6440':'#38492f'),cx0+dx,cy0+dy,1,1);
+      }
+    };
+    oliva(gx-21,2,11);
+    oliva(gx+21,4,10);
+    for(let i=0;i<7;i++){                                 // qualche fronda sul varco
+      const bx0=gx+(i%2?11:-11),by0=6+i*2;
+      rect(fg,'#4e6440',bx0,by0,(i%2?1:-1)*(2+(i%3)),1);
+    }
+    const rx2=OX+5*TILE+TILE/2,py2=CH-OY+28;
+    rect(fg,CF.portal,rx2-9,py2,19,CH-py2);
+    for(let i=0;i<5;i++)rect(fg,CF.portal,rx2-9+i,py2-Math.round(i*1.2),19-i*2,2);
+    rect(fg,CF.sagGold,rx2-10,py2-1,1,CH-py2+1);
+    rect(fg,CF.sagGold,rx2+10,py2-1,1,CH-py2+1);
+    rect(fg,CF.trim,rx2-9,py2-9,19,1);
+    return;
+  }
   // limitare del bosco: fronde fitte da cui esce la processione
   for(let X=gx-24;X<=gx+24;X++){
     const t=Math.abs(X-gx)/24;
@@ -2761,8 +3452,9 @@ let atime=0;
 function drawNebbia(){
   for(let i=0;i<3;i++){
     const off=Math.sin(atime*.22+i*2.1)*26;
-    x.globalAlpha=(CYBER?.035:(APO?.075:(INF?.06:.045)))+.022*Math.sin(atime*.7+i);
-    x.fillStyle=CYBER?(CYFASE===1?'#82ff75':'#20d8ff'):(APO?'#e8e8f0':(INF?'#c0664a':'#9fb0c0'));
+    x.globalAlpha=(POLIS?.05:(CYBER?.035:(APO?.075:(INF?.06:.045))))+.022*Math.sin(atime*.7+i);
+    x.fillStyle=POLIS?(POLFASE===2?'#d8bc90':(POLFASE===0?'#bcd4e0':'#e0dcc8'))
+      :(CYBER?(CYFASE===1?'#82ff75':'#20d8ff'):(APO?'#e8e8f0':(INF?'#c0664a':'#9fb0c0')));
     x.fillRect(-OX,-OY+24+i*4,CW,2);
     x.fillStyle=CYBER?'#ff3bd4':(APO?'#b9c0d0':(INF?'#8e3a24':'#7d8ea0'));
     x.fillRect(-OX+off,-OY+26+i*4,CW*.5,1);
@@ -2770,7 +3462,8 @@ function drawNebbia(){
   x.globalAlpha=1;
 }
 function drawCenere(){
-  x.fillStyle=CYBER?(CYFASE===1?'#b7ff45':'#20d8ff'):(APO?'#f2ecd8':(INF?'#e8703a':'#c3b9d0'));
+  x.fillStyle=POLIS?(POLFASE===2?'#e0c496':(POLFASE===0?'#dceaf2':'#f0ece0'))
+    :(CYBER?(CYFASE===1?'#b7ff45':'#20d8ff'):(APO?'#f2ecd8':(INF?'#e8703a':'#c3b9d0')));
   for(let i=0;i<FLAKES.length;i++){
     const f=FLAKES[i];
     const t=(atime*f.sp+f.ph*9)%(CH+30);
@@ -2827,10 +3520,13 @@ function mWrap(f,cx){
 }
 /* cielo: bande, stelle, luna. Due terne per atto: il colore allo zenit
    e quello all'orizzonte, interpolati riga per riga */
+/* zenit → orizzonte. Le prime sei sono notti; le ultime tre no: la polis si
+   combatte di giorno, e il cielo del menu deve dirlo prima di ogni parola. */
 const MSKY=[[9,7,17,26,20,35],[14,6,6,46,18,14],[8,10,18,34,40,58],
-  [2,5,13,8,22,38],[3,8,7,18,38,25],[2,3,12,16,12,45]];
+  [2,5,13,8,22,38],[3,8,7,18,38,25],[2,3,12,16,12,45],
+  [58,102,140,150,180,198],[92,110,128,190,192,182],[92,58,30,196,148,92]];
 function mkCielo(){
-  const q=mLayer(),k=MSKY[CYBER?3+CYFASE:(APO?2:(INF?1:0))];
+  const q=mLayer(),k=MSKY[POLIS?6+POLFASE:(CYBER?3+CYFASE:(APO?2:(INF?1:0)))];
   for(let y=0;y<MHZ;y++){
     const t=y/MHZ;
     rect(q,'rgb('+Math.round(k[0]+t*(k[3]-k[0]))+','+Math.round(k[1]+t*(k[4]-k[1]))
@@ -3016,6 +3712,75 @@ function mkSterpi(){
 /* Mondo II: una megalopoli a strati, costruita in pixel e cucita sul bordo.
    Ogni fascia ha una grammatica diversa: torri lontane, blocchi industriali,
    sopraelevate, insegne e tetti tecnici in primo piano. */
+/* MONDO III — LA CITTÀ CHIARA. Al posto della megalopoli: case basse a fasce,
+   tetti di coppi rossi, e ogni tanto un tempio col frontone che spunta sopra
+   i tetti. Le fasce più lontane sono più chiare: è la distanza, non la luce. */
+function mkPolisCitta(base,minH,maxH,passo,prof){
+  const q=mLayer(),i4=Math.min(4,prof);
+  const ton=['#8a7f68','#9a8f76','#a89c82','#b8ac90','#c6bb9e'][i4];
+  const tet=['#7a3428','#8a3c2c','#9c4632','#a85038','#b45c40'][i4];
+  const chi=['#a89c82','#b8ac90','#c6bb9e','#d2c8ac','#dcd3b8'][i4];
+  let X=-6;
+  while(X<MW+8){
+    const w=passo+((rnd()*passo)|0),h=minH+((rnd()*(maxH-minH+1))|0),t=base-h;
+    if(rnd()<.16){                                  // un tempio fra le case
+      const tw=Math.max(9,w+4);
+      mWrap(x0=>{
+        rect(q,ton,x0,t,tw,h);
+        for(let c=0;c<tw;c+=3)rect(q,chi,x0+c,t+3,2,h-3);      // colonnato
+        rect(q,chi,x0-1,t+1,tw+2,2);                           // architrave
+        for(let i=0;i<5;i++){                                  // frontone
+          const pw2=Math.round((tw/2+1)*(1-i/5));
+          rect(q,chi,x0+(tw>>1)-pw2,t-i,pw2*2,1);
+        }
+      },X);
+      X+=tw+2+((rnd()*3)|0);continue;
+    }
+    mWrap(x0=>{
+      rect(q,ton,x0,t,w,h);
+      rect(q,chi,x0,t,1,h);
+      rect(q,tet,x0-1,t-2,w+2,3);                              // coppi
+      rect(q,chi,x0-1,t-2,w+2,1);
+      for(let wy=t+4;wy<base-2;wy+=4)for(let wx=x0+1;wx<x0+w-1;wx+=3)
+        if(rnd()<.42)rect(q,'#4a4234',wx,wy,1,2);
+    },X);
+    X+=w+1+((rnd()*3)|0);
+  }
+  rect(q,ton,0,base,MW,MH-base);
+  for(let i=0;i<Math.max(2,Math.round(MW/70));i++){            // cipressi
+    const cx=(rnd()*MW)|0,ch=minH+4+((rnd()*7)|0);
+    mWrap(x0=>{
+      for(let y=0;y<ch;y++){
+        const ww=1+Math.round(1.6*Math.sin(Math.PI*(1-y/ch)));
+        rect(q,'#3a4a32',x0-ww,base-y,ww*2,1);
+      }
+    },cx);
+  }
+  return q.canvas;
+}
+/* La stoa in primo piano: un portico lungo tutto uguale. È la RIPETIZIONE a
+   farla leggere — una fila di colonne identiche, non un edificio con un
+   centro: se avesse un fuoco diventerebbe un altro tempio. */
+function mkPolisStoa(){
+  const q=mLayer();
+  const by=MH-Math.round(MW*.05),h=Math.round(MW*.12),t=by-h;
+  rect(q,'#4a4234',0,t+6,MW,h-6);                  // l'ombra sotto il portico
+  const passo=Math.max(7,Math.round(MW*.035));
+  for(let X=0;X<MW+passo;X+=passo){
+    mWrap(x0=>{
+      rect(q,'#dad0b8',x0,t+6,4,h-6);              // fusto
+      rect(q,'#f0e8d0',x0,t+6,1,h-6);
+      rect(q,'#e8e0c8',x0-1,t+4,6,2);              // capitello
+    },X);
+  }
+  rect(q,'#e2d8c0',0,t+1,MW,4);                    // architrave
+  rect(q,'#f2ecd8',0,t+1,MW,1);
+  rect(q,'#9c3a2a',0,t-2,MW,3);                    // tetto di coppi
+  rect(q,'#c26a4a',0,t-2,MW,1);
+  rect(q,'#dad0b8',0,by,MW,3);                     // stilobate
+  rect(q,'#8a7f68',0,by+3,MW,MH-by-3);
+  return q.canvas;
+}
 function mkCyberCitta(base,minH,maxH,passo,prof){
   const q=mLayer();
   const corpi=['#06101a','#071520','#081923','#030811','#02050a'];
@@ -3053,6 +3818,20 @@ function buildMenuBg(){
   const semeVero=seed;seed=77010203;   // seme proprio: quello del campo non si tocca
   MLAY.length=0;
   MLAY.push(mkCielo());
+  if(POLIS){
+    MLAY.push(mkPolisCitta(MHZ+Math.round(MW*.10),Math.round(MW*.05),Math.round(MW*.13),Math.round(MW*.05),0));
+    MLAY.push(mkPolisCitta(MHZ+Math.round(MW*.20),Math.round(MW*.06),Math.round(MW*.15),Math.round(MW*.06),1));
+    MLAY.push(mkPolisCitta(MHZ+Math.round(MW*.32),Math.round(MW*.07),Math.round(MW*.17),Math.round(MW*.07),2));
+    MLAY.push(mkPolisCitta(MHZ+Math.round(MW*.48),Math.round(MW*.08),Math.round(MW*.20),Math.round(MW*.08),3));
+    MLAY.push(mkPolisStoa());
+    MFOG=mkNebbia();MFOFF=0;
+    MFLAKES.length=0;
+    // salsedine sul mare, polvere sulla steppa: poca roba, e non cade dritta
+    for(let i=0,n=Math.min(54,Math.round(MW*MH/460));i<n;i++)
+      MFLAKES.push({x:rnd()*MW,ph:rnd()*90,sp:4+rnd()*9,dr:.3+rnd()*1.2,s:1});
+    MHALO=glowTex(MMR*3,255,238,190);
+    MACT=G.act;seed=semeVero;return;
+  }
   if(CYBER){
     MLAY.push(mkCyberCitta(MHZ+Math.round(MW*.06),Math.round(MW*.12),Math.round(MW*.29),Math.round(MW*.09),0));
     MLAY.push(mkCyberCitta(MHZ+Math.round(MW*.16),Math.round(MW*.10),Math.round(MW*.24),Math.round(MW*.075),1));
@@ -3110,14 +3889,15 @@ function drawMenuBg(dt){
     if(i===4&&MFOG){
       MFOFF=(MFOFF+6*dt)%MW;
       const fo=Math.round(MFOFF);
-      mg.globalAlpha=(CYBER?.16:(APO?.24:(INF?.21:.18)))+.05*Math.sin(mtime*.5);
+      mg.globalAlpha=(POLIS?.14:(CYBER?.16:(APO?.24:(INF?.21:.18))))+.05*Math.sin(mtime*.5);
       mg.drawImage(MFOG,-fo,0);
       mg.drawImage(MFOG,MW-fo,0);
       mg.globalAlpha=1;
     }
   }
   // cenere
-  mg.fillStyle=CYBER?(CYFASE===1?'#b7ff45':'#20d8ff'):(APO?'#f2ecd8':(INF?'#e8703a':'#c3b9d0'));
+  mg.fillStyle=POLIS?(POLFASE===2?'#e0c496':(POLFASE===0?'#dceaf2':'#f0ece0'))
+    :(CYBER?(CYFASE===1?'#b7ff45':'#20d8ff'):(APO?'#f2ecd8':(INF?'#e8703a':'#c3b9d0')));
   mg.globalAlpha=.28;
   for(let i=0;i<MFLAKES.length;i++){
     const f=MFLAKES[i],t=(mtime*f.sp+f.ph*9)%(MH+30);
@@ -3228,6 +4008,33 @@ const ART_TAPPA={
      '.mccccccm',
      '..mmmmmm.',
      '....c....'],
+  7:['....m....',   // la nave del Gran Re
+     '....m....',
+     '..sssss..',
+     '.ssssss..',
+     '..sssss..',
+     '....m....',
+     '.ddddddd.',
+     '..ddddd..',
+     '.w.www.w.'],
+  8:['..aa.aa..',   // l'aquila della legione su traversa
+     '.aaaaaaa.',
+     '..aaaaa..',
+     'bbbbabbbb',
+     '....a....',
+     '...aaa...',
+     '..a.a.a..',
+     '....a....',
+     '...bbb...'],
+  9:['.a.......',   // l'arco degli Unni con la freccia
+     'ba.......',
+     'b.a......',
+     'b..aaaaaa',
+     'b...a....',
+     'b..a.....',
+     'b.a......',
+     'ba.......',
+     '.a.......'],
   chiuso:['..sssss..', // ceralacca sulla pietra
           '.sswwwss.',
           'sswwwwwss',
@@ -3245,6 +4052,9 @@ const PAL_TAPPA={
   4:{n:'#113749',c:'#20d8ff',m:'#ff3bd4',b:'#07131d'},
   5:{a:'#497330',g:'#b7ff45',l:'#fff47a',b:'#07130d'},
   6:{m:'#ff3bd4',c:'#20d8ff',w:'#ffffff'},
+  7:{m:'#6a5436',s:'#e2d8c0',d:'#3e5a6e',w:'#7fa8c0'},
+  8:{a:'#e8c452',b:'#9c2a26'},
+  9:{b:'#6a5436',a:'#c8bca4'},
   chiuso:{s:'#3a1018',w:'#5a1c28',k:'#7a2634'}
 };
 const SEM={};
@@ -3437,6 +4247,19 @@ const VIG_CYBER=(()=>{
   return c;
 })();
 const GLOW_SACRO=glowTex(30,236,196,110);
+/* La luce delle are è fuoco d'olio: calda, non fredda come le insegne. */
+const GLOW_BRONZO=glowTex(28,240,176,90);
+/* La vignettatura della polis non chiude nel buio come quella delle veglie
+   notturne: si combatte di giorno, e ai bordi deve solo scaldare. */
+const VIG_POLIS=(()=>{
+  const c=document.createElement('canvas');c.width=CW;c.height=CH;
+  const q=c.getContext('2d');
+  const g=q.createRadialGradient(CW/2,CH/2,CH*.40,CW/2,CH/2,CH*.92);
+  g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.55,'rgba(90,60,26,.10)');
+  g.addColorStop(1,'rgba(58,38,18,.34)');
+  q.fillStyle=g;q.fillRect(0,0,CW,CH);
+  return c;
+})();
 /* celle libere: ricalcolate solo quando la griglia cambia */
 let freeCells=[];
 function rebuildFree(){
@@ -3991,12 +4814,13 @@ function render(){
   for(let i=0;i<LIGHTS.length;i++){
     const L=LIGHTS[i],fl=.55+Math.sin(G.t*7+L.x)*.12+Math.random()*.08;
     x.globalAlpha=.20*fl;
-    if(CYBER)x.drawImage(CYFASE===1?GLOW_NEON_ACIDO:GLOW_NEON,L.x-28,L.y-28);
+    if(POLIS)x.drawImage(GLOW_BRONZO,L.x-28,L.y-28);
+    else if(CYBER)x.drawImage(CYFASE===1?GLOW_NEON_ACIDO:GLOW_NEON,L.x-28,L.y-28);
     else if(APO)x.drawImage(GLOW_SACRO,L.x-30,L.y-30);
     else if(INF)x.drawImage(GLOW_INFERNO,L.x-22,L.y-22);
     else x.drawImage(GLOW_CANDELA,L.x-20,L.y-20);
     x.globalAlpha=.5*fl;
-    x.fillStyle=CYBER?(CYFASE===1?'#b7ff45':'#20d8ff'):'#f2c14e';
+    x.fillStyle=POLIS?'#f0b45a':(CYBER?(CYFASE===1?'#b7ff45':'#20d8ff'):'#f2c14e');
     x.fillRect(L.x,L.y-1-((Math.random()*2)|0),1,1);
   }
   {const pl=.72+Math.sin(atime*1.5)*.12,sx=5*TILE+8,sy=H+30;
@@ -4025,7 +4849,7 @@ function render(){
     x.fillStyle='rgba(201,162,39,.6)';x.fillRect(bx0+((bw*b.def.breakAt)|0),by0-2,1,8);
   }
   drawCenere();
-  x.drawImage(CYBER?VIG_CYBER:(APO?VIG_APO:(INF?VIG_INF:VIG)),-OX,-OY);
+  x.drawImage(POLIS?VIG_POLIS:(CYBER?VIG_CYBER:(APO?VIG_APO:(INF?VIG_INF:VIG))),-OX,-OY);
 
   // il velo della pausa non si disegna qui: lo mette l'overlay #pausa
   x.restore();
@@ -4984,6 +5808,14 @@ function gameOver(){
       'Contro una cosa simile non si resiste: la si ferma prima, oppure non la si ferma.',
       'RIPROVA','TORNA ALLA MAPPA',
       'FERMATO AL <b>'+Math.round((1-(G.bossHp||0))*100)+'%</b> · CADUTI: <b>'+G.killed+'</b>');
+  else if(G.act>=7)
+    showScreen('LE PORTE<br>SONO CEDUTE','LA POLIS È PRESA',
+      'Non è caduta una difesa: è caduta <b>la</b> difesa. Sono entrati dalla stessa strada '+
+      'che avevi tenuto per venti ondate, e l\'hanno percorsa senza fretta, come si percorre '+
+      'una cosa già propria.<br><br>Le mura sono ancora in piedi. Non è mai stato quello '+
+      'il punto: una città la si tiene finché c\'è qualcuno sulla porta.',
+      'TORNA A SCHIERARTI','TORNA ALLA MAPPA',
+      'ONDATE RESISTITE: <b>'+ROMAN(Math.max(1,rel))+'</b> · CADUTI: <b>'+G.killed+'</b>');
   else if(G.act>=4)
     showScreen('CONNESSIONE<br>INTERROTTA','LA CITTÀ HA VINTO',
       'I sigilli di rete sono esauriti. Il protocollo ostile ha attraversato la soglia e '+
@@ -5041,7 +5873,26 @@ const CHIUSURA={
   6:{tit:'SPUNTA<br>UN\'ALBA FALSA',sub:'LA CITTÀ SENZA ALBA È COMPIUTA',
      testo:'La Matrice Nera perde l\'ultimo processo e le insegne si spengono, isolato dopo '+
        'isolato.<br><br>All\'orizzonte compare una luce che imita il mattino. Non è il sole, '+
-       'ma per questa notte basta: hai restituito alla città il diritto di scegliere.'}
+       'ma per questa notte basta: hai restituito alla città il diritto di scegliere.'},
+  /* Le tre cerniere della polis: ognuna chiude un assedio e apre il secolo
+     dopo. Non è lo stesso nemico ridipinto — è la stessa porta. */
+  7:{tit:'IL MARE<br>SI RITIRA',sub:'IL GRAN RE HA RINUNCIATO',
+     testo:'Il Gran Re resta sulla strada che aveva sceso, e la flotta gira la prua verso '+
+       'oriente: prima una nave, poi dieci, poi tutte. Il golfo torna a essere acqua.<br><br>'+
+       'Passano gli anni — più di quanti ne duri un uomo. Poi da <b>occidente</b> comincia a '+
+       'salire qualcosa che non urla e non si ferma: arriva <b>in ordine</b>.'},
+  8:{tit:'RESTA<br>SOLO LA STRADA',sub:'IL FERRO ORDINATO È PASSATO OLTRE',
+     testo:'Il Console cade dove era caduto il Gran Re. Le legioni si ritirano e lasciano '+
+       'dietro di sé quello che Roma lascia sempre: non la libertà, una <b>strada dritta</b>.'+
+       '<br><br>Le strade servono ad andare. Ma servono anche a <b>tornare</b>, e a percorrerle '+
+       'può essere chiunque. Da oriente, molto più tardi, l\'orizzonte comincia a fare '+
+       '<b>polvere</b>.'},
+  9:{tit:'LA POLVERE<br>SI POSA',sub:'LA POLIS È COMPIUTA',
+     testo:'Il Flagello di Dio si ferma sulla soglia come tutti gli altri, e la piana torna '+
+       'vuota. La polvere impiega un giorno intero a posarsi.<br><br>Hai tenuto la stessa '+
+       'porta contro il mare, contro il ferro e contro la steppa: <b>tre eserciti, tre '+
+       'secoli, una città che c\'è ancora</b>. Nessuno di loro ha lasciato il proprio nome '+
+       'su queste pietre. Tu sì.'}
 };
 /* Venti ondate compiute. Se la veglia non era l'ultima del mondo si sceglie
    fra restare e scendere; se lo era, il mondo è chiuso e quello dopo — quando
