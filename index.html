@@ -123,6 +123,27 @@ canvas#menubg.off{display:none}
 #screen .sub{font-size:9.5px;line-height:2;letter-spacing:.16em;color:#8b7f6c;max-width:300px}
 #screen .lore{font-size:9.5px;line-height:1.95;color:#7a6f60;max-width:310px;text-align:left;letter-spacing:.02em}
 #screen .lore b{color:#c9a227;font-weight:600}
+/* MONDO III · LA POLIS — le altre sei veglie sono notturne e il velo è tarato
+   su quelle: sopra un fondale scuro un grigio caldo si legge benissimo. Qui il
+   fondale è di GIORNO, cielo chiaro e marmo, e gli stessi grigi ci affondano
+   dentro. Si alza il velo e si schiariscono i testi in un posto solo, agganciati
+   al body: #screen si riscrive la className a ogni schermata (wide, mappa,
+   mondi) e una classe messa lì verrebbe cancellata al primo cambio. */
+body.mondo-polis #screen{
+  background:linear-gradient(180deg,
+    rgba(10,8,6,.60) 0%,rgba(12,9,7,.82) 25%,rgba(12,9,7,.84) 60%,
+    rgba(10,8,6,.62) 77%,rgba(10,8,6,.42) 89%,rgba(10,8,6,.34) 100%)}
+body.mondo-polis #screen.wide{
+  background:linear-gradient(180deg,rgba(10,8,6,.90) 0%,rgba(12,9,7,.94) 40%,
+    rgba(10,8,6,.94) 100%)}
+body.mondo-polis #screen h1{color:#f5efdc;
+  text-shadow:0 0 18px rgba(200,138,58,.70),0 2px 0 rgba(0,0,0,.55)}
+body.mondo-polis #screen .rule{background:linear-gradient(90deg,transparent,#e8c452,transparent)}
+body.mondo-polis #screen .sub{color:#dccca6;text-shadow:0 1px 2px rgba(0,0,0,.85)}
+body.mondo-polis #screen .lore{color:#cdbf9e;text-shadow:0 1px 2px rgba(0,0,0,.85)}
+body.mondo-polis #screen .lore b{color:#f0cd63}
+body.mondo-polis #screen .scoreline{color:#dccca6}
+body.mondo-polis #screen .scoreline b{color:#f0cd63}
 /* compendio illustrato: testo fitto, serve più velo sul fondale */
 #screen.wide{justify-content:flex-start;padding:14px 16px;
   background:linear-gradient(180deg,rgba(7,6,10,.86) 0%,rgba(9,7,12,.92) 40%,
@@ -2762,6 +2783,9 @@ const PAL_POLIS=[
 function applyAct(a){
   G.act=a;INF=(a===2);APO=(a===3);CYBER=a>=4&&a<=6;CYFASE=CYBER?a-4:0;
   POLIS=a>=7&&a<=9;POLFASE=POLIS?a-7:0;
+  /* il mondo chiaro vuole un velo e dei testi suoi: la classe sta sul body
+     perché #screen si riscrive la className a ogni schermata */
+  if(document.body)document.body.classList.toggle('mondo-polis',POLIS);
   const src=CYBER?PAL_CYBER[CYFASE]:(POLIS?PAL_POLIS[POLFASE]
     :(a===2?PAL_INF:(a===3?PAL_APO:PAL_DAY)));
   // riparto sempre dalla veglia, così nessuna tinta resta appiccicata
@@ -3512,11 +3536,16 @@ function mLayer(){
 }
 /* chi sta a cavallo del bordo va ridisegnato dall'altra parte, altrimenti
    il punto di ricongiunzione si vede. I casuali si tirano PRIMA di chiamare
-   questa, se no le due copie escono diverse. */
-function mWrap(f,cx){
+   questa, se no le due copie escono diverse.
+   `w` è quanto l'elemento è largo davvero: con la vecchia soglia fissa di 16
+   un edificio più largo di così veniva tagliato dal bordo e non ricompariva
+   dall'altra parte — restava mozzato lì, ed è il difetto che si vedeva
+   scorrere. Chi non lo passa mantiene il vecchio comportamento. */
+function mWrap(f,cx,w){
+  const m=w||16;
   f(cx);
-  if(cx>MW-16)f(cx-MW);
-  if(cx<16)f(cx+MW);
+  if(cx>MW-m)f(cx-MW);
+  if(cx<m)f(cx+MW);
 }
 /* cielo: bande, stelle, luna. Due terne per atto: il colore allo zenit
    e quello all'orizzonte, interpolati riga per riga */
@@ -3720,8 +3749,12 @@ function mkPolisCitta(base,minH,maxH,passo,prof){
   const ton=['#8a7f68','#9a8f76','#a89c82','#b8ac90','#c6bb9e'][i4];
   const tet=['#7a3428','#8a3c2c','#9c4632','#a85038','#b45c40'][i4];
   const chi=['#a89c82','#b8ac90','#c6bb9e','#d2c8ac','#dcd3b8'][i4];
+  /* Il ciclo si ferma a MW e non oltre: quello che sborda lo rimette dall'altra
+     parte mWrap, con la larghezza vera. Tirare avanti oltre il bordo, come si
+     faceva prima, disegnava case che poi il bordo tagliava via — e sul giro
+     si vedeva la fetta mozzata passare. */
   let X=-6;
-  while(X<MW+8){
+  while(X<MW){
     const w=passo+((rnd()*passo)|0),h=minH+((rnd()*(maxH-minH+1))|0),t=base-h;
     if(rnd()<.16){                                  // un tempio fra le case
       const tw=Math.max(9,w+4);
@@ -3733,17 +3766,24 @@ function mkPolisCitta(base,minH,maxH,passo,prof){
           const pw2=Math.round((tw/2+1)*(1-i/5));
           rect(q,chi,x0+(tw>>1)-pw2,t-i,pw2*2,1);
         }
-      },X);
+      },X,tw+2);
       X+=tw+2+((rnd()*3)|0);continue;
     }
+    /* Le finestre si tirano PRIMA di mWrap, non dentro: mWrap disegna la casa
+       fino a tre volte per rimetterla dall'altra parte del bordo, e se i
+       casuali si tirassero dentro la copia al bordo avrebbe finestre diverse
+       dall'originale — cioè la giuntura non combacerebbe proprio nel punto in
+       cui deve essere invisibile. È la regola scritta sopra mWrap. */
+    const fin=[];
+    for(let wy=t+4;wy<base-2;wy+=4)for(let dx=1;dx<w-1;dx+=3)
+      if(rnd()<.42)fin.push([dx,wy]);
     mWrap(x0=>{
       rect(q,ton,x0,t,w,h);
       rect(q,chi,x0,t,1,h);
       rect(q,tet,x0-1,t-2,w+2,3);                              // coppi
       rect(q,chi,x0-1,t-2,w+2,1);
-      for(let wy=t+4;wy<base-2;wy+=4)for(let wx=x0+1;wx<x0+w-1;wx+=3)
-        if(rnd()<.42)rect(q,'#4a4234',wx,wy,1,2);
-    },X);
+      for(let k=0;k<fin.length;k++)rect(q,'#4a4234',x0+fin[k][0],fin[k][1],1,2);
+    },X,w+2);
     X+=w+1+((rnd()*3)|0);
   }
   rect(q,ton,0,base,MW,MH-base);
@@ -3765,13 +3805,21 @@ function mkPolisStoa(){
   const q=mLayer();
   const by=MH-Math.round(MW*.05),h=Math.round(MW*.12),t=by-h;
   rect(q,'#4a4234',0,t+6,MW,h-6);                  // l'ombra sotto il portico
-  const passo=Math.max(7,Math.round(MW*.035));
-  for(let X=0;X<MW+passo;X+=passo){
+  /* Il passo deve stare in MW un numero INTERO di volte, se no il colonnato
+     non si richiude: con MW=125 e passo 7 entravano 17 vuoti da 7 e uno da 6,
+     e a ogni giro una colonna arrivava un pixel in anticipo — sembrava che il
+     bordo sinistro saltasse di lato. Si sceglie quante colonne ci stanno e si
+     spartisce la larghezza fra loro: il resto si distribuisce su tutte, un
+     pixel qua e uno là, invece di ammucchiarsi tutto sulla giuntura. */
+  const desiderato=Math.max(7,Math.round(MW*.035));
+  const n=Math.max(6,Math.round(MW/desiderato)),passo=MW/n;
+  for(let i=0;i<n;i++){
+    const X=Math.round(i*passo);
     mWrap(x0=>{
       rect(q,'#dad0b8',x0,t+6,4,h-6);              // fusto
       rect(q,'#f0e8d0',x0,t+6,1,h-6);
       rect(q,'#e8e0c8',x0-1,t+4,6,2);              // capitello
-    },X);
+    },X,7);
   }
   rect(q,'#e2d8c0',0,t+1,MW,4);                    // architrave
   rect(q,'#f2ecd8',0,t+1,MW,1);
