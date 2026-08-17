@@ -311,7 +311,28 @@ l'edificio è già equipaggiato, i due slot si scambiano. Ogni riga ha un tasto
 Il catalogo è una **griglia** di schede compatte — due colonne sul telefono, tre
 da 480px in su — **raggruppata per mondo**: sedici edifici in colonna singola
 sono sedici schermate di scorrimento, e qui serve vedere a colpo d'occhio dove
-si è arrivati. Descrizione e numeri stanno nella scheda di dettaglio, a un tocco.
+si è arrivati.
+
+Ogni scheda porta **mestiere e costo in lacrime** (`acRuolo`, `acNum`), e li
+porta **in tutt'e due i modi**. Le due armerie hanno mestieri diversi — si
+sfoglia per studiare, si sceglie per scendere — ma la differenza sta in *quanta
+profondità* offrono, non in *cosa nascondono*: lore, cinque gradi e statistiche
+grado per grado restano nella scheda di dettaglio, a un tocco.
+
+Prima il mestiere occupava la stessa casella del tasto `SCEGLI` e quindi spariva
+proprio in modalità scelta, cioè nell'unico momento in cui serve, e per una
+quaterna che poi non si cambia più fino a fine veglia: si sceglieva fra sedici
+sagome e sedici nomi. Il costo non c'era da nessuna parte — la scheda mostrava
+il prezzo in **frammenti**, cioè quello di ciò che non puoi ancora usare, e
+taceva sulle **lacrime**, che si ripagano a ogni pietra posata e decidono quante
+ne tieni in piedi insieme (vanno da ◈45 a ◈155, e nella Veglia si parte con ◈130
+in mano: il reliquiario, che è nella quaterna di riferimento, alla prima ondata
+non si può nemmeno posare).
+
+**La portata sulla scheda no**, ed è una scelta: è un numero che si giudica solo
+in confronto a un altro, e in un riquadro da due colonne diventa rumore. Sta nel
+dettaglio, dove c'è spazio per incolonnarla e dove ha le sue parole giuste —
+`VOCE` per chi sostiene, `AURA` per chi lavora d'aura, `GITTATA` per gli altri.
 
 Ogni scheda ha quattro stati, che si devono leggere senza leggere una parola:
 **aperto**; **sigillato** — il mondo è ancora chiuso, catena in diagonale e

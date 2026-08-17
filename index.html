@@ -217,7 +217,18 @@ canvas#menubg.off{display:none}
 .acI img{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
 .acN{display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   font-size:9px;letter-spacing:.1em;color:#c9a227}
-.acRuolo{display:block;padding:0 4px 6px;font-size:6.8px;letter-spacing:.13em;color:#7d6a4a}
+/* Il mestiere e i due numeri che fanno decidere stanno su ogni scheda e in
+   tutt'e due i modi. Prima il mestiere occupava la stessa casella del tasto
+   SCEGLI, quindi spariva proprio in modalità scelta: nell'unico momento in cui
+   serve, e per una quaterna che poi non si cambia più fino a fine veglia.
+   Il costo non c'era da nessuna parte: la scheda mostrava il prezzo in
+   frammenti — quello di ciò che non puoi ancora usare — e taceva sulle lacrime,
+   che si ripagano a ogni pietra posata e decidono quante ne tieni in piedi. */
+.acRuolo{display:block;padding:0 4px 2px;font-size:6.8px;letter-spacing:.13em;color:#7d6a4a}
+.acNum{display:block;padding:0 4px 6px;font-size:6.8px;letter-spacing:.06em;color:#8f8472}
+.acNum b{color:#c9bda4;font-weight:600}
+.armCard.chiuso .acRuolo,.armCard.chiuso .acNum{color:#4a423a}
+.armCard.chiuso .acNum b{color:#584f45}
 /* la targa del prezzo si vede da subito, anche a veglia non compiuta: la porta
    ha due serrature e non se ne deve scoprire una alla volta */
 .acAdv{display:block;margin-top:2px;font-size:6.8px;letter-spacing:.12em;color:#6b5f7d}
@@ -4806,13 +4817,13 @@ function armStato(k){
 function armRiga(k){
   const cfg=TOWERS[k],slot=armSel.indexOf(k),dentro=slot>=0;
   const stato=armStato(k),chiuso=stato!=='aperto',prezzo=cfg.fr|0;
-  let azione;
+  let azione='';
   if(stato==='aperto'){
     if(armScegli){
       const et=slot===armSlot?'SCELTA':(dentro?'SPOSTA':'SCEGLI');
       azione='<button type="button" class="acAct armPick'+(slot===armSlot?' on':'')+
         '" data-arm-choose="'+k+'">'+et+'</button>';
-    }else azione='<span class="acRuolo">'+(cfg.ruolo||'')+'</span>';
+    }
   }else if(stato==='sigillato')azione='<span class="acAct acGate">MONDO<br>SIGILLATO</span>';
   else if(stato==='veglia')azione='<span class="acAct acGate">COMPI<br>'+ATTO[cfg.veglia].nome+'</span>';
   else{
@@ -4824,11 +4835,17 @@ function armRiga(k){
   // ha due serrature e si devono vedere tutt'e due da subito
   const targa=chiuso?'<span class="acAdv'+(stato==='prezzo'?' vicino':'')+'">'+
     (stato==='sigillato'?MONDO[cfg.mondo||1].nome:FRAM_SEGNO+' '+prezzo)+'</span>':'';
+  /* Sulla scheda ci stanno il mestiere e il costo, e basta: la portata è un
+     numero che si legge solo in confronto a un altro, e in un riquadro da due
+     colonne diventa rumore. Sta nella scheda di dettaglio, con le sue parole
+     giuste (voce, aura, gittata), dove c'è spazio per confrontarla. */
+  const scheda='<span class="acRuolo">'+(cfg.ruolo||'')+'</span>'+
+    '<span class="acNum">◈<b>'+cfg.cost+'</b></span>';
   return '<div class="armCard'+(dentro?' on':'')+(chiuso?' chiuso':'')+
     (stato==='sigillato'?' sigillato':'')+'" data-t="'+k+'">'+
     '<button type="button" class="acBody" data-arm-info="'+k+'">'+
       '<span class="acI">'+spr(k+'1',2)+'</span>'+
-      '<span class="acN">'+cfg.short+'</span>'+targa+
+      '<span class="acN">'+cfg.short+'</span>'+scheda+targa+
     '</button>'+azione+
     (stato==='sigillato'?'<span class="armLucch"><i></i><b></b></span>':'')+'</div>';
 }
