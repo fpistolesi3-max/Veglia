@@ -313,26 +313,39 @@ da 480px in su — **raggruppata per mondo**: sedici edifici in colonna singola
 sono sedici schermate di scorrimento, e qui serve vedere a colpo d'occhio dove
 si è arrivati.
 
-Ogni scheda porta **mestiere e costo in lacrime** (`acRuolo`, `acNum`), e li
-porta **in tutt'e due i modi**. Le due armerie hanno mestieri diversi — si
-sfoglia per studiare, si sceglie per scendere — ma la differenza sta in *quanta
-profondità* offrono, non in *cosa nascondono*: lore, cinque gradi e statistiche
-grado per grado restano nella scheda di dettaglio, a un tocco.
+Ogni scheda porta il **mestiere** (`acRuolo`), e lo porta **in tutt'e due i
+modi**. Le due armerie hanno mestieri diversi — si sfoglia per studiare, si
+sceglie per scendere — ma la differenza sta in *quanta profondità* offrono, non
+in *cosa nascondono*: lore, cinque gradi e statistiche grado per grado restano
+nella scheda di dettaglio, a un tocco.
 
 Prima il mestiere occupava la stessa casella del tasto `SCEGLI` e quindi spariva
 proprio in modalità scelta, cioè nell'unico momento in cui serve, e per una
 quaterna che poi non si cambia più fino a fine veglia: si sceglieva fra sedici
-sagome e sedici nomi. Il costo non c'era da nessuna parte — la scheda mostrava
-il prezzo in **frammenti**, cioè quello di ciò che non puoi ancora usare, e
-taceva sulle **lacrime**, che si ripagano a ogni pietra posata e decidono quante
-ne tieni in piedi insieme (vanno da ◈45 a ◈155, e nella Veglia si parte con ◈130
-in mano: il reliquiario, che è nella quaterna di riferimento, alla prima ondata
-non si può nemmeno posare).
+sagome e sedici nomi.
 
-**La portata sulla scheda no**, ed è una scelta: è un numero che si giudica solo
-in confronto a un altro, e in un riquadro da due colonne diventa rumore. Sta nel
-dettaglio, dove c'è spazio per incolonnarla e dove ha le sue parole giuste —
-`VOCE` per chi sostiene, `AURA` per chi lavora d'aura, `GITTATA` per gli altri.
+**Sulla scheda una cifra sola, e vuol dire una cosa sola: quanto costa aprirlo.**
+Ci si era provati anche col costo in lacrime, ed è stato un errore da correggere:
+in armeria si compra con i frammenti, le lacrime si pagano in campo a ogni pietra
+posata. Sulle quattro storiche — che nessuno deve sbloccare — quel `◈` restava
+l'unica cifra del riquadro e si leggeva come il prezzo di una cosa che sei già.
+Ora **l'assenza di numero dice «è tuo»**, e la presenza dice quanti frammenti
+mancano: una regola che si legge scorrendo la griglia, senza leggere parole.
+Il costo in lacrime sta dove si spende — dettaglio e barra degli edifici.
+
+**La portata sulla scheda no**, per lo stesso motivo: è un numero che si giudica
+solo in confronto a un altro, e in un riquadro da due colonne diventa rumore.
+Sta nel dettaglio, dove c'è spazio per incolonnarla e dove ha le sue parole
+giuste — `VOCE` per chi sostiene, `AURA` per chi lavora d'aura, `GITTATA` per
+gli altri.
+
+Il prezzo (`acFr`) è **viola come i frammenti, mai oro**: l'oro è delle lacrime,
+e confondere le due monete è precisamente ciò che si vuole evitare. Si accende
+(`.vicino`) quando la veglia è compiuta e manca solo pagare. Il nome del mondo
+sui sigillati ha invece un suo stile smorto (`acAdv`): dice *perché* è chiuso,
+non *quanto* costa, e prima condivideva una riga sola col prezzo. Il tasto non
+ripete la cifra che sta già sopra: porta l'azione (`APRI`) o quanto manca ancora
+(`MANCANO ❖15`), che è l'unico numero che sopra non c'è.
 
 Ogni scheda ha quattro stati, che si devono leggere senza leggere una parola:
 **aperto**; **sigillato** — il mondo è ancora chiuso, catena in diagonale e

@@ -220,15 +220,21 @@ canvas#menubg.off{display:none}
    frammenti — quello di ciò che non puoi ancora usare — e taceva sulle lacrime,
    che si ripagano a ogni pietra posata e decidono quante ne tieni in piedi. */
 .acRuolo{display:block;padding:0 4px 2px;font-size:6.8px;letter-spacing:.13em;color:#7d6a4a}
-/* il costo è l'unica cifra della scheda e si legge di colpo, scorrendo la
-   griglia: il segno in oro come le lacrime dell'HUD, la cifra grande e chiara.
-   A 6.8px come il mestiere non si vedeva, ed era il numero che fa decidere. */
-.acNum{display:block;padding:1px 4px 6px;font-size:8px;letter-spacing:.04em;
-  color:#c9a227;font-variant-numeric:tabular-nums}
-.acNum b{color:#d8cbb0;font-weight:600;font-size:10px;letter-spacing:.02em}
+/* Il costo in lacrime sulla scheda no: si paga in campo a ogni pietra posata,
+   non qui, e sulle quattro storiche — che nessuno deve sbloccare — restava
+   l'unica cifra del riquadro, quindi si leggeva come il prezzo di una cosa che
+   sei già. In armeria si compra con i frammenti e basta; le lacrime stanno
+   nella scheda di dettaglio e sulla barra degli edifici, dove si spendono.
+   Il prezzo di sblocco è perciò la sola cifra della scheda e deve leggersi
+   scorrendo la griglia: viola come i frammenti, mai oro — l'oro è delle
+   lacrime, e confondere le due monete è esattamente ciò che si vuole evitare. */
+.acFr{display:block;padding:1px 4px 6px;font-size:8px;letter-spacing:.04em;
+  color:#6b5f7d;font-variant-numeric:tabular-nums}
+.acFr b{color:#9a86c4;font-weight:600;font-size:10px;letter-spacing:.02em}
+/* «vicino» = la veglia è compiuta, manca solo pagare: il viola si accende */
+.acFr.vicino{color:#8f7ab8}
+.acFr.vicino b{color:#d3bcff}
 .armCard.chiuso .acRuolo{color:#4a423a}
-.armCard.chiuso .acNum{color:#5a4a22}
-.armCard.chiuso .acNum b{color:#6b6252}
 /* la targa del prezzo si vede da subito, anche a veglia non compiuta: la porta
    ha due serrature e non se ne deve scoprire una alla volta */
 .acAdv{display:block;margin-top:2px;font-size:6.8px;letter-spacing:.12em;color:#6b5f7d}
@@ -4828,19 +4834,25 @@ function armRiga(k){
   else if(stato==='veglia')azione='<span class="acAct acGate">COMPI<br>'+ATTO[cfg.veglia].nome+'</span>';
   else{
     const puoi=(PROG.fr|0)>=prezzo;
+    /* il prezzo sta già sopra, e grande: ripeterlo qui era dirlo due volte.
+       Il tasto porta l'azione, o quanto manca ancora — che è l'unica cifra
+       che sopra non c'è */
     azione='<button type="button" class="acAct armApri'+(puoi?'':' no')+'" data-arm-apri="'+k+
-      '">'+(puoi?'APRI':'SERVE')+' '+FRAM_SEGNO+prezzo+'</button>';
+      '">'+(puoi?'APRI':'MANCANO '+FRAM_SEGNO+(prezzo-(PROG.fr|0)))+'</button>';
   }
   // il prezzo si vede fin dal principio, anche a veglia non compiuta: la porta
   // ha due serrature e si devono vedere tutt'e due da subito
-  const targa=chiuso?'<span class="acAdv'+(stato==='prezzo'?' vicino':'')+'">'+
-    (stato==='sigillato'?MONDO[cfg.mondo||1].nome:FRAM_SEGNO+' '+prezzo)+'</span>':'';
-  /* Sulla scheda ci stanno il mestiere e il costo, e basta: la portata è un
-     numero che si legge solo in confronto a un altro, e in un riquadro da due
-     colonne diventa rumore. Sta nella scheda di dettaglio, con le sue parole
-     giuste (voce, aura, gittata), dove c'è spazio per confrontarla. */
-  const scheda='<span class="acRuolo">'+(cfg.ruolo||'')+'</span>'+
-    '<span class="acNum">◈<b>'+cfg.cost+'</b></span>';
+  /* Due cose diverse, due stili diversi: il nome del mondo dice *perché* è
+     chiuso, il prezzo dice *quanto* costa. Prima condividevano una riga sola. */
+  const targa=!chiuso?'':stato==='sigillato'
+    ? '<span class="acAdv">'+MONDO[cfg.mondo||1].nome+'</span>'
+    : '<span class="acFr'+(stato==='prezzo'?' vicino':'')+'">'+FRAM_SEGNO+
+      '<b>'+prezzo+'</b></span>';
+  /* Sulla scheda ci sta il mestiere, e basta: la portata è un numero che si
+     legge solo in confronto a un altro, e in un riquadro da due colonne diventa
+     rumore. Sta nella scheda di dettaglio, con le sue parole giuste (voce,
+     aura, gittata), dove c'è spazio per incolonnarla. */
+  const scheda='<span class="acRuolo">'+(cfg.ruolo||'')+'</span>';
   return '<div class="armCard'+(dentro?' on':'')+(chiuso?' chiuso':'')+
     (stato==='sigillato'?' sigillato':'')+'" data-t="'+k+'">'+
     '<button type="button" class="acBody" data-arm-info="'+k+'">'+

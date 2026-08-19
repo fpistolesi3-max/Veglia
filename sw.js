@@ -3,7 +3,7 @@
    GitHub si vede al primo avvio con connessione, senza dover toccare nulla.
    La cache resta come riserva per l'uso offline.
    La v11 aggiunge la colonna sonora delle schermate. */
-const CACHE='ultima-veglia-v16';
+const CACHE='ultima-veglia-v17';
 /* La colonna sonora è l'unico pezzo grosso che non sta dentro la pagina: si
    scarica una volta e resta in cache, come le icone. In base64 dentro l'HTML
    peserebbe undici mega e il rete-prima la riscaricherebbe a ogni avvio. */
