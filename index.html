@@ -260,7 +260,11 @@ canvas#menubg.off{display:none}
 .fram{color:#b79ae8;white-space:nowrap}
 .armChiuso{font-size:8.5px;line-height:1.7;color:#8b7f6c;margin:8px 0 2px;
   padding:7px 8px;border:1px solid #2f2740;border-radius:3px;background:rgba(22,16,34,.5)}
-.armChiuso b{color:#b79ae8}
+/* qui dentro il grassetto è il nome di una veglia, non un prezzo: oro, non
+   viola. Il viola è dei frammenti e prometterebbe che basti pagare, mentre
+   quella è precisamente la serratura che il denaro non apre. */
+.armChiuso b{color:#c9a227}
+.armChiuso .fatta{color:#7fa88a;letter-spacing:.06em}
 .armBack,.armInfoPick{min-height:24px;padding:4px 3px;border-radius:2px;
   font:600 7.5px/1.2 ui-monospace,monospace;letter-spacing:.08em}
 .armMore,.armBack{border:1px solid #3a3344;background:#100d16;color:#8fa5b0}
@@ -4908,17 +4912,16 @@ function armDettaglio(k){
     '<div class="desc">'+cfg.desc+'</div></div>';
   if(stato!=='aperto'){
     const prezzo=cfg.fr|0,tuoi=PROG.fr|0;
-    h+='<div class="armChiuso">Appartiene a <b>'+MONDO[cfg.mondo||1].nome+'</b>. Ha due '+
-      'serrature: <b>'+ATTO[cfg.veglia].nome+'</b> compiuta, e '+FRAM_SEGNO+' <b>'+prezzo+
-      '</b> — ne hai '+FRAM_SEGNO+' <b>'+tuoi+'</b>.<br>'+
-      (stato==='sigillato'
-        ?'Quel mondo è ancora sigillato: quella veglia non la si può nemmeno tentare.'
-        :stato==='veglia'
-          ?'La veglia non è ancora compiuta, e non c\'è prezzo che la sostituisca.'
-          :'La veglia è compiuta: manca solo pagare.')+
-      '<br><br>Aperto una volta, è tuo per sempre — in ogni veglia di ogni mondo.</div>';
+    /* Una riga sola, e solo dove serve. Quando resta il prezzo il tasto da solo
+       non direbbe *perché* quell'edificio è tuo di diritto, quindi la veglia va
+       nominata; negli altri due stati il tasto lo dice già — «COMPI PRIMA IL
+       GIUDIZIO», «MONDO ANCORA SIGILLATO» — e ripeterlo sopra è dirlo due volte.
+       Il prezzo sta sul tasto e il saldo in fondo, sulla riga di stato: il
+       paragrafo di prima li ripeteva tutti e due. */
     if(stato==='prezzo'){
       const puoi=tuoi>=prezzo;
+      h+='<div class="armChiuso">Si apre compiendo <b>'+ATTO[cfg.veglia].nome+
+        '</b> <span class="fatta">✓ fatta</span></div>';
       h+='<button type="button" class="armInfoPick'+(puoi?'':' no')+'" data-arm-apri="'+k+'">'+
         (puoi?'APRI PER '+FRAM_SEGNO+prezzo:'TI MANCANO '+FRAM_SEGNO+(prezzo-tuoi))+'</button>';
     }else h+='<div class="armInfoPick gate">'+(stato==='sigillato'
@@ -4926,10 +4929,11 @@ function armDettaglio(k){
   }
   if(armScegli&&stato==='aperto')h+='<button type="button" class="armInfoPick" data-arm-choose="'+k+
     '">ASSEGNA ALLO SLOT '+ROMAN(armSlot+1)+'</button>';
+  /* Niente paragrafo qui sotto: che i gradi non si comprino lo dicono i gradi
+     stessi, uno per uno — «ANCORA 20 CADUTI CON QUESTO EDIFICIO» — e una regola
+     vista vale più di una regola spiegata. Anche a che grado sei si vede: il
+     tuo è acceso, quelli dopo sono in ombra. */
   h+='<div class="cmpH">I CINQUE GRADI</div>';
-  h+='<div class="cmpT cmpI">I gradi <b>non si comprano con i frammenti</b>: si aprono usando '+
-    'l\'edificio, e in campo si pagano in lacrime come sempre. '+
-    'Con questo hai contato <b>'+uccTorre(k)+'</b> caduti — sei al grado <b>'+ROMAN(g)+'</b>.</div>';
   for(let lv=1;lv<=MAXLV;lv++){
     const c=armCosto(k,lv),prezzo=lv===1?'ERIGI <b>◈'+c.passo+'</b>':
       lex('rito',msel)+' <b>◈'+c.passo+'</b> · INVESTITO <b>◈'+c.tot+'</b>';
