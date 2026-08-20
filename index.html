@@ -4067,12 +4067,15 @@ function render(){
   }
   // barre vita sopra a tutto: devono restare leggibili
   for(let i=0;i<G.enemies.length;i++)drawBarra(G.enemies[i]);
-  // cerchio di gittata della torre selezionata
+  // cerchio di gittata della torre selezionata, e il suo grado
   if(G.sel){
     const t=G.sel;
     x.strokeStyle='rgba(201,162,39,.55)';x.lineWidth=1;
     x.beginPath();x.arc(t.x,t.y,t.st.range,0,6.2832);x.stroke();
     x.strokeStyle=C.gold;x.strokeRect(t.x-TILE/2+.5,t.y-TILE/2+.5,TILE-1,TILE-1);
+    // dopo lo ZLIST e dopo le barre vita: così non lo copre nessuna sagoma,
+    // che è tutto il punto — la torre toccata può stare sotto una più alta
+    drawGrado(t);
   }
 
   // proiettili
@@ -4157,6 +4160,25 @@ const ZLIST=[];
 const zy=o=>o.def?o.y+4:o.y+TILE/2;
 const zcmp=(a,b)=>zy(a)-zy(b);
 
+/* Il grado della torre toccata, sulla cima della sua sagoma.
+   Serve perché il grado è codificato nella sagoma stessa, e la sagoma è proprio
+   quel che sparisce quando davanti cresce una torre più alta: al quarto grado
+   una pietra arriva a 34px contro una casella di 16, e fra il 70% e l'83% delle
+   caselle costruibili ne ha un'altra subito sotto.
+   Una barretta e non delle tacche: si legge «quanto è piena» senza contare.
+   Solo sulla selezionata e non su tutte: il sagrato è pieno di fiammelle calde
+   e un segno su ogni torre si leggerebbe come un'altra candela. Così invece
+   compare accanto alla sagoma di cui parla, ed è guardandole insieme che si
+   impara a riconoscere i gradi a occhio. */
+function drawGrado(t){
+  const sp=t.sp, py=t.y+TILE/2-sp.h;
+  const W=11, x0=Math.round(t.x-W/2), y0=Math.round(py)-6;
+  x.fillStyle='rgba(4,3,7,.85)';x.fillRect(x0-1,y0-1,W+2,4);
+  x.fillStyle='#3a3344';x.fillRect(x0,y0,W,2);
+  // al quinto grado bianco, se no l'oro si impasterebbe con l'aureola
+  x.fillStyle=t.lv===MAXLV?'#ffffff':'#f7e08a';
+  x.fillRect(x0,y0,Math.max(2,Math.round(W*t.lv/MAXLV)),2);
+}
 function drawTorre(t){
   const sp=t.sp;
   const py=t.y+TILE/2-sp.h+(t.rec>0?1:0);

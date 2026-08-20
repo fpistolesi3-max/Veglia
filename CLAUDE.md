@@ -103,6 +103,26 @@ per il punto in cui toccano terra (`zy`). Chi ha i piedi più in alto sta dietro
 Non reintrodurre due cicli separati: era il bug per cui i mob passavano sempre
 davanti alle torri.
 
+**Il grado di una torre si legge in due posti, e non è una ripetizione.**
+Le **tacche** alla base (in fondo a `drawTorre`, una per grado oltre il primo,
+sigillo pieno al quinto) sono l'indicatore sempre acceso, quello che si coglie
+senza toccare niente. Ma stanno sul bordo basso della casella, che è la prima
+fascia a sparire quando davanti cresce una torre più alta: la sagoma è ancorata
+col fondo al bordo basso e cresce verso l'alto, e al quarto grado arriva a 34px
+contro una casella di 16. Di una torre coperta resta visibile
+`16 + altezza_sua − altezza_davanti`: un grado 1 sotto un grado 4 si riduce a un
+pixel, tacche comprese. E non è un caso di scuola — fra il 70% e l'83% delle
+caselle costruibili ne ha un'altra costruibile subito sotto.
+
+Perciò la **barretta** (`drawGrado`): compare solo sulla torre toccata, sulla
+cima della sagoma, disegnata dentro il blocco di `G.sel` — cioè dopo lo `ZLIST`
+e dopo le barre vita, così non la copre niente per costruzione. Lunghezza
+proporzionale al grado: si legge «quanto è piena» senza contare. **Solo sulla
+selezionata** e non su tutte: il sagrato è pieno di fiammelle calde e un segno
+dorato su ogni torre si leggerebbe come un'altra candela. Sta accanto alla
+sagoma di cui parla, ed è guardandole insieme che si impara a riconoscere i
+gradi a occhio.
+
 **Sei scenari da venti ondate**, ognuno una partita a sé. Ogni scenario ha il
 proprio percorso; `ROSTER`
 traduce i ruoli (`base`, `fast`, `tank`, `ghost`, `big`, `boss`, `final`) nella
